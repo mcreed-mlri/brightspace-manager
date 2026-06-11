@@ -39,7 +39,7 @@ export default function SettingsPage() {
       </div>
 
       <section className="mt-8 max-w-2xl text-sm text-ink-muted">
-        <h2 className="mb-2 text-base font-semibold text-ink">About mock mode</h2>
+        <h2 className="section-title mb-2 text-ink">About mock mode</h2>
         <p>
           With no credentials configured, every page runs on realistic mock data and shows an amber
           banner. Brightspace stays the system of record: this app reads through secure server-side

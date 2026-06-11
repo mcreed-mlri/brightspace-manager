@@ -35,7 +35,7 @@ export function Drawer({
       />
       <div className="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-line bg-surface shadow-lift">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
-          <h2 className="text-base font-semibold text-ink">{title}</h2>
+          <h2 className="text-[17px] font-bold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}

@@ -62,7 +62,7 @@ export function SyncReportView({
           type="button"
           onClick={() => void runCheck()}
           disabled={running}
-          className="rounded-lg bg-brand-fill px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="btn-primary"
         >
           {running ? "Checking…" : "Run Sync Check"}
         </button>
@@ -103,7 +103,7 @@ export function SyncReportView({
       </div>
 
       <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-ink">Course diagnostics</h2>
+        <h2 className="section-title mb-3 text-ink">Course diagnostics</h2>
         <div className="editorial-card overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-sm">
             <thead>
@@ -152,7 +152,7 @@ export function SyncReportView({
 
       {report.orphans.length > 0 ? (
         <section className="mt-8">
-          <h2 className="mb-3 text-base font-semibold text-ink">Orphaned Supabase rows</h2>
+          <h2 className="section-title mb-3 text-ink">Orphaned Supabase rows</h2>
           <div className="editorial-card divide-y divide-line-soft">
             {report.orphans.map((orphan) => (
               <div key={orphan.providerCourseId} className="flex items-center gap-3 px-5 py-3">

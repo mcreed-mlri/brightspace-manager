@@ -188,11 +188,7 @@ export function CourseInventory({ courses }: { courses: CourseOffering[] }) {
         <EmptyState title="No courses match these filters">
           <p>Try broadening the search or clearing the filters.</p>
           {hasFilters ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-3 rounded-lg border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-sunken"
-            >
+            <button type="button" onClick={clearFilters} className="btn-secondary mt-3">
               Clear filters
             </button>
           ) : null}

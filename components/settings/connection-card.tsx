@@ -56,7 +56,7 @@ export function ConnectionCard({
   return (
     <div className="editorial-card px-5 py-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-semibold text-ink">{title}</h2>
+        <h2 className="text-[17px] font-bold text-ink">{title}</h2>
         {checking ? (
           <StatusBadge tone="info">Checking…</StatusBadge>
         ) : failed ? (
@@ -84,7 +84,7 @@ export function ConnectionCard({
         type="button"
         onClick={() => void runCheck()}
         disabled={checking}
-        className="mt-4 rounded-lg border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-sunken disabled:opacity-50"
+        className="btn-secondary mt-4"
       >
         Re-check connection
       </button>

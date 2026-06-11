@@ -113,12 +113,7 @@ export function DataBrowser({ tables }: { tables: BrowserTable[] }) {
             className="w-72 rounded-lg border border-line bg-surface py-1.5 pl-9 pr-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/30"
           />
         </label>
-        <button
-          type="button"
-          onClick={exportCsv}
-          disabled={filtered.length === 0}
-          className="rounded-lg border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-sunken disabled:opacity-50"
-        >
+        <button type="button" onClick={exportCsv} disabled={filtered.length === 0} className="btn-secondary">
           Export CSV
         </button>
         <span className="ml-auto font-mono text-xs text-ink-soft">

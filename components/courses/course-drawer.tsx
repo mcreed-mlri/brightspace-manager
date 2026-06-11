@@ -98,7 +98,7 @@ export function CourseDrawer({
         href={course.brightspaceUrl}
         target="_blank"
         rel="noreferrer"
-        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-fill px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        className="btn-primary mt-6"
       >
         Open in Brightspace
         <IconExternal size={15} />

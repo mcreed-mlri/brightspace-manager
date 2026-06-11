@@ -99,7 +99,7 @@ export default async function DashboardPage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold text-ink">Needs attention</h2>
+        <h2 className="section-title mb-3 text-ink">Needs attention</h2>
         {sync.warnings.length === 0 && needsAttention.length === 0 ? (
           <p className="text-sm text-ink-muted">Nothing needs attention right now.</p>
         ) : (
