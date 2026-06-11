@@ -16,6 +16,9 @@ npm-debug.log*
 .env*
 !.env.example
 
+# OAuth tokens (rotating refresh token — machine-local, never commit)
+.brightspace-tokens.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

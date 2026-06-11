@@ -1,3 +1,5 @@
+import { hasStoredTokens } from "@/lib/brightspace/tokens";
+
 /* Brightspace configuration health — booleans only, never values.
    Ported from learning-hub lib/brightspace/config.ts, trimmed to the
    credentials this admin tool actually supports. */
@@ -33,7 +35,9 @@ export function getBrightspaceAuthMode(
 }
 
 export function isBrightspaceLive(): boolean {
-  /* Only "token" mode can make live calls in this milestone; "oauth" means
-     credentials exist but the client-credentials flow isn't built yet. */
-  return getBrightspaceAuthMode() === "token";
+  const mode = getBrightspaceAuthMode();
+  if (mode === "token") return true;
+  /* OAuth mode goes live once `npm run authorize` has minted tokens. */
+  if (mode === "oauth") return hasStoredTokens();
+  return false;
 }

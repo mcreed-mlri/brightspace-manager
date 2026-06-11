@@ -1,8 +1,10 @@
 import "server-only";
 
-/* Server-only Brightspace (D2L Valence) fetch helper. Env-token bearer auth
-   only for this milestone — the service-user client-credentials flow comes
-   later. URL pattern: {base}/d2l/api/{product}/{version}{path} */
+import { getAccessToken } from "@/lib/brightspace/tokens";
+
+/* Server-only Brightspace (D2L Valence) fetch helper. Auth comes from the
+   file-backed OAuth token store (rotating refresh), or a long-lived env
+   token override. URL pattern: {base}/d2l/api/{product}/{version}{path} */
 
 export function getBrightspaceBaseUrl() {
   return process.env.BRIGHTSPACE_BASE_URL;
@@ -18,11 +20,10 @@ export function getBrightspaceLeVersion() {
 
 export async function brightspaceApiFetch(path: string) {
   const baseUrl = getBrightspaceBaseUrl();
-  const accessToken = process.env.BRIGHTSPACE_ACCESS_TOKEN;
-
-  if (!baseUrl || !accessToken) {
-    throw new Error("Missing Brightspace base URL or access token.");
+  if (!baseUrl) {
+    throw new Error("Missing BRIGHTSPACE_BASE_URL.");
   }
+  const accessToken = await getAccessToken();
 
   return fetch(`${baseUrl}${path}`, {
     headers: {
@@ -31,6 +32,34 @@ export async function brightspaceApiFetch(path: string) {
     },
     cache: "no-store",
   });
+}
+
+type PagedResultSet<T> = {
+  PagingInfo?: { Bookmark?: string; HasMoreItems?: boolean };
+  Items: T[];
+};
+
+/* Bookmark-based PagedResultSet pagination (capped, like the admin MCP). */
+export async function brightspacePagedGet<T>(basePath: string, maxPages = 50): Promise<T[]> {
+  const items: T[] = [];
+  let bookmark: string | undefined;
+
+  for (let page = 0; page < maxPages; page++) {
+    const separator = basePath.includes("?") ? "&" : "?";
+    const url = bookmark
+      ? `${basePath}${separator}bookmark=${encodeURIComponent(bookmark)}`
+      : basePath;
+    const response = await brightspaceApiFetch(url);
+    if (!response.ok) {
+      throw new Error(`Brightspace API responded ${response.status} for ${basePath}.`);
+    }
+    const json = (await response.json()) as PagedResultSet<T>;
+    items.push(...json.Items);
+    if (!json.PagingInfo?.HasMoreItems || !json.PagingInfo.Bookmark) break;
+    bookmark = json.PagingInfo.Bookmark;
+  }
+
+  return items;
 }
 
 /* Convenience builders for the read endpoints this app will grow into.

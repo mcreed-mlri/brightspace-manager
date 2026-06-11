@@ -2,6 +2,7 @@ import "server-only";
 
 import { brightspaceApiFetch, lpPath } from "@/lib/brightspace/api";
 import { getBrightspaceAuthMode } from "@/lib/brightspace/config";
+import { hasStoredTokens } from "@/lib/brightspace/tokens";
 import { createSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { HealthStatus } from "@/types/domain";
 
@@ -22,13 +23,13 @@ export async function checkBrightspaceHealth(): Promise<HealthStatus> {
     };
   }
 
-  if (mode === "oauth") {
+  if (mode === "oauth" && !hasStoredTokens()) {
     return {
       service: "brightspace",
       status: "unconfigured",
       mode,
       detail:
-        "OAuth client credentials are set, but the service-user flow is not built yet. Set BRIGHTSPACE_ACCESS_TOKEN to test live reads.",
+        "OAuth client is configured but no tokens are minted yet. Run `npm run authorize` once.",
       checkedAt,
     };
   }
