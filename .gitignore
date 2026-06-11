@@ -22,6 +22,9 @@ npm-debug.log*
 # sync write audit log (machine-local)
 sync-audit.jsonl
 
+# NOTE: course-drafts/ is intentionally TRACKED — drafts are canonical course
+# content and git gives them version history and offsite backup.
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
