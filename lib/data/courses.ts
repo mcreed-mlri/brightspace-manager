@@ -7,9 +7,12 @@ import { listLearningItems } from "@/lib/data/learning-items";
 import { mockCourseOfferings } from "@/lib/fixtures/courses";
 import type { CourseOffering, DataResult, SyncState } from "@/types/domain";
 
-/* D2L's built-in org unit type ID for Course Offering is 3; configurable in
-   case the tenant uses a custom type. */
+/* D2L's built-in org unit type ID for Course Offering is 3; the MLRI tenant
+   defines custom types State=103 and Program=101 (see /outypes/). All
+   configurable in case the tenant changes. */
 const COURSE_OFFERING_TYPE_ID = Number(process.env.BRIGHTSPACE_COURSE_OFFERING_TYPE_ID || 3);
+const STATE_TYPE_ID = Number(process.env.BRIGHTSPACE_STATE_TYPE_ID || 103);
+const PROGRAM_TYPE_ID = Number(process.env.BRIGHTSPACE_PROGRAM_TYPE_ID || 101);
 const STALE_AFTER_DAYS = 30;
 const DETAIL_CONCURRENCY = 5;
 
@@ -31,19 +34,23 @@ function computeSyncState(syncedAt: string | null): SyncState {
   return Date.now() - ms > STALE_AFTER_DAYS * 24 * 60 * 60 * 1000 ? "stale" : "synced";
 }
 
-/* Best-effort jurisdiction/program from org structure ancestors. The MLRI
-   hierarchy is Org → State/Jurisdiction → Training Area → Program → … with
-   custom org unit types; match on the type name. */
-function classifyParents(parents: OrgStructureItem[]) {
+/* Jurisdiction/program from org structure ancestors. The MLRI hierarchy is
+   Org → State (103) → Training Area (105) → Program (101) → Course Template
+   → Course Offering. Match on type ID first, type name as fallback. */
+function classifyAncestors(ancestors: OrgStructureItem[]) {
   let jurisdiction: string | null = null;
   let program: string | null = null;
-  for (const parent of parents) {
-    const typeName = `${parent.Type?.Name ?? ""} ${parent.Type?.Code ?? ""}`.toLowerCase();
-    if (!jurisdiction && (typeName.includes("jurisdiction") || typeName.includes("state"))) {
-      jurisdiction = parent.Name;
+  for (const ancestor of ancestors) {
+    const typeId = ancestor.Type?.Id;
+    const typeName = `${ancestor.Type?.Name ?? ""} ${ancestor.Type?.Code ?? ""}`.toLowerCase();
+    if (
+      !jurisdiction &&
+      (typeId === STATE_TYPE_ID || typeName.includes("state") || typeName.includes("jurisdiction"))
+    ) {
+      jurisdiction = ancestor.Name;
     }
-    if (!program && typeName.includes("program")) {
-      program = parent.Name;
+    if (!program && (typeId === PROGRAM_TYPE_ID || typeName.includes("program"))) {
+      program = ancestor.Name;
     }
   }
   return { jurisdiction, program };
@@ -88,10 +95,10 @@ async function fetchLiveCourseOfferings(): Promise<CourseOffering[]> {
       let jurisdiction: string | null = null;
       let program: string | null = null;
       try {
-        const response = await brightspaceApiFetch(lpPath(`/orgstructure/${orgUnitId}/parents/`));
+        const response = await brightspaceApiFetch(lpPath(`/orgstructure/${orgUnitId}/ancestors/`));
         if (response.ok) {
-          const parents = (await response.json()) as OrgStructureItem[];
-          ({ jurisdiction, program } = classifyParents(parents));
+          const ancestors = (await response.json()) as OrgStructureItem[];
+          ({ jurisdiction, program } = classifyAncestors(ancestors));
         }
       } catch {
         /* keep nulls — flagged as missing metadata, which is honest */

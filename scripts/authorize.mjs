@@ -50,6 +50,13 @@ async function main() {
   const scope = env.BRIGHTSPACE_SCOPE || DEFAULT_SCOPE;
   const state = randomBytes(16).toString("base64url");
 
+  /* Non-interactive modes so the flow can be split across two invocations:
+       node scripts/authorize.mjs --print-url      → emit the auth URL only
+       node scripts/authorize.mjs "<callback-url>" → exchange and save tokens */
+  const args = process.argv.slice(2);
+  const printOnly = args.includes("--print-url");
+  const pastedArg = args.find((a) => !a.startsWith("--"));
+
   const authUrl =
     AUTH_URL +
     "?" +
@@ -62,20 +69,28 @@ async function main() {
       prompt: "consent",
     }).toString();
 
-  console.log("\nOpening your browser to Brightspace for authorization...");
-  console.log("(If it doesn't open automatically, paste this URL into your browser:)\n");
-  console.log(`  ${authUrl}\n`);
-  if (process.platform === "win32") {
-    exec(`start "" "${authUrl.replace(/&/g, "^&")}"`);
+  if (printOnly) {
+    console.log(authUrl);
+    return;
   }
 
-  console.log("After you log in and approve access, the browser will be redirected to");
-  console.log(`${redirectUri}?code=... and show a connection error — that's expected.`);
-  console.log("Copy the FULL URL from the address bar and paste it below.\n");
+  let pasted = pastedArg ?? "";
+  if (!pasted) {
+    console.log("\nOpening your browser to Brightspace for authorization...");
+    console.log("(If it doesn't open automatically, paste this URL into your browser:)\n");
+    console.log(`  ${authUrl}\n`);
+    if (process.platform === "win32") {
+      exec(`start "" "${authUrl.replace(/&/g, "^&")}"`);
+    }
 
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const pasted = (await rl.question("Callback URL (or just the code): ")).trim();
-  rl.close();
+    console.log("After you log in and approve access, the browser will be redirected to");
+    console.log(`${redirectUri}?code=... and show a connection error — that's expected.`);
+    console.log("Copy the FULL URL from the address bar and paste it below.\n");
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    pasted = (await rl.question("Callback URL (or just the code): ")).trim();
+    rl.close();
+  }
 
   let code = pasted;
   if (pasted.toLowerCase().startsWith("http")) {
@@ -86,7 +101,9 @@ async function main() {
       console.error("No ?code= found in the URL you pasted.");
       process.exit(1);
     }
-    if (returnedState && returnedState !== state) {
+    /* When the URL arrives via a separate invocation the in-memory state
+       differs by design; only enforce it in same-session interactive mode. */
+    if (!pastedArg && returnedState && returnedState !== state) {
       console.error("State mismatch — possible CSRF or stale URL. Run the script again.");
       process.exit(1);
     }
