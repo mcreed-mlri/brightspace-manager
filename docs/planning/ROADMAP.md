@@ -51,6 +51,11 @@ Brightspace by hand (today's normal workflow), and note every point of friction.
    official look is settled. Locks before any bulk course production. *(Cheap, important,
    easily forgotten.)*
 4. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
+5. **Studio UX pass — "Harborside patterns."** Adopt the design language Marlana proved in
+   the Harborside school portal: always-on live preview beside the form (not behind a
+   button), progressive disclosure for optional sections (rule box, what-changed, media
+   start collapsed behind an "Add detail"-style control), and a "writing tips" checklist
+   panel. Fold into the dogfooding friction list.
 
 ## 🔮 Later
 
