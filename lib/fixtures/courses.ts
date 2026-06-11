@@ -1,0 +1,150 @@
+import type { CourseOffering } from "@/types/domain";
+
+/* Mock Massachusetts course inventory. Org units 6703 (Eviction Defense,
+   the live validation target) and 6707 (Blank-Course) are real; the rest
+   are realistic invented entries that exercise every filter state. */
+
+const BASE = "https://mlri.brightspace.com";
+
+function bsUrl(orgUnitId: number) {
+  return `${BASE}/d2l/home/${orgUnitId}`;
+}
+
+function daysAgo(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
+
+export const mockCourseOfferings: CourseOffering[] = [
+  {
+    orgUnitId: 6703,
+    name: "Eviction Defense: The First 48 Hours",
+    code: "MA-HOU-EVIC-101",
+    jurisdiction: "Massachusetts",
+    program: "Housing",
+    isActive: true,
+    lastSyncedAt: daysAgo(0.2),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6703),
+  },
+  {
+    orgUnitId: 6707,
+    name: "Blank-Course",
+    code: "",
+    jurisdiction: null,
+    program: null,
+    isActive: true,
+    lastSyncedAt: null,
+    syncState: "never-synced",
+    brightspaceUrl: bsUrl(6707),
+  },
+  {
+    orgUnitId: 6712,
+    name: "Summary Process: Answer and Discovery",
+    code: "MA-HOU-SP-102",
+    jurisdiction: "Massachusetts",
+    program: "Housing",
+    isActive: true,
+    lastSyncedAt: daysAgo(1),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6712),
+  },
+  {
+    orgUnitId: 6718,
+    name: "SNAP Benefits: Eligibility and Appeals",
+    code: "MA-BEN-SNAP-101",
+    jurisdiction: "Massachusetts",
+    program: "Benefits",
+    isActive: true,
+    lastSyncedAt: daysAgo(3),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6718),
+  },
+  {
+    orgUnitId: 6721,
+    name: "Emergency Assistance Shelter Advocacy",
+    code: "MA-BEN-EA-201",
+    jurisdiction: "Massachusetts",
+    program: "Benefits",
+    isActive: true,
+    lastSyncedAt: daysAgo(40),
+    syncState: "stale",
+    brightspaceUrl: bsUrl(6721),
+  },
+  {
+    orgUnitId: 6726,
+    name: "209A Protective Orders: Practice Basics",
+    code: "MA-FAM-209A-101",
+    jurisdiction: "Massachusetts",
+    program: "Family",
+    isActive: true,
+    lastSyncedAt: daysAgo(5),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6726),
+  },
+  {
+    orgUnitId: 6731,
+    name: "Debt Collection Defense in District Court",
+    code: "MA-CON-DEBT-101",
+    jurisdiction: "Massachusetts",
+    program: "Consumer",
+    isActive: true,
+    lastSyncedAt: daysAgo(6),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6731),
+  },
+  {
+    orgUnitId: 6735,
+    name: "Welcome to LACE",
+    code: "MA-FND-LACE-100",
+    jurisdiction: "Massachusetts",
+    program: "Foundations",
+    isActive: true,
+    lastSyncedAt: daysAgo(2),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6735),
+  },
+  {
+    orgUnitId: 6739,
+    name: "Trauma-Informed Client Interviewing",
+    code: "MA-FND-TICI-201",
+    jurisdiction: "Massachusetts",
+    program: null,
+    isActive: true,
+    lastSyncedAt: daysAgo(8),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6739),
+  },
+  {
+    orgUnitId: 6741,
+    name: "Unemployment Insurance Hearings (2024)",
+    code: "MA-BEN-UI-101",
+    jurisdiction: "Massachusetts",
+    program: "Benefits",
+    isActive: false,
+    lastSyncedAt: daysAgo(120),
+    syncState: "stale",
+    brightspaceUrl: bsUrl(6741),
+  },
+  {
+    orgUnitId: 6744,
+    name: "Legal Writing Archive",
+    code: "MA-SKL-WRIT-ARC",
+    jurisdiction: "Massachusetts",
+    program: "Legal Skills",
+    isActive: false,
+    lastSyncedAt: daysAgo(200),
+    syncState: "stale",
+    brightspaceUrl: bsUrl(6744),
+  },
+  {
+    orgUnitId: 6748,
+    name: "Housing Conditions: Code Enforcement Clinic",
+    code: "MA-HOU-COND-201",
+    jurisdiction: "Massachusetts",
+    program: "Housing",
+    isActive: true,
+    lastSyncedAt: daysAgo(0.5),
+    syncState: "synced",
+    brightspaceUrl: bsUrl(6748),
+  },
+];

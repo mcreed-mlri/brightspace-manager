@@ -1,0 +1,29 @@
+{
+  "name": "Brightspace Manager",
+  "short_name": "BS Manager",
+  "description": "Internal admin console for the LACE learning platform.",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#f5f6f8",
+  "theme_color": "#14161b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
