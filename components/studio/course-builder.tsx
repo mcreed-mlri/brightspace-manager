@@ -583,6 +583,72 @@ function TopicEditor({
       </div>
 
       <div className="rounded-lg border border-line-soft bg-paper px-3.5 py-3">
+        <p className="mb-1 text-sm font-medium text-ink">Media placeholders</p>
+        <p className="mb-3 text-xs text-ink-muted">
+          Name the image file and where it goes — the export adds an{" "}
+          <code className="font-mono text-[11px]">images/README.txt</code> listing what to drop in
+          before uploading to Brightspace.
+        </p>
+        <div className="space-y-2">
+          {(topic.media ?? []).map((media, i) => (
+            <div key={i} className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_1fr_1fr_auto_auto]">
+              <input
+                className={inputClass}
+                placeholder="filename.png"
+                value={media.filename}
+                onChange={(e) => onChange((t) => void (t.media[i].filename = e.target.value))}
+              />
+              <input
+                className={inputClass}
+                placeholder="Alt text (what the image shows)"
+                value={media.alt}
+                onChange={(e) => onChange((t) => void (t.media[i].alt = e.target.value))}
+              />
+              <input
+                className={inputClass}
+                placeholder="Caption (optional)"
+                value={media.caption}
+                onChange={(e) => onChange((t) => void (t.media[i].caption = e.target.value))}
+              />
+              <select
+                className={inputClass}
+                value={media.placement}
+                onChange={(e) =>
+                  onChange(
+                    (t) => void (t.media[i].placement = e.target.value as "scenario" | "rule"),
+                  )
+                }
+                aria-label="Placement"
+              >
+                <option value="scenario">after §1 Scenario</option>
+                <option value="rule">after §2 Rule</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => onChange((t) => void t.media.splice(i, 1))}
+                className="rounded p-1 text-ink-soft hover:bg-surface-sunken hover:text-status-error"
+                aria-label="Remove image"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              onChange((t) => {
+                if (!t.media) t.media = [];
+                t.media.push({ filename: "", alt: "", caption: "", placement: "scenario" });
+              })
+            }
+            className="btn-secondary"
+          >
+            + Add image placeholder
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-line-soft bg-paper px-3.5 py-3">
         <p className="mb-3 text-sm font-medium text-ink">§ Try it — one question, the climax</p>
         <Field label="Question">
           <textarea

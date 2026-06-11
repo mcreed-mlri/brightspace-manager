@@ -39,6 +39,15 @@ export async function GET(request: NextRequest, { params }: Params) {
       );
     }
 
+    /* Image files don't exist yet (placeholders) — render a labeled box so
+       the preview shows where each figure will sit. */
+    html = html.replace(
+      /<img src="images\/([^"]+)" alt="([^"]*)"[^>]*\/>/g,
+      (_match, filename, alt) =>
+        `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:120px;border:2px dashed var(--line, #d3d8e0);border-radius:10px;color:var(--muted, #8b909d);font-size:0.8rem;">` +
+        `<span style="font-size:1.4rem;">🖼</span><strong>images/${filename}</strong><span>${alt}</span></div>`,
+    );
+
     const body: ApiResponse<{ html: string }> = {
       ok: true,
       data: { html },

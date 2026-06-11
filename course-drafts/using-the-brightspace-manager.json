@@ -1,0 +1,55 @@
+{
+  "id": "using-the-brightspace-manager",
+  "createdAt": "2026-06-11T19:32:39.215Z",
+  "updatedAt": "2026-06-11T19:32:39.215Z",
+  "courseId": "using-the-brightspace-manager",
+  "courseTitle": "Using the Brightspace Manager",
+  "courseSubtitle": "",
+  "courseBlurb": "",
+  "courseArea": "",
+  "topic": "foundations",
+  "chromeMode": "bar",
+  "homeLinkUrl": "https://lms-discovery.vercel.app/",
+  "modules": [
+    {
+      "id": "module-1",
+      "title": "Using the Brightspace Manager",
+      "description": "",
+      "topics": [
+        {
+          "slug": "topic-1",
+          "title": "First topic",
+          "kind": "Concept",
+          "minutes": 3,
+          "description": "",
+          "updated": "",
+          "standfirst": "",
+          "scenario": "",
+          "rule": "",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "",
+            "options": [
+              {
+                "text": "",
+                "correct": false
+              },
+              {
+                "text": "",
+                "correct": true
+              },
+              {
+                "text": "",
+                "correct": false
+              }
+            ],
+            "answer": ""
+          },
+          "remember": []
+        }
+      ]
+    }
+  ]
+}

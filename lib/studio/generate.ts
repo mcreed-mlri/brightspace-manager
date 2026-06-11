@@ -169,6 +169,29 @@ function whatChangedSection(topic: TopicDraft): string {
 `;
 }
 
+/* Media figures — markup is self-contained (inline styles on wrapper CSS
+   variables with fallbacks) because course-style.css has no figure rules
+   yet. When the official look lands, move this styling into the wrapper
+   and slim the inline styles here. */
+function mediaFigures(topic: TopicDraft, placement: "scenario" | "rule"): string {
+  const figures = (topic.media ?? []).filter((m) => m.placement === placement && m.filename.trim());
+  if (figures.length === 0) return "";
+  return (
+    figures
+      .map(
+        (m) => `      <figure class="media-figure" style="margin:1.25rem 0;">
+        <img src="images/${escapeHtml(m.filename.trim())}" alt="${escapeHtml(m.alt)}"
+             style="display:block;max-width:100%;border:1px solid var(--line, #e4e7ed);border-radius:10px;" />${
+               m.caption.trim()
+                 ? `\n        <figcaption style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted, #565c69);">${inline(m.caption)}</figcaption>`
+                 : ""
+             }
+      </figure>`,
+      )
+      .join("\n") + "\n"
+  );
+}
+
 function ruleBox(topic: TopicDraft): string {
   const items = topic.ruleBoxItems.filter((i) => i.trim());
   if (items.length === 0) return "";
@@ -279,7 +302,7 @@ export function generateTopicHtml(draft: CourseDraft, slug: string): string {
         <span class="sr-label">The scenario</span>
       </div>
 ${paragraphs(topic.scenario)}
-    </section>
+${mediaFigures(topic, "scenario")}    </section>
 
     <!-- ── § 2 · The rule ───────────────────────────────────────────────── -->
     <section class="section">
@@ -289,7 +312,7 @@ ${paragraphs(topic.scenario)}
         <span class="sr-label">The rule</span>
       </div>
 ${paragraphs(topic.rule)}
-${ruleBox(topic)}    </section>
+${ruleBox(topic)}${mediaFigures(topic, "rule")}    </section>
 
 ${whatChangedSection(topic)}${tryItSection(topic).replace("§ 4", `§ ${tryItNum}`)}
 
@@ -345,6 +368,18 @@ export function validateDraft(draft: CourseDraft): string[] {
   return problems;
 }
 
+export function referencedImages(draft: CourseDraft): string[] {
+  return [
+    ...new Set(
+      draft.modules
+        .flatMap((m) => m.topics)
+        .flatMap((t) => t.media ?? [])
+        .map((m) => m.filename.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
 export async function buildPackageFiles(draft: CourseDraft): Promise<Map<string, string>> {
   const files = new Map<string, string>();
   files.set("course-config.js", generateConfigJs(draft));
@@ -353,6 +388,17 @@ export async function buildPackageFiles(draft: CourseDraft): Promise<Map<string,
   }
   for (const name of WRAPPER_FILES) {
     files.set(name, await readWrapperFile(name));
+  }
+
+  const images = referencedImages(draft);
+  if (images.length > 0) {
+    files.set(
+      "images/README.txt",
+      "This course references the following images.\n" +
+        "Drop each file into this folder before uploading to Brightspace:\n\n" +
+        images.map((name) => `  - ${name}`).join("\n") +
+        "\n",
+    );
   }
   return files;
 }

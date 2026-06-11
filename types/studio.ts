@@ -23,6 +23,18 @@ export type TryItOption = {
   correct: boolean;
 };
 
+/* A media placeholder: the Studio records WHERE an image goes and its
+   filename — the actual file is dropped into the package's images/ folder
+   (and later, Brightspace Manage Files). */
+export type TopicMedia = {
+  /* filename inside images/, e.g. "notice-timeline.png" */
+  filename: string;
+  alt: string;
+  caption: string;
+  /* which section the figure appears after */
+  placement: "scenario" | "rule";
+};
+
 export type WhatChanged = {
   /* e.g. "Law changed · 3 days ago" */
   pill: string;
@@ -48,6 +60,8 @@ export type TopicDraft = {
   /* §2 optional callout box with an ordered list */
   ruleBoxLabel: string;
   ruleBoxItems: string[];
+  /* image placeholders — files land in images/ at upload time */
+  media: TopicMedia[];
   /* §3 — optional; omit by leaving heading empty */
   whatChanged: WhatChanged | null;
   /* §4 */
@@ -111,6 +125,7 @@ export function emptyTopic(slug: string, title: string): TopicDraft {
     rule: "",
     ruleBoxLabel: "",
     ruleBoxItems: [],
+    media: [],
     whatChanged: null,
     tryIt: {
       question: "",
