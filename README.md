@@ -68,6 +68,12 @@ Copy `.env.example` to `.env.local` and fill in:
 API versions are configurable (`BRIGHTSPACE_LP_VERSION`, `BRIGHTSPACE_LE_VERSION`) — never
 assume an endpoint version is final.
 
+## Where features belong
+
+See [docs/admin-boundaries.md](docs/admin-boundaries.md) for the working agreement on what
+lives here vs. in Learning Hub admin. Short version: this app operates the *platform* and is
+the only surface that writes; the hub operates the *learning program* and reads.
+
 ## Code map
 
 ```
