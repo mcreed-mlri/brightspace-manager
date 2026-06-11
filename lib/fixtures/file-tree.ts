@@ -1,7 +1,9 @@
 import type { FileNode } from "@/types/domain";
 
-/* Mock Manage Files tree for org unit 6703, following the LACE course
-   package convention (Home.html + topic pages + shared wrapper assets). */
+/* Mock Manage Files trees following the LACE course package convention
+   (Home.html + topic pages + shared wrapper assets). Org unit 6703 has a
+   detailed tree; other org units get a generic package so the course
+   picker has something realistic to show. */
 
 export const mockFileTree: FileNode = {
   name: "Course-Files",
@@ -108,3 +110,81 @@ export const mockFileTree: FileNode = {
     },
   ],
 };
+
+const WRAPPER_FILES: FileNode[] = [
+  {
+    name: "course-config.js",
+    path: "/course-config.js",
+    kind: "file",
+    sizeBytes: 3_120,
+    modifiedAt: "2026-05-20T11:00:00Z",
+  },
+  {
+    name: "course-nav.js",
+    path: "/course-nav.js",
+    kind: "file",
+    sizeBytes: 31_540,
+    modifiedAt: "2026-05-12T10:02:00Z",
+  },
+  {
+    name: "course-style.css",
+    path: "/course-style.css",
+    kind: "file",
+    sizeBytes: 27_366,
+    modifiedAt: "2026-05-12T10:02:00Z",
+  },
+];
+
+export function mockFileTreeFor(orgUnitId: number): FileNode {
+  if (orgUnitId === 6703) return mockFileTree;
+  return {
+    name: "Course-Files",
+    path: "/",
+    kind: "folder",
+    children: [
+      {
+        name: "Home.html",
+        path: "/Home.html",
+        kind: "file",
+        sizeBytes: 11_840,
+        modifiedAt: "2026-05-20T11:00:00Z",
+      },
+      {
+        name: "01-overview.html",
+        path: "/01-overview.html",
+        kind: "file",
+        sizeBytes: 18_204,
+        modifiedAt: "2026-05-20T11:02:00Z",
+      },
+      {
+        name: "02-practice.html",
+        path: "/02-practice.html",
+        kind: "file",
+        sizeBytes: 20_115,
+        modifiedAt: "2026-05-20T11:03:00Z",
+      },
+      {
+        name: "complete.html",
+        path: "/complete.html",
+        kind: "file",
+        sizeBytes: 8_540,
+        modifiedAt: "2026-05-20T11:04:00Z",
+      },
+      ...WRAPPER_FILES,
+      {
+        name: "images",
+        path: "/images",
+        kind: "folder",
+        children: [
+          {
+            name: "module-diagram.png",
+            path: "/images/module-diagram.png",
+            kind: "file",
+            sizeBytes: 96_410,
+            modifiedAt: "2026-05-20T10:55:00Z",
+          },
+        ],
+      },
+    ],
+  };
+}

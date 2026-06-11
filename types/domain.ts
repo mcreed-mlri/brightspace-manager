@@ -58,6 +58,34 @@ export type SyncStatus = {
   warnings: SyncWarning[];
 };
 
+/* Per-course result of a sync check. */
+export type DiagnosticState = "healthy" | "needs-review" | "broken" | "unknown";
+
+export type CourseDiagnostic = {
+  orgUnitId: number;
+  name: string;
+  state: DiagnosticState;
+  issues: string[];
+};
+
+/* Supabase row with no matching Brightspace course offering. */
+export type SupabaseOrphan = {
+  providerCourseId: string;
+  title: string;
+  reason: string;
+};
+
+export type SyncReport = {
+  ranAt: string;
+  coursesInBrightspace: number;
+  coursesInSupabase: number;
+  healthy: number;
+  needsReview: number;
+  broken: number;
+  diagnostics: CourseDiagnostic[];
+  orphans: SupabaseOrphan[];
+};
+
 export type HealthState = "ok" | "error" | "unconfigured";
 
 export type HealthStatus = {

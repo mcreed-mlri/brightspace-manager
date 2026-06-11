@@ -1,84 +1,66 @@
-import { EmptyState } from "@/components/empty-state";
-import { IconDatabase } from "@/components/icons";
+import { DataBrowser, type BrowserTable } from "@/components/supabase/data-browser";
+import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
-import { previewLearningItems } from "@/lib/data/learning-items";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
+import { listLearningItems } from "@/lib/data/learning-items";
+import { mockJurisdictions, mockPrograms, mockTags } from "@/lib/fixtures/supabase-tables";
 
 export const dynamic = "force-dynamic";
 
 export default async function SupabaseDataPage() {
-  const configured = isSupabaseConfigured();
-  const items = configured ? await previewLearningItems(10) : null;
+  const items = await listLearningItems();
+
+  const tables: BrowserTable[] = [
+    {
+      key: "learning_items",
+      label: "learning_items",
+      description:
+        "The course catalog cache synced from Brightspace. Rows are keyed on provider_course_id (the Brightspace org unit ID).",
+      columns: ["title", "item_type", "provider_course_id", "practice_area", "synced_at"],
+      rows: items.data as unknown as Record<string, unknown>[],
+      source: items.source,
+    },
+    {
+      key: "jurisdictions",
+      label: "jurisdictions",
+      description:
+        "Planned reference table — which states LACE serves. Mock preview of the intended shape until the live table exists.",
+      columns: ["code", "name", "active", "course_count"],
+      rows: mockJurisdictions,
+      source: "mock",
+    },
+    {
+      key: "programs",
+      label: "programs",
+      description:
+        "Planned reference table — program/practice-area categories used across the catalog. Mock preview.",
+      columns: ["name", "practice_area", "course_count"],
+      rows: mockPrograms,
+      source: "mock",
+    },
+    {
+      key: "tags",
+      label: "tags",
+      description: "Planned reference table — catalog tags and how often each is used. Mock preview.",
+      columns: ["name", "usage_count"],
+      rows: mockTags,
+      source: "mock",
+    },
+  ];
 
   return (
     <>
       <PageHeader
         title="Supabase Data"
-        description="Read-only inspector for the Supabase cache layer — learning_items first, with jurisdictions, programs, and tags to follow."
+        description="Read-only inspector for the Supabase cache layer. Search, sort, open a row for full detail, or export the current view to CSV."
         actions={<StatusBadge tone="info">Read-only</StatusBadge>}
       />
-
-      {items && items.length > 0 ? (
-        <div className="editorial-card overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-line text-left">
-                {["Title", "Type", "Provider course", "Practice area", "Synced"].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-[11px] font-medium uppercase tracking-wider text-ink-soft"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-b border-line-soft last:border-b-0">
-                  <td className="px-4 py-3 font-medium text-ink">{item.title}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-ink-muted">{item.item_type}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-ink-muted">
-                    {item.provider_course_id ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-ink-muted">{item.practice_area ?? "—"}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-ink-muted">
-                    {item.synced_at ? item.synced_at.slice(0, 10) : "never"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="border-t border-line-soft px-4 py-2.5 text-xs text-ink-soft">
-            Live preview — 10 most recently updated learning_items rows.
-          </p>
-        </div>
-      ) : (
-        <EmptyState
-          icon={<IconDatabase size={28} />}
-          title={configured ? "No rows in learning_items yet" : "Supabase is not connected"}
-        >
-          {configured ? (
-            <p>The cache table is reachable but empty. Run a Brightspace sync to populate it.</p>
-          ) : (
-            <>
-              <p>
-                Once Supabase credentials are configured in Settings, this tab becomes a searchable,
-                filterable browser for the cache tables:
-              </p>
-              <ul className="mt-2 list-inside list-disc text-left">
-                <li>learning_items — the course catalog cache</li>
-                <li>jurisdictions, programs, and tags</li>
-                <li>tracking and usage data, when available</li>
-              </ul>
-              <p className="mt-2">
-                Views stay read-only — no destructive SQL from this UI, ever.
-              </p>
-            </>
-          )}
-        </EmptyState>
-      )}
+      {items.source === "mock" ? <MockDataBanner /> : null}
+      <DataBrowser tables={tables} />
+      <p className="mt-6 text-xs text-ink-soft">
+        No destructive SQL runs from this UI — ever. Writes to Supabase happen only through the
+        logged sync pipeline in a later milestone.
+      </p>
     </>
   );
 }
