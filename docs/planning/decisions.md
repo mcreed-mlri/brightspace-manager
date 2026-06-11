@@ -5,6 +5,7 @@ re-litigating. Newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-06-11 | "Own the content, rent the LMS" — preserve LMS-exit optionality, don't build an LMS | 3-yr D2L contract (~2029 re-eval); content stays in JSON/Supabase, D2L behind adapters; option is leverage even if never exercised |
 | 2026-06-11 | Course drafts (`course-drafts/*.json`) are **tracked in git** | They're canonical content; git = free version history + offsite backup for a solo maintainer |
 | 2026-06-11 | Studio owns what Studio creates — no round-trip parsing of hand-made HTML | Parsing arbitrary HTML back to fields is unreliable; hand-made courses stay read-only / integrity-checked |
 | 2026-06-11 | Drafts are canonical, HTML is a build artifact | "Official look" changes = bump wrapper + regenerate all courses from JSON |

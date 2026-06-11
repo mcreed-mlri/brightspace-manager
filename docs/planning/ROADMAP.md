@@ -8,6 +8,13 @@ This file is the steering wheel. When a new idea shows up (they always do), it g
 **Parking lot** — not into the week. Promote things from the parking lot deliberately, when a
 Now slot opens. One thing in **Now** at a time.
 
+> **The horizon bet — "own the content, rent the LMS."** MLRI is contracted with D2L for
+> ~3 years (re-evaluate around 2029). We don't plan to build an LMS; we keep making the
+> choices that preserve the option: course content lives in drafts (JSON) + Supabase, the
+> wrapper is plain HTML/CSS/JS, and every D2L touchpoint stays behind an adapter in the data
+> layer. If D2L earns renewal, nothing is wasted. If not, the content walks out the door.
+> No work item may couple course *content* to D2L-specific formats.
+
 ---
 
 ## Focus rules (read me when excited about a new idea)
