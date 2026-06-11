@@ -19,6 +19,9 @@ npm-debug.log*
 # OAuth tokens (rotating refresh token — machine-local, never commit)
 .brightspace-tokens.json
 
+# sync write audit log (machine-local)
+sync-audit.jsonl
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

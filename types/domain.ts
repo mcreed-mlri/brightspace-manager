@@ -86,6 +86,38 @@ export type SyncReport = {
   orphans: SupabaseOrphan[];
 };
 
+/* A planned change to one learning_items row, computed before any write. */
+export type SyncPlanItem = {
+  orgUnitId: number;
+  name: string;
+  action: "create" | "update";
+  changes: string[];
+};
+
+export type SyncPlan = {
+  builtAt: string;
+  toCreate: SyncPlanItem[];
+  toUpdate: SyncPlanItem[];
+  unchanged: number;
+  /* Rows left alone because their Brightspace course vanished — never deleted. */
+  orphansLeftAlone: number;
+};
+
+export type SyncRunResult = {
+  ranAt: string;
+  created: number;
+  updated: number;
+  failed: number;
+  errors: string[];
+};
+
+export type SyncAuditEntry = {
+  ranAt: string;
+  created: number;
+  updated: number;
+  failed: number;
+};
+
 export type HealthState = "ok" | "error" | "unconfigured";
 
 export type HealthStatus = {

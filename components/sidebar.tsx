@@ -79,8 +79,8 @@ export function Sidebar() {
 
       <div className="border-t border-line px-3 py-3 lg:px-5">
         <span className="hidden items-center gap-2 text-[11px] text-ink-soft lg:flex">
-          <span className="h-2 w-2 rounded-full bg-status-warn" aria-hidden />
-          Read-only · v0.1
+          <span className="h-2 w-2 rounded-full bg-status-ok" aria-hidden />
+          v0.2 · writes: sync only
         </span>
         <span className="flex justify-center lg:hidden">
           <span className="h-2 w-2 rounded-full bg-status-warn" aria-hidden />
