@@ -1,37 +1,16 @@
 import "server-only";
 
+import { escapeHtml, inline, paragraphs } from "@/lib/studio/inline";
 import { readWrapperFile, WRAPPER_FILES } from "@/lib/studio/template";
 import type { CourseDraft, TopicDraft } from "@/types/studio";
 
 /* Generates the LACE course package from a draft, faithful to the structures
    in brightspace-courses/Course-Template. Only course-config.js and the topic
    pages are generated — Home.html and complete.html render themselves from
-   the config at runtime and ship verbatim. */
+   the config at runtime and ship verbatim. Text helpers (escape + markdown-
+   lite) live in lib/studio/inline.ts, shared with the live preview. */
 
-/* ── text helpers — escape everything, then allow **bold** and _italic_ ──── */
-
-export function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-export function inline(text: string): string {
-  return escapeHtml(text)
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/_([^_]+)_/g, "<em>$1</em>");
-}
-
-function paragraphs(text: string, className = "prose"): string {
-  return text
-    .split(/\r?\n\s*\r?\n/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => `      <p class="${className}">${inline(p).replace(/\r?\n/g, " ")}</p>`)
-    .join("\n");
-}
+export { escapeHtml, inline };
 
 function jsString(text: string): string {
   return JSON.stringify(text);

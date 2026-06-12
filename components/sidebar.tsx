@@ -51,10 +51,7 @@ const AUTHOR_NAV: NavGroup[] = [
 const OPERATOR_NAV: NavGroup[] = [
   {
     label: null,
-    items: [
-      { label: "Dashboard", href: "/dashboard/", icon: IconDashboard },
-      { label: "Course Studio", href: "/course-studio/", icon: IconStudio },
-    ],
+    items: [{ label: "Dashboard", href: "/dashboard/", icon: IconDashboard }],
   },
   {
     label: "Monitor",
@@ -93,8 +90,8 @@ const OPERATOR_PREFIXES = [
 
 function deriveMode(pathname: string): Mode | null {
   if (OPERATOR_PREFIXES.some((p) => pathname.startsWith(p))) return "operator";
-  if (pathname === "/") return "author";
-  /* shared routes (/course-studio, /learners): keep the current mode */
+  if (pathname === "/" || pathname.startsWith("/course-studio")) return "author";
+  /* shared routes (/learners): keep the current mode */
   return null;
 }
 
