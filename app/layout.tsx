@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, IBM_Plex_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Providers } from "./providers";
 import "./globals.css";
 
-// Geist — app-wide sans. IBM Plex Mono — org unit IDs, codes, counts.
-// Both exposed as CSS vars consumed in globals.css (same pattern as the hub).
-const geist = Geist({
+// Inter — app-wide sans (design handoff v3). IBM Plex Mono — org unit IDs,
+// codes, counts. Both exposed as CSS vars consumed in globals.css.
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-geist",
+  variable: "--font-inter",
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -51,7 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} ${plexMono.variable}`}>
+      <body className={`${inter.variable} ${plexMono.variable}`}>
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

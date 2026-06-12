@@ -30,6 +30,16 @@ const config: Config = {
           strong: "var(--line-strong)",
           soft: "var(--line-soft)",
         },
+        hover: "var(--hover)",
+        // Dark sidebar rail (design handoff v3)
+        sb: {
+          DEFAULT: "var(--sb)",
+          ink: "var(--sb-ink)",
+          muted: "var(--sb-muted)",
+          hover: "var(--sb-hover)",
+          active: "var(--sb-active)",
+          line: "var(--sb-line)",
+        },
         brand: {
           DEFAULT: "var(--brand)",
           ink: "var(--brand-ink)",

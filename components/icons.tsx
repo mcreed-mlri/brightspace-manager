@@ -29,6 +29,26 @@ export function IconDashboard(props: IconProps) {
   );
 }
 
+export function IconHome(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 10l9-7 9 7v11H3z" />
+      <rect x="9" y="14" width="5" height="7" rx="0.5" />
+    </svg>
+  );
+}
+
+export function IconLearners(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="9" cy="7.5" r="3.5" />
+      <path d="M2 21c0-4 3.1-6 7-6s7 2 7 6" />
+      <circle cx="17.5" cy="7" r="2.5" />
+      <path d="M16.5 11c2.5 0 4.5 1.5 4.5 4.5" />
+    </svg>
+  );
+}
+
 export function IconCourses(props: IconProps) {
   return (
     <svg {...base(props)}>

@@ -38,6 +38,8 @@ Now slot opens. One thing in **Now** at a time.
 | M4 — Sync pipeline (first write) | Preview → confirm → upsert learning_items → audit log | 2026-06-11 |
 | M5 — Course Studio Phase A | Template library, five-section course builder, topic preview, ZIP package export; drafts tracked in git | 2026-06-11 |
 | Theme | Hub "Studio" design system: tokens, type scale, button system | 2026-06-11 |
+| M6 — Sign-in (team access) | Supabase Auth email codes, invite-only; middleware + per-route `requireUser()`; audit log records who ran each sync; SW network-first navigations. Setup: [docs/auth-setup.md](../auth-setup.md) | 2026-06-12 |
+| M7 — Design handoff v3 (Studio UX pass) | Recreated the Claude-Design prototype (`design_handoff_brightspace_manager/`): dark sidebar with Author/Operator mode toggle, Author Home at `/` (operator dashboard moved to `/dashboard/`), and the Studio builder rebuilt as a full-screen three-pane editor — lesson outline → plain-English form with section blocks/templates → always-on live preview, 2s auto-save. Covers most of old Next item 5 ("Harborside patterns"). | 2026-06-12 |
 
 ## 🎯 Now (one thing)
 
@@ -58,11 +60,9 @@ Brightspace by hand (today's normal workflow), and note every point of friction.
    official look is settled. Locks before any bulk course production. *(Cheap, important,
    easily forgotten.)*
 4. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
-5. **Studio UX pass — "Harborside patterns."** Adopt the design language Marlana proved in
-   the Harborside school portal: always-on live preview beside the form (not behind a
-   button), progressive disclosure for optional sections (rule box, what-changed, media
-   start collapsed behind an "Add detail"-style control), and a "writing tips" checklist
-   panel. Fold into the dogfooding friction list.
+5. **Studio UX pass — "Harborside patterns."** ~~Always-on live preview beside the form,
+   progressive disclosure for optional sections~~ → shipped in M7 (design handoff v3).
+   Remaining: the "writing tips" checklist panel. Fold into the dogfooding friction list.
 
 ## 🔮 Later
 

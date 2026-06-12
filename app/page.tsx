@@ -1,141 +1,139 @@
 import Link from "next/link";
-import { MetricCard } from "@/components/metric-card";
-import { MockDataBanner } from "@/components/mock-data-banner";
-import { PageHeader } from "@/components/page-header";
-import { StatusBadge, type BadgeTone } from "@/components/status-badge";
-import { listCourseOfferings } from "@/lib/data/courses";
-import { checkBrightspaceHealth, checkSupabaseHealth } from "@/lib/data/health";
-import { getSyncStatus } from "@/lib/data/sync";
-import { missingMetadata, type CourseOffering, type HealthStatus } from "@/types/domain";
+import { NewCourseButton } from "@/components/studio/new-course-button";
+import { StatusBadge } from "@/components/status-badge";
+import { listDrafts } from "@/lib/studio/drafts";
 import { formatRelative } from "@/components/courses/course-presentation";
 
 export const dynamic = "force-dynamic";
 
-const HEALTH_TONE: Record<HealthStatus["status"], BadgeTone> = {
-  ok: "ok",
-  error: "error",
-  unconfigured: "neutral",
-};
+/* Author Home (design handoff v3) — the plain-English landing screen for
+   attorneys and legal aid staff. Reads only; nothing here changes anything
+   until they choose to publish from the Studio. */
 
-function countRecentlyUpdated(courses: CourseOffering[]): number {
-  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return courses.filter((c) => c.lastSyncedAt && new Date(c.lastSyncedAt).getTime() > cutoff)
-    .length;
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning, counsel.";
+  if (hour < 17) return "Good afternoon, counsel.";
+  return "Good evening, counsel.";
 }
 
-export default async function DashboardPage() {
-  const [coursesResult, syncResult, bsHealth, sbHealth] = await Promise.all([
-    listCourseOfferings(),
-    getSyncStatus(),
-    checkBrightspaceHealth(),
-    checkSupabaseHealth(),
-  ]);
+function dateLine(): string {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
-  const courses = coursesResult.data;
-  const sync = syncResult.data;
-  const isMock = coursesResult.source === "mock" || syncResult.source === "mock";
-
-  const active = courses.filter((c) => c.isActive);
-  const archived = courses.filter((c) => !c.isActive);
-  const recentlyUpdated = countRecentlyUpdated(courses);
-  const needsAttention = courses.filter((c) => missingMetadata(c).length > 0);
+export default async function AuthorHomePage() {
+  const drafts = await listDrafts();
+  const lastDraft = drafts[0];
 
   return (
-    <>
-      <PageHeader
-        title="Dashboard"
-        description="Operational overview of Brightspace course offerings and the Supabase cache."
-      />
-      {isMock ? <MockDataBanner /> : null}
+    <div className="max-w-[820px]">
+      <header className="mb-[26px]">
+        <p className="mb-[5px] font-mono text-[11px] text-ink-soft">{dateLine()}</p>
+        <h1 className="page-title text-ink">{greeting()}</h1>
+        <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
+          Your courses on the LACE Learning Hub, in plain language. Everything here is safe to
+          read — nothing changes until you choose to publish.
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <MetricCard
-          label="Active offerings"
-          value={active.length}
-          sub="Course offerings learners can reach"
-        />
-        <MetricCard
-          label="Recently updated"
-          value={recentlyUpdated}
-          sub="Synced within the last 7 days"
-        />
-        <MetricCard label="Archived" value={archived.length} sub="Retired offerings (kept, not deleted)" />
-        <MetricCard
-          label="Sync drift"
-          value={sync.driftCount}
-          sub={
-            sync.lastRunAt
-              ? `Last sync check ${formatRelative(sync.lastRunAt)}`
-              : "Sync has not run yet"
-          }
-          badge={
-            <StatusBadge tone={sync.driftCount > 0 ? "warn" : "ok"}>
-              {sync.coursesInBrightspace} BS / {sync.coursesInSupabase} SB
-            </StatusBadge>
-          }
-        />
-        <MetricCard
-          label="API health"
-          value={
-            <span className="flex flex-wrap items-center gap-2 text-sm font-normal">
-              <StatusBadge tone={HEALTH_TONE[bsHealth.status]}>
-                Brightspace · {bsHealth.status}
-              </StatusBadge>
-              <StatusBadge tone={HEALTH_TONE[sbHealth.status]}>
-                Supabase · {sbHealth.status}
-              </StatusBadge>
-            </span>
-          }
-          sub="Connection details live in Settings"
-        />
-        <MetricCard
-          label="Warnings"
-          value={sync.warnings.length}
-          sub="Open items from the last sync check"
-          badge={
-            sync.warnings.length > 0 ? <StatusBadge tone="warn">needs review</StatusBadge> : undefined
-          }
-        />
+      <section className="mb-[30px] rounded-[14px] border border-[rgba(42,91,255,0.16)] bg-brand-tint px-[30px] py-[26px]">
+        <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.1em] text-brand">
+          Course Studio
+        </p>
+        <h2 className="mb-1.5 text-xl font-extrabold tracking-[-0.025em] text-ink">
+          Build a course without touching any code.
+        </h2>
+        <p className="mb-[18px] max-w-[480px] text-[13.5px] leading-relaxed text-ink-muted">
+          Fill in a few plain-English boxes — a scenario, a rule, a question — and watch the
+          finished course build itself on the right.
+        </p>
+        <div className="flex items-center gap-[9px]">
+          <NewCourseButton label="+ Start a new course" />
+          {lastDraft ? (
+            <Link href={`/course-studio/${lastDraft.id}/`} className="btn-secondary">
+              Continue last draft
+            </Link>
+          ) : null}
+        </div>
+      </section>
+
+      <div className="mb-2.5 flex items-center justify-between">
+        <span className="section-title text-ink">Your courses</span>
+        <Link href="/course-studio/" className="text-[12.5px] font-semibold text-brand">
+          All courses →
+        </Link>
+      </div>
+      <div className="editorial-card mb-[26px]">
+        {drafts.length === 0 ? (
+          <p className="px-5 py-5 text-[13px] text-ink-muted">
+            No courses yet — start your first one above. It stays a private draft until you
+            publish it.
+          </p>
+        ) : (
+          drafts.slice(0, 5).map((draft) => (
+            <Link
+              key={draft.id}
+              href={`/course-studio/${draft.id}/`}
+              className="flex items-center gap-[13px] border-b border-line-soft px-5 py-[13px] transition-colors last:border-b-0 hover:bg-hover"
+            >
+              <svg
+                className="shrink-0 text-ink-soft"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                aria-hidden
+              >
+                <path d="M2 2h10v10H2z" />
+                <path d="M5 6h4M5 8.5h2.5" />
+              </svg>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold text-ink">
+                  {draft.courseTitle}
+                </span>
+                <span className="block text-xs text-ink-soft">
+                  {draft.topicCount} lesson{draft.topicCount === 1 ? "" : "s"} ·{" "}
+                  {draft.totalMinutes} min · edited {formatRelative(draft.updatedAt)}
+                </span>
+              </span>
+              <StatusBadge tone="neutral">draft</StatusBadge>
+              <svg
+                className="shrink-0 text-ink-soft"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                aria-hidden
+              >
+                <path d="M4 7h6M7.5 4l3 3-3 3" />
+              </svg>
+            </Link>
+          ))
+        )}
       </div>
 
-      <section className="mt-8">
-        <h2 className="section-title mb-3 text-ink">Needs attention</h2>
-        {sync.warnings.length === 0 && needsAttention.length === 0 ? (
-          <p className="text-sm text-ink-muted">Nothing needs attention right now.</p>
-        ) : (
-          <div className="editorial-card divide-y divide-line-soft">
-            {sync.warnings.map((warning, index) => (
-              <div key={`${warning.orgUnitId}-${index}`} className="flex items-center gap-3 px-5 py-3">
-                <StatusBadge tone={warning.severity === "error" ? "error" : "warn"}>
-                  {warning.severity === "error" ? "broken" : "review"}
-                </StatusBadge>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">{warning.courseName}</p>
-                  <p className="text-xs text-ink-muted">{warning.message}</p>
-                </div>
-                <span className="ml-auto font-mono text-xs text-ink-soft">{warning.orgUnitId}</span>
-              </div>
-            ))}
-            {needsAttention.map((course) => (
-              <div key={course.orgUnitId} className="flex items-center gap-3 px-5 py-3">
-                <StatusBadge tone="warn">metadata</StatusBadge>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">{course.name}</p>
-                  <p className="text-xs text-ink-muted">
-                    Missing {missingMetadata(course).join(", ")}
-                  </p>
-                </div>
-                <Link
-                  href="/courses/"
-                  className="ml-auto text-xs font-medium text-brand underline-offset-2 hover:underline"
-                >
-                  View in inventory
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </>
+      <div className="mb-2.5 flex items-center justify-between">
+        <span className="section-title text-ink">Who could use a nudge</span>
+        <Link href="/learners/" className="text-[12.5px] font-semibold text-brand">
+          See everyone →
+        </Link>
+      </div>
+      <div className="editorial-card px-5 py-5">
+        <p className="text-[13px] leading-relaxed text-ink-muted">
+          Learner progress is on its way — once courses report progress to Supabase, the people
+          who are stuck or haven&apos;t started will show up here so you know who to check in
+          with.
+        </p>
+      </div>
+    </div>
   );
 }
