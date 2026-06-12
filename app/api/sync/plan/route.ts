@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { buildSyncPlan, canSyncWrite } from "@/lib/data/sync-write";
 import type { ApiResponse } from "@/types/api";
 import type { SyncPlan } from "@/types/domain";
 
 export async function GET() {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   if (!canSyncWrite()) {
     const body: ApiResponse<never> = {
       ok: false,

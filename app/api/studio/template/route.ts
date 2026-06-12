@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { getTemplateInfo } from "@/lib/studio/template";
 import type { ApiResponse } from "@/types/api";
 import type { TemplateInfo } from "@/types/studio";
 
 export async function GET() {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   try {
     const info = await getTemplateInfo();
     const body: ApiResponse<TemplateInfo> = {

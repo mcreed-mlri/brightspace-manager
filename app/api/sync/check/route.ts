@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { runSyncCheck } from "@/lib/data/sync";
 import type { ApiResponse } from "@/types/api";
 import type { SyncReport } from "@/types/domain";
 
 export async function GET() {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   try {
     const result = await runSyncCheck();
     const body: ApiResponse<SyncReport> = {

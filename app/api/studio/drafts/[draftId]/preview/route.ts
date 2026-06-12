@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { readDraft } from "@/lib/studio/drafts";
 import { generateTopicHtml } from "@/lib/studio/generate";
 import { isTemplateAvailable, readWrapperFile } from "@/lib/studio/template";
@@ -11,6 +12,9 @@ type Params = { params: Promise<{ draftId: string }> };
    iframe srcdoc preview. The nav chrome is omitted (it needs the full
    package); this previews content + styling, which is what editing needs. */
 export async function GET(request: NextRequest, { params }: Params) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   const { draftId } = await params;
   const slug = request.nextUrl.searchParams.get("slug") ?? "";
 

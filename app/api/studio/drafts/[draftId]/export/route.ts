@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { readDraft } from "@/lib/studio/drafts";
 import { buildPackageFiles, validateDraft } from "@/lib/studio/generate";
 import { isTemplateAvailable } from "@/lib/studio/template";
@@ -9,6 +10,9 @@ import type { ApiResponse } from "@/types/api";
 type Params = { params: Promise<{ draftId: string }> };
 
 export async function GET(_request: NextRequest, { params }: Params) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   const { draftId } = await params;
   const draft = await readDraft(draftId);
   if (!draft) {

@@ -1,10 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { listCourseOfferings } from "@/lib/data/courses";
 import type { ApiResponse } from "@/types/api";
 import type { CourseOffering } from "@/types/domain";
 
 export async function GET(request: NextRequest) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   try {
     const result = await listCourseOfferings();
     const params = request.nextUrl.searchParams;

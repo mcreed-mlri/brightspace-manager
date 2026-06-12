@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { readDraft, writeDraft } from "@/lib/studio/drafts";
 import type { ApiResponse } from "@/types/api";
 import type { CourseDraft } from "@/types/studio";
@@ -7,6 +8,9 @@ import type { CourseDraft } from "@/types/studio";
 type Params = { params: Promise<{ draftId: string }> };
 
 export async function GET(_request: NextRequest, { params }: Params) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   const { draftId } = await params;
   const draft = await readDraft(draftId);
   if (!draft) {
@@ -26,6 +30,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   const { draftId } = await params;
   const existing = await readDraft(draftId);
   if (!existing) {

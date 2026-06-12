@@ -111,7 +111,7 @@ export async function buildSyncPlan(): Promise<SyncPlan> {
   return { builtAt: new Date().toISOString(), toCreate, toUpdate, unchanged, orphansLeftAlone };
 }
 
-export async function executeSyncPlan(): Promise<SyncRunResult> {
+export async function executeSyncPlan(actor?: string): Promise<SyncRunResult> {
   /* Recompute server-side at execution time — the preview the admin saw may
      be stale, but what executes is always the current truth. */
   const plan = await buildSyncPlan();
@@ -151,6 +151,7 @@ export async function executeSyncPlan(): Promise<SyncRunResult> {
     created: result.created,
     updated: result.updated,
     failed: result.failed,
+    ...(actor ? { actor } : {}),
   });
 
   return result;

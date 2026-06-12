@@ -168,6 +168,7 @@ export function SyncWritePanel({
                 <li key={run.ranAt} className="font-mono text-xs text-ink-muted">
                   {formatRelative(run.ranAt)} — {run.created} created, {run.updated} updated
                   {run.failed > 0 ? `, ${run.failed} failed` : ""}
+                  {run.actor ? ` · by ${run.actor}` : ""}
                 </li>
               ))}
             </ul>

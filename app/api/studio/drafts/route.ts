@@ -1,10 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireUser } from "@/lib/auth/server";
 import { createDraft, listDrafts } from "@/lib/studio/drafts";
 import type { ApiResponse } from "@/types/api";
 import type { CourseDraft, DraftSummary } from "@/types/studio";
 
 export async function GET() {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   try {
     const drafts = await listDrafts();
     const body: ApiResponse<DraftSummary[]> = {
@@ -24,6 +28,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
   try {
     const json = (await request.json()) as { courseTitle?: string };
     const title = (json.courseTitle ?? "").trim();

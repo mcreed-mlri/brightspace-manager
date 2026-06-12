@@ -116,6 +116,9 @@ export type SyncAuditEntry = {
   created: number;
   updated: number;
   failed: number;
+  /* Signed-in email of whoever ran it; absent for pre-auth entries and
+     open mock/dev mode. */
+  actor?: string;
 };
 
 export type HealthState = "ok" | "error" | "unconfigured";
