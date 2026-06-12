@@ -55,11 +55,14 @@ Emails → SMTP settings — e.g. a free Resend account, 100 emails/day), which
 also removes the "for development only" caveat on the built-in sender.
 
 Three things that soften the limit meanwhile:
-- **`npm run dev-code [email]`** mints a valid sign-in code via the admin
-  API — **no email is sent**, so testing never touches the budget. Works for
-  any invited user; defaults to the first user. Needs the service-role key
-  in `.env`, so it's local-machine only by design. (Each run invalidates the
-  previous pending code — normal one-time-code behavior.)
+- **Double-click `scripts\dev-code.cmd`** to mint a valid sign-in code via
+  the admin API — **no email is sent**, so testing never touches the budget.
+  Pure PowerShell, no node/npm needed. Defaults to the first invited user;
+  pass an email for someone else
+  (`powershell -File scripts\dev-code.ps1 you@mlri.org`). Needs the
+  service-role key in `.env`, so it's local-machine only by design. (Each
+  run invalidates the previous pending code — normal one-time-code
+  behavior. `npm run dev-code` is the same thing for machines with node.)
 - A code stays valid for ~1 hour — if a send fails on the rate limit, the
   code from an *earlier* email still works (the card lets you enter it).
 - Local dev doesn't need auth at all: comment out
