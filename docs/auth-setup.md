@@ -54,7 +54,12 @@ the real fix for day-to-day use is a **custom SMTP sender** (Authentication →
 Emails → SMTP settings — e.g. a free Resend account, 100 emails/day), which
 also removes the "for development only" caveat on the built-in sender.
 
-Two things that soften the limit meanwhile:
+Three things that soften the limit meanwhile:
+- **`npm run dev-code [email]`** mints a valid sign-in code via the admin
+  API — **no email is sent**, so testing never touches the budget. Works for
+  any invited user; defaults to the first user. Needs the service-role key
+  in `.env`, so it's local-machine only by design. (Each run invalidates the
+  previous pending code — normal one-time-code behavior.)
 - A code stays valid for ~1 hour — if a send fails on the rate limit, the
   code from an *earlier* email still works (the card lets you enter it).
 - Local dev doesn't need auth at all: comment out
