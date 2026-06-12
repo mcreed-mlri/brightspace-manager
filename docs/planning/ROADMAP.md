@@ -50,17 +50,24 @@ Brightspace by hand (today's normal workflow), and note every point of friction.
 
 ## 📋 Next (in order)
 
-1. **Course Studio Phase B — deploy automation.** Manage Files upload + Content topic
+1. **Drafts → Supabase (`course_drafts` table).** Promoted from the parking lot: the
+   Vercel deploy (https://brightspace-manager.vercel.app) is the "second machine" — file-backed
+   drafts can't save on serverless, so Studio is local-only in prod until this lands.
+   Keep the JSON shape as-is (one row per draft, jsonb column); local disk stays the
+   dev fallback.
+2. **Course Studio Phase B — deploy automation.** Manage Files upload + Content topic
    creation + automatic URL backfill (kills the dual-URL dance). Needs new OAuth scopes
    (content/managefiles write) registered in Manage Extensibility. Feature-flagged, dry-run
-   first, against sandbox offering 6707.
-2. **Integrity Checker v1.** Read-only: ghost topics (Content node → missing file), orphaned
+   first. **Test tenant now available: https://mlritest.brightspace.com** — register the
+   OAuth app there and develop the write path against it instead of tip-toeing around
+   production (sandbox offering 6707 remains the prod-side validation target).
+3. **Integrity Checker v1.** Read-only: ghost topics (Content node → missing file), orphaned
    files, missing `?d2l_body_type=3` links. Needs `content:toc:read` scope.
-3. **Section-schema sign-off.** Final list of topic sections + fields ("the spine") once the
+4. **Section-schema sign-off.** Final list of topic sections + fields ("the spine") once the
    official look is settled. Locks before any bulk course production. *(Cheap, important,
    easily forgotten.)*
-4. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
-5. **Studio UX pass — "Harborside patterns."** ~~Always-on live preview beside the form,
+5. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
+6. **Studio UX pass — "Harborside patterns."** ~~Always-on live preview beside the form,
    progressive disclosure for optional sections~~ → shipped in M7 (design handoff v3).
    Remaining: the "writing tips" checklist panel. Fold into the dogfooding friction list.
 
@@ -77,7 +84,6 @@ Brightspace by hand (today's normal workflow), and note every point of friction.
 
 - Dark mode (token names already match the hub's dark block — cheap when wanted)
 - "Prune broken nodes" cleanup action (behind feature flag, per original brief)
-- Supabase `course_drafts` table (move drafts off-disk — only if a second machine/editor appears)
 - CSV import for bulk course metadata
 - Hub catalog curation editor (featured/collections) — boundary question settled in
   [admin-boundaries.md](../admin-boundaries.md): editing would live here
