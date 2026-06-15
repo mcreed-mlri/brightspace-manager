@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { isAuthConfigured } from "@/lib/auth/config";
+import { getSupabaseAuthEnv, isAuthConfigured } from "@/lib/auth/config";
 
 /* First line of defense: refresh the Supabase session cookie and redirect
    signed-out visitors to /sign-in. API routes ALSO check the session
@@ -12,11 +12,12 @@ export async function middleware(request: NextRequest) {
   if (!isAuthConfigured()) return NextResponse.next();
 
   let response = NextResponse.next({ request });
+  const { url, anonKey } = getSupabaseAuthEnv();
+  if (!url || !anonKey) return response;
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  let supabase: ReturnType<typeof createServerClient>;
+  try {
+    supabase = createServerClient(url, anonKey, {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {
@@ -27,8 +28,10 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
-    },
-  );
+    });
+  } catch {
+    return response;
+  }
 
   const {
     data: { user },

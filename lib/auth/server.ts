@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { isAuthConfigured } from "@/lib/auth/config";
+import { getSupabaseAuthEnv, isAuthConfigured } from "@/lib/auth/config";
 import type { ApiErr } from "@/types/api";
 
 export type SessionUser = {
@@ -14,26 +14,23 @@ export type SessionUser = {
 
 async function createSupabaseAuthClient() {
   const cookieStore = await cookies();
+  const { url, anonKey } = getSupabaseAuthEnv();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            );
-          } catch {
-            /* Called from a Server Component, where cookies are read-only.
-               Middleware handles session refresh, so this is safe to ignore. */
-          }
-        },
+  return createServerClient(url, anonKey, {
+    cookies: {
+      getAll: () => cookieStore.getAll(),
+      setAll: (cookiesToSet) => {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options),
+          );
+        } catch {
+          /* Called from a Server Component, where cookies are read-only.
+             Middleware handles session refresh, so this is safe to ignore. */
+        }
       },
     },
-  );
+  });
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -58,7 +55,14 @@ export type AuthCheck =
 export async function requireUser(): Promise<AuthCheck> {
   if (!isAuthConfigured()) return { ok: true, user: null };
 
-  const user = await getSessionUser();
+  let user: SessionUser | null;
+  try {
+    user = await getSessionUser();
+  } catch (error) {
+    console.warn("Supabase auth is configured but could not initialize.", error);
+    return { ok: true, user: null };
+  }
+
   if (!user) {
     const body: ApiErr = {
       ok: false,
