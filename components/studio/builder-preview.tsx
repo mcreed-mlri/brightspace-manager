@@ -222,7 +222,8 @@ export function BuilderPreview({
           <p className="max-w-[340px] text-[13px] leading-relaxed text-ink-muted">
             The wrapper template isn&apos;t reachable, so the preview can&apos;t use the real
             course styles. Check <code className="font-mono text-xs">COURSE_TEMPLATE_DIR</code>{" "}
-            (expected at <code className="font-mono text-xs">C:\dev\brightspace-courses\Course-Template</code>).
+            (local path) or <code className="font-mono text-xs">COURSE_TEMPLATE_URL</code> (GitHub
+            raw, for Vercel).
           </p>
         </div>
       ) : css ? (

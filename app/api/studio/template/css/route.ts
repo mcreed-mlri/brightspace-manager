@@ -10,7 +10,7 @@ import { isTemplateAvailable, readWrapperFile } from "@/lib/studio/template";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!isTemplateAvailable()) {
+  if (!(await isTemplateAvailable())) {
     return NextResponse.json(
       { ok: false, error: { message: "Wrapper template not found.", status: 404 } },
       { status: 404 },

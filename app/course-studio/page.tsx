@@ -96,8 +96,9 @@ export default async function CourseStudioPage() {
             <p className="mt-2 text-sm text-ink-muted">
               Expected the wrapper template at{" "}
               <code className="font-mono text-xs">{template.dir}</code>. Set{" "}
-              <code className="font-mono text-xs">COURSE_TEMPLATE_DIR</code> in{" "}
-              <code className="font-mono text-xs">.env</code> if it lives elsewhere.
+              <code className="font-mono text-xs">COURSE_TEMPLATE_DIR</code> (local path) or{" "}
+              <code className="font-mono text-xs">COURSE_TEMPLATE_URL</code> (GitHub raw, for
+              Vercel) in <code className="font-mono text-xs">.env</code> if it lives elsewhere.
             </p>
           </>
         )}

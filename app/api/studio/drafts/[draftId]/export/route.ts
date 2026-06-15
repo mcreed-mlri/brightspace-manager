@@ -23,11 +23,11 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return NextResponse.json(body, { status: 404 });
   }
 
-  if (!isTemplateAvailable()) {
+  if (!(await isTemplateAvailable())) {
     const body: ApiResponse<never> = {
       ok: false,
       error: {
-        message: "Course template not found. Check COURSE_TEMPLATE_DIR in Settings.",
+        message: "Course template not found. Check the wrapper template source in Settings.",
         status: 409,
       },
     };

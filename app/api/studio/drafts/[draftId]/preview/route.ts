@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     let html = generateTopicHtml(draft, slug);
 
-    if (isTemplateAvailable()) {
+    if (await isTemplateAvailable()) {
       const css = await readWrapperFile("course-style.css");
       html = html
         .replace('<link rel="stylesheet" href="course-style.css">', `<style>\n${css}\n</style>`)
