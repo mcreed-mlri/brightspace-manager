@@ -31,6 +31,33 @@ function emptyHint(text: string): string {
   return `<p class="prose" style="color:var(--muted-soft);font-style:italic;">${escapeHtml(text)}</p>`;
 }
 
+/* A soft "ghost" of a built-out lesson, shown before any section exists — so
+   the preview pane reads as ready rather than empty. Faint bars in the real
+   wrapper's neutral tones, with a gentle pulse (suppressed on reduce-motion). */
+function skeletonGhost(): string {
+  const bar = (width: string, height: number, marginTop: number) =>
+    `<div style="height:${height}px;width:${width};border-radius:6px;background:var(--hair-strong,#e6e7ec);margin-top:${marginTop}px;"></div>`;
+  const block = () => `<div style="margin-top:32px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${bar("40px", 13, 0)}
+        <div style="flex:1;height:1px;background:var(--hair,#ececf0);"></div>
+      </div>
+      ${bar("100%", 12, 16)}${bar("93%", 12, 9)}${bar("68%", 12, 9)}
+    </div>`;
+  return `<div class="lace-skeleton" aria-hidden="true">
+    ${bar("55%", 26, 0)}${bar("78%", 13, 16)}
+    ${block()}${block()}${block()}
+    <p style="margin-top:30px;color:var(--muted-soft);font-style:italic;font-size:0.9rem;">
+      Add sections on the left — they'll appear here in the real course design.
+    </p>
+    <style>
+      @keyframes lace-skel { 0%, 100% { opacity: 0.5 } 50% { opacity: 0.8 } }
+      .lace-skeleton { animation: lace-skel 1.8s ease-in-out infinite }
+      @media (prefers-reduced-motion: reduce) { .lace-skeleton { animation: none; opacity: 0.6 } }
+    </style>
+  </div>`;
+}
+
 function mediaPlaceholders(topic: TopicDraft, placement: "scenario" | "rule"): string {
   return (topic.media ?? [])
     .filter((m) => m.placement === placement && (m.filename.trim() || m.alt.trim()))
@@ -146,7 +173,7 @@ function buildBodyHtml(
       <div class="topic-progress-track"><div data-lace="course-progress-bar" style="width:${progress}%;"></div></div>
       <span class="topic-progress-label">${progress}% through this course</span>
     </div>
-    ${sectionMarkup || emptyHint("Add sections on the left and they'll appear here, styled exactly like the real course.")}
+    ${sectionMarkup || skeletonGhost()}
   </main>
 </div>`;
 }

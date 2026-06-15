@@ -14,11 +14,13 @@ import {
 import {
   TEMPLATES,
   clearSection,
+  sectionsWithContent,
   type SectionType,
 } from "@/components/studio/builder-blocks";
 import { BuilderForm } from "@/components/studio/builder-form";
 import { BuilderOutline } from "@/components/studio/builder-outline";
 import { BuilderPreview } from "@/components/studio/builder-preview";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { formatRelative } from "@/components/courses/course-presentation";
 
 /* Course Studio builder (design handoff v3) — full-screen three-pane editor:
@@ -66,6 +68,7 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const [autoFocusType, setAutoFocusType] = useState<SectionType | null>(null);
 
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{ slug: string; title: string; sections: number } | null>(null);
   const [preview, setPreview] = useState<{ slug: string; html: string } | null>(null);
   const [previewBusy, setPreviewBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -224,10 +227,9 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
     });
   }
 
-  function moveLesson(delta: number) {
-    if (!selectedSlug) return;
+  function moveLesson(slug: string, delta: number) {
     mutate((next) => {
-      const found = locate(next, selectedSlug);
+      const found = locate(next, slug);
       if (!found) return;
       const target = found.index + delta;
       if (target < 0 || target >= found.mod.topics.length) return;
@@ -236,21 +238,60 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
     });
   }
 
-  function removeLesson() {
-    if (!selectedSlug) return;
+  function duplicateLesson(slug: string) {
     const current = draftRef.current;
-    if (flatTopics(current).length <= 1) return;
-    const flat = flatTopics(current);
-    const flatIndex = flat.findIndex((t) => t.slug === selectedSlug);
+    const found = locate(current, slug);
+    if (!found) return;
+    const source = found.mod.topics[found.index];
+    const newSlug = uniqueSlug(current, `${slug}-copy`);
+    const clone = structuredClone(source);
+    clone.slug = newSlug;
+    clone.title = source.title ? `${source.title} (copy)` : "New lesson";
+    mutate((next) => {
+      const target = locate(next, slug);
+      if (!target) return;
+      target.mod.topics.splice(target.index + 1, 0, clone);
+    });
+    /* carry over the explicitly-added section state so the copy opens identical */
+    setAdded((prev) => (prev[slug] ? { ...prev, [newSlug]: [...prev[slug]] } : prev));
+    setSelectedSlug(newSlug);
+    setAutoFocusType(null);
+  }
+
+  /* Delete is gated by ConfirmDialog only when the lesson holds content;
+     an empty lesson deletes instantly. */
+  function requestDeleteLesson(slug: string) {
+    const found = locate(draftRef.current, slug);
+    if (!found) return;
+    const topic = found.mod.topics[found.index];
+    const sections = sectionsWithContent(topic).length;
+    const hasContent =
+      sections > 0 || topic.description.trim() !== "" || topic.standfirst.trim() !== "";
+    if (hasContent) {
+      setPendingDelete({ slug, title: topic.title || "Untitled lesson", sections });
+    } else {
+      removeLesson(slug);
+    }
+  }
+
+  function removeLesson(slug: string) {
+    const flat = flatTopics(draftRef.current);
+    const flatIndex = flat.findIndex((t) => t.slug === slug);
     const fallback = flat[flatIndex + 1] ?? flat[flatIndex - 1];
     mutate((next) => {
       for (const mod of next.modules) {
-        mod.topics = mod.topics.filter((t) => t.slug !== selectedSlug);
+        mod.topics = mod.topics.filter((t) => t.slug !== slug);
       }
       /* drop modules emptied by the removal */
       next.modules = next.modules.filter((m) => m.topics.length > 0);
     });
-    setSelectedSlug(fallback?.slug ?? null);
+    setAdded((prev) => {
+      if (!prev[slug]) return prev;
+      const rest = { ...prev };
+      delete rest[slug];
+      return rest;
+    });
+    if (selectedSlug === slug) setSelectedSlug(fallback?.slug ?? null);
   }
 
   /* ── top bar actions ── */
@@ -304,13 +345,16 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const flat = flatTopics(draft);
   const flatIndex = topic ? flat.findIndex((t) => t.slug === topic.slug) : 0;
 
-  const saveStatus = saving
-    ? "saving…"
+  /* One save indicator instead of two: the pill carries label, tone, and the
+     relative save time (was a separate redundant text element). */
+  const savePill = saving
+    ? { label: "Saving…", tone: "bg-status-warn-soft text-status-warn" }
     : dirty
-      ? "unsaved changes"
-      : savedAt
-        ? `saved ${formatRelative(savedAt)}`
-        : "";
+      ? { label: "● Unsaved", tone: "bg-status-warn-soft text-status-warn" }
+      : {
+          label: savedAt ? `Saved · ${formatRelative(savedAt)}` : "Saved",
+          tone: "bg-status-ok-soft text-status-ok-ink",
+        };
 
   return (
     <div className="fade-up flex h-full flex-1 flex-col overflow-hidden">
@@ -333,7 +377,6 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           className="min-w-0 max-w-[320px] flex-shrink rounded-[5px] border-none bg-transparent px-[5px] py-0.5 text-sm font-bold tracking-[-0.01em] text-ink outline-none focus:bg-surface-sunken"
           style={{ width: `${Math.max(draft.courseTitle.length, 12)}ch` }}
         />
-        <span className="whitespace-nowrap font-mono text-xs text-ink-soft">{saveStatus}</span>
         {error ? (
           <span className="truncate text-xs font-semibold text-status-error-ink">{error}</span>
         ) : null}
@@ -355,13 +398,9 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
             {previewBusy ? "Building…" : "Preview"}
           </button>
           <span
-            className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${
-              dirty
-                ? "bg-status-warn-soft text-status-warn"
-                : "bg-status-ok-soft text-status-ok-ink"
-            }`}
+            className={`whitespace-nowrap rounded-full px-[9px] py-[3px] text-[11px] font-bold transition-colors ${savePill.tone}`}
           >
-            {dirty ? "● Unsaved" : "Saved"}
+            {savePill.label}
           </span>
           <button
             type="button"
@@ -388,6 +427,9 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           onRenameModule={renameModule}
           onAddLesson={addLesson}
           onAddModule={addModule}
+          onMoveLesson={moveLesson}
+          onDuplicateLesson={duplicateLesson}
+          onDeleteLesson={requestDeleteLesson}
         />
         {topic ? (
           <BuilderForm
@@ -395,15 +437,10 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
             topic={topic}
             added={added[topic.slug] ?? []}
             autoFocusType={autoFocusType}
-            canRemoveLesson={flat.length > 1}
-            canMoveUp={(found?.index ?? 0) > 0}
-            canMoveDown={found ? found.index < found.mod.topics.length - 1 : false}
             onTopicChange={(fn) => mutateTopic(topic.slug, fn)}
             onAddSection={addSection}
             onRemoveSection={removeSection}
             onApplyTemplate={applyTemplate}
-            onMoveLesson={moveLesson}
-            onRemoveLesson={removeLesson}
             onSlugChange={changeSlug}
           />
         ) : (
@@ -529,6 +566,25 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           </>
         ) : null}
       </Drawer>
+
+      {/* ── delete-lesson confirm (only when the lesson has content) ── */}
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={`Delete "${pendingDelete?.title ?? ""}"?`}
+        message={
+          pendingDelete
+            ? `This removes ${pendingDelete.sections} section${
+                pendingDelete.sections === 1 ? "" : "s"
+              } and can't be undone.`
+            : ""
+        }
+        confirmLabel="Delete lesson"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) removeLesson(pendingDelete.slug);
+          setPendingDelete(null);
+        }}
+      />
     </div>
   );
 }

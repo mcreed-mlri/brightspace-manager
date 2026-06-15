@@ -284,3 +284,48 @@ h3 {
     animation: none;
   }
 }
+
+/* ── Section block reveal (staggered via --i) ───────────────────────────── */
+@keyframes section-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-in {
+  animation: section-in 220ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-in {
+    animation: none;
+  }
+}
+
+/* ── Confirm dialog pop ─────────────────────────────────────────────────── */
+@keyframes confirm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.confirm-pop {
+  animation: confirm-pop 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-pop {
+    animation: none;
+  }
+}

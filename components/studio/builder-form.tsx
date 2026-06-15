@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { TOPIC_KINDS, UPDATED_FLAGS, type TopicDraft } from "@/types/studio";
 import {
   BLOCKS,
@@ -25,55 +25,81 @@ export function BuilderForm({
   topic,
   added,
   autoFocusType,
-  canRemoveLesson,
-  canMoveUp,
-  canMoveDown,
   onTopicChange,
   onAddSection,
   onRemoveSection,
   onApplyTemplate,
-  onMoveLesson,
-  onRemoveLesson,
   onSlugChange,
 }: {
   topic: TopicDraft;
   added: SectionType[];
   autoFocusType: SectionType | null;
-  canRemoveLesson: boolean;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
   onAddSection: (type: SectionType) => void;
   onRemoveSection: (type: SectionType) => void;
   onApplyTemplate: (name: keyof typeof TEMPLATES) => void;
-  onMoveLesson: (delta: number) => void;
-  onRemoveLesson: () => void;
   onSlugChange: (slug: string) => void;
 }) {
   const sections = activeSections(topic, added);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const coreRef = useRef<HTMLDivElement>(null);
+  /* The sticky mini-header fades in once the core-fields card scrolls away. */
+  const [stuck, setStuck] = useState(false);
 
   /* Design: selecting a lesson scrolls the form back to the top. The form
      remounts per lesson (keyed by module+index in the builder), so on-mount
      is exactly "on lesson switch". */
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
+    setStuck(false);
+  }, []);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    const target = coreRef.current;
+    if (!root || !target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setStuck(!entry.isIntersecting),
+      { root, threshold: 0, rootMargin: "-44px 0px 0px 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <div ref={scrollRef} className="min-w-0 flex-1 overflow-y-auto bg-paper">
-      <div className="max-w-[560px] px-9 pb-[60px] pt-7">
-        <div className="mb-5">
-          <label className={labelClass} htmlFor="f-title">
-            Lesson title
-          </label>
-          <input
-            id="f-title"
-            className={inputClass}
-            value={topic.title}
-            onChange={(e) => onTopicChange((t) => void (t.title = e.target.value))}
-          />
-        </div>
+    <div className="relative min-w-0 flex-1 bg-paper">
+      {/* sticky mini-header — fades in once the core card scrolls away */}
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center gap-2 border-b border-line bg-surface/85 px-9 py-2.5 backdrop-blur transition-opacity duration-150 ${
+          stuck ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="min-w-0 truncate text-[13px] font-bold text-ink">
+          {topic.title || "Untitled lesson"}
+        </span>
+        <span className="shrink-0 text-[11px] text-ink-soft">
+          {topic.kind} · {topic.minutes} min
+        </span>
+      </div>
+
+      <div ref={scrollRef} className="absolute inset-0 overflow-y-auto">
+        <div className="max-w-[560px] px-9 pb-[60px] pt-7">
+          {/* core fields — "the basics", grouped so the form isn't a flat column */}
+          <div
+            ref={coreRef}
+            className="mb-6 rounded-[12px] border border-line bg-surface p-5 shadow-[var(--shadow-xs)]"
+          >
+            <div className="mb-5">
+              <label className={labelClass} htmlFor="f-title">
+                Lesson title
+              </label>
+              <input
+                id="f-title"
+                className={`${inputClass} !text-[15px] !font-semibold`}
+                value={topic.title}
+                onChange={(e) => onTopicChange((t) => void (t.title = e.target.value))}
+              />
+            </div>
 
         <div className="mb-5">
           <label className={labelClass} htmlFor="f-summary">
@@ -157,7 +183,17 @@ export function BuilderForm({
           />
         </div>
 
-        <hr className="mb-5 mt-1.5 border-0 border-t border-line" />
+            <div className="flex items-center gap-2 border-t border-line-soft pt-3.5">
+              <span className="text-[11px] text-ink-soft">Filename:</span>
+              <input
+                value={topic.slug}
+                onChange={(e) => onSlugChange(e.target.value)}
+                aria-label="Lesson slug (filename)"
+                className="w-44 rounded-md border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-muted outline-none focus:border-brand-fill"
+              />
+              <span className="font-mono text-[11px] text-ink-soft">.html</span>
+            </div>
+          </div>
 
         <div className="mb-4 flex flex-wrap items-center gap-[7px]">
           <span className="mr-0.5 whitespace-nowrap text-[10.5px] font-bold uppercase tracking-[0.09em] text-ink-soft">
@@ -176,9 +212,20 @@ export function BuilderForm({
         </div>
 
         {sections.length === 0 ? (
-          <div className="mb-2.5 rounded-[10px] border-[1.5px] border-dashed border-line px-4 py-5 text-center text-[13px] leading-relaxed text-ink-soft">
-            <strong className="block text-[13px] font-bold text-ink-muted">No sections yet</strong>
-            Pick a template above or add sections one by one below.
+          <div className="mb-2.5 rounded-[12px] border-[1.5px] border-dashed border-line bg-surface/50 px-5 py-7 text-center">
+            <div className="mb-2 flex justify-center gap-1.5 text-lg" aria-hidden>
+              {(Object.keys(BLOCKS) as SectionType[]).map((t) => (
+                <span key={t} className="opacity-40">
+                  {BLOCKS[t].emoji}
+                </span>
+              ))}
+            </div>
+            <strong className="block text-[13.5px] font-bold text-ink-muted">
+              Build your lesson
+            </strong>
+            <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-soft">
+              Start from a template above, or add a section below.
+            </p>
           </div>
         ) : (
           sections.map((type, index) => (
@@ -195,45 +242,6 @@ export function BuilderForm({
         )}
 
         <AddSectionPicker active={sections} onAdd={onAddSection} />
-
-        <div className="mt-8 flex items-center gap-2 border-t border-line-soft pt-4">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-ink-soft">
-            This lesson
-          </span>
-          <button
-            type="button"
-            onClick={() => onMoveLesson(-1)}
-            disabled={!canMoveUp}
-            className="btn-secondary !px-2.5 !py-1 !text-xs disabled:opacity-30"
-          >
-            ↑ Move up
-          </button>
-          <button
-            type="button"
-            onClick={() => onMoveLesson(1)}
-            disabled={!canMoveDown}
-            className="btn-secondary !px-2.5 !py-1 !text-xs disabled:opacity-30"
-          >
-            ↓ Move down
-          </button>
-          <button
-            type="button"
-            onClick={onRemoveLesson}
-            disabled={!canRemoveLesson}
-            className="ml-auto rounded-md px-2.5 py-1 text-xs font-semibold text-status-error-ink transition-colors hover:bg-status-error-soft disabled:opacity-30"
-          >
-            Remove lesson
-          </button>
-        </div>
-        <div className="mt-2.5 flex items-center gap-2">
-          <span className="text-[11px] text-ink-soft">Filename:</span>
-          <input
-            value={topic.slug}
-            onChange={(e) => onSlugChange(e.target.value)}
-            aria-label="Lesson slug (filename)"
-            className="w-44 rounded-md border border-line bg-surface px-2 py-1 font-mono text-[11px] text-ink-muted outline-none focus:border-brand-fill"
-          />
-          <span className="font-mono text-[11px] text-ink-soft">.html</span>
         </div>
       </div>
     </div>
@@ -281,7 +289,10 @@ function SectionBlock({
           };
 
   return (
-    <div className={`mb-3.5 overflow-hidden rounded-xl border ${accent.card}`}>
+    <div
+      className={`section-in mb-3.5 overflow-hidden rounded-xl border ${accent.card}`}
+      style={{ "--i": index } as CSSProperties}
+    >
       <div className={`flex items-center gap-[11px] border-b px-4 py-3 ${accent.header}`}>
         <span
           className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border text-[11.5px] font-bold ${accent.num}`}
