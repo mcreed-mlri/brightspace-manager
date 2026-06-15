@@ -11,6 +11,7 @@ export default async function CoursesPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Monitor · Inventory"
         title="Course Inventory"
         description="Searchable inventory of Brightspace course offerings. Massachusetts is the first jurisdiction in scope."
       />

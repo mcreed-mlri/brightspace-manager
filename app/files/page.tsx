@@ -18,6 +18,7 @@ export default async function FilesPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Under the hood · Files"
         title="Manage Files"
         description="Read-only view of a course's Manage Files area — see where HTML pages, wrapper assets, and images live without entering the LMS."
         actions={<StatusBadge tone="info">Read-only preview</StatusBadge>}

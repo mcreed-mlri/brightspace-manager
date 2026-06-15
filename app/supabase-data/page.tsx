@@ -51,6 +51,7 @@ export default async function SupabaseDataPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Under the hood · Supabase"
         title="Supabase Data"
         description="Read-only inspector for the Supabase cache layer. Search, sort, open a row for full detail, or export the current view to CSV."
         actions={<StatusBadge tone="info">Read-only</StatusBadge>}

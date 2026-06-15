@@ -3,98 +3,186 @@
 @tailwind utilities;
 
 /* ============================================================================
-   Brightspace Manager — design tokens
+   Brightspace Manager — design tokens ("Cool / Bold" direction)
    ----------------------------------------------------------------------------
-   Internal admin console for the LACE platform. Tokens mirror the learning-hub
-   "Studio" system (app/globals.css there) so hub and admin feel like one
-   product. Light theme only for now; token names match learning-hub so a dark
-   block can be re-added later. Colour is reserved as a *signal*: the page
-   stays calm grey/white, status colours appear only on badges and warnings.
+   Internal admin console for the LACE platform. Cool, high-contrast, confident
+   — energetic and modern. Dark is the DEFAULT; light is opt-in via
+   [data-theme="light"] on <html>. Token *names* mirror the learning-hub Studio
+   system so hub and admin feel like one product; only the *values* changed for
+   this direction. Three typefaces: Space Grotesk (display voice), Inter (UI),
+   JetBrains Mono (structural labels/IDs/counts). Colour stays disciplined — an
+   electric indigo-blue accent plus a multicolor category system kept alive on
+   list rows, dots and chips.
    ========================================================================= */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+
+  /* Display voice: Space Grotesk (big numbers, titles, headlines). */
+  --font-display:
+    var(--font-space-grotesk, "Space Grotesk"), "Segoe UI Variable", "Segoe UI", system-ui,
+    sans-serif;
   /* UI / body: Inter (loaded via next/font in layout.tsx). */
   --font-sans:
     var(--font-inter, "Inter"), "Segoe UI Variable", "Segoe UI", system-ui, ui-sans-serif,
     -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  /* Mono: IBM Plex Mono — org unit IDs, codes, counts, timestamps. */
+  /* Mono: JetBrains Mono — org unit IDs, codes, counts, eyebrows, timestamps. */
   --font-mono:
-    var(--font-plex-mono, "IBM Plex Mono"), "SFMono-Regular", "Cascadia Mono", Consolas,
+    var(--font-jetbrains-mono, "JetBrains Mono"), "SFMono-Regular", "Cascadia Mono", Consolas,
     ui-monospace, monospace;
 
-  /* ── Neutral base — cool grey canvas ──────────────────────────────────── */
-  --paper: #f5f6f8;
-  --paper-deep: #eef0f4;
-  --panel: #eef0f4;
+  /* ── Neutral base — DARK (default) ────────────────────────────────────── */
+  --paper: #0b0d12; /* app background / content area (--bg) */
+  --paper-deep: #1b1f28;
+  --panel: #1b1f28;
+  --surface: #13161d; /* cards, sidebar, top bar, drawer */
+  --surface-raised: #13161d;
+  --surface-sunken: #1b1f28; /* inset fields, search, segmented track (--surface-2) */
+  --hover-tint: #1b1f28;
+  --ink: #f3f5f9;
+  --ink-muted: #9aa3b2;
+  --ink-soft: #5e6675;
+  --line: #242a34;
+  --line-strong: #333b48;
+  --line-soft: #1c212a;
+  --hover: #1b1f28;
+  --scroll: #2a3039;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(0, 0, 0, 0.36);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(0, 0, 0, 0.36);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-drawer: -26px 0 70px rgba(0, 0, 0, 0.4);
+
+  /* ── Accent — electric indigo-blue ────────────────────────────────────── */
+  --accent: #5b7dff;
+  --accent-ink: #94aaff;
+  --accent-tint: rgba(91, 125, 255, 0.15);
+  --accent-glow: rgba(91, 125, 255, 0.4);
+
+  /* Brand aliases (Tailwind bg-brand-text-brand) point at the accent. */
+  --brand: var(--accent);
+  --brand-ink: var(--accent-ink);
+  --brand-fill: var(--accent);
+  --brand-tint: var(--accent-tint);
+
+  /* ── Sidebar — themed surface (no longer a permanent dark rail) ────────── */
+  --sb: var(--surface);
+  --sb-ink: var(--ink);
+  --sb-muted: var(--ink-soft);
+  --sb-hover: var(--surface-sunken);
+  --sb-active: var(--accent-tint);
+  --sb-line: var(--line);
+
+  /* ── Status — health / lifecycle signal (admin semantics) ─────────────── */
+  --ok: #2fd397;
+  --ok-glow: rgba(47, 211, 151, 0.22);
+  --amber: #f0a93a;
+  --amber-ink: #f0b860;
+  --amber-tint: rgba(240, 169, 58, 0.14);
+  --danger: #ff6257;
+  --danger-tint: rgba(255, 98, 87, 0.14);
+
+  --status-ok: var(--ok);
+  --status-ok-soft: var(--ok-glow);
+  --status-ok-ink: #3fdca5;
+  --status-info: var(--accent);
+  --status-info-soft: var(--accent-tint);
+  --status-info-ink: var(--accent-ink);
+  --status-warn: var(--amber);
+  --status-warn-soft: var(--amber-tint);
+  --status-warn-ink: var(--amber-ink);
+  --status-error: var(--danger);
+  --status-error-soft: var(--danger-tint);
+  --status-error-ink: #ff8077;
+  --status-neutral: var(--ink-soft);
+  --status-neutral-soft: var(--surface-sunken);
+  --status-neutral-ink: var(--ink-muted);
+
+  --radius-card: 14px;
+  --radius-control: 9px;
+
+  /* ── Category palette — theme-independent multicolor system. Keeps the
+        cool palette from feeling sleepy: row bars, dots, per-course accents. */
+  --cat-blue: #3b82f6;
+  --cat-violet: #8b5cf6;
+  --cat-pink: #ec4899;
+  --cat-amber: #f59e0b;
+  --cat-green: #10b981;
+  --cat-teal: #14b8a6;
+
+  /* Hue aliases (legacy hub naming) — kept pointing at the category palette. */
+  --hue-1: var(--cat-blue);
+  --hue-1-tint: rgba(59, 130, 246, 0.16);
+  --hue-2: var(--cat-violet);
+  --hue-2-tint: rgba(139, 92, 246, 0.16);
+  --hue-3: var(--cat-pink);
+  --hue-3-tint: rgba(236, 72, 153, 0.16);
+  --hue-4: var(--cat-amber);
+  --hue-4-tint: rgba(245, 158, 11, 0.16);
+  --hue-5: var(--cat-green);
+  --hue-5-tint: rgba(16, 185, 129, 0.16);
+  --hue-6: #38bdf8;
+  --hue-6-tint: rgba(56, 189, 248, 0.16);
+  --hue-7: #6366f1;
+  --hue-7-tint: rgba(99, 102, 241, 0.16);
+  --hue-8: #fb7185;
+  --hue-8-tint: rgba(251, 113, 133, 0.16);
+}
+
+/* ── Neutral base — LIGHT theme ─────────────────────────────────────────── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --paper: #f4f6fa;
+  --paper-deep: #eef1f7;
+  --panel: #eef1f7;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-sunken: #eef0f4;
-  --hover-tint: #f5f6f8;
-  --ink: #14161b;
-  --ink-muted: #565c69;
-  --ink-soft: #8b909d;
-  --line: #e4e7ed;
-  --line-strong: #d3d8e0;
-  --line-soft: #edeff3;
-  --hover: #f0f2f6;
+  --surface-sunken: #eef1f7;
+  --hover-tint: #f4f6fa;
+  --ink: #0d1117;
+  --ink-muted: #48505e;
+  --ink-soft: #8b94a3;
+  --line: #e4e8ef;
+  --line-strong: #cdd5e1;
+  --line-soft: #eef1f6;
+  --hover: #eef1f7;
+  --scroll: #cdd3de;
   --shadow-xs: 0 1px 2px rgba(20, 22, 27, 0.05);
   --shadow-card: 0 1px 3px rgba(20, 22, 27, 0.05), 0 6px 20px rgba(20, 22, 27, 0.07);
   --shadow-sm: 0 1px 3px rgba(20, 22, 27, 0.05), 0 6px 20px rgba(20, 22, 27, 0.07);
   --shadow-md: 0 1px 3px rgba(20, 22, 27, 0.05), 0 6px 20px rgba(20, 22, 27, 0.07);
   --shadow-lg: 0 8px 32px rgba(20, 22, 27, 0.15), 0 2px 6px rgba(20, 22, 27, 0.06);
+  --shadow-drawer: -26px 0 70px rgba(20, 22, 27, 0.18);
 
-  /* ── Sidebar — dark rail (design handoff v3) ──────────────────────────── */
-  --sb: #0f1117;
-  --sb-ink: rgba(255, 255, 255, 0.82);
-  --sb-muted: rgba(255, 255, 255, 0.4);
-  --sb-hover: rgba(255, 255, 255, 0.06);
-  --sb-active: rgba(255, 255, 255, 0.11);
-  --sb-line: rgba(255, 255, 255, 0.07);
+  --accent: #2f5bff;
+  --accent-ink: #1e44e0;
+  --accent-tint: #e9eeff;
+  --accent-glow: rgba(47, 91, 255, 0.26);
 
-  /* ── Brand — Studio blue ──────────────────────────────────────────────── */
-  --brand: #1c3fb0;
-  --brand-ink: #1c3fb0;
-  --brand-fill: #2a5bff;
-  --brand-tint: #eaf0ff;
+  --ok: #10b981;
+  --ok-glow: rgba(16, 185, 129, 0.18);
+  --amber: #e0941f;
+  --amber-ink: #9a6510;
+  --amber-tint: #fdf2dd;
+  --danger: #e0463a;
+  --danger-tint: #fdeae8;
 
-  /* ── Status — health / lifecycle signal (admin semantics) ─────────────── */
-  --status-ok: #179a72;
+  --status-ok: var(--ok);
   --status-ok-soft: #e2f4ed;
   --status-ok-ink: #0f6e51;
-  --status-info: #2a5bff;
-  --status-info-soft: #eaf0ff;
-  --status-info-ink: #1c3fb0;
-  --status-warn: #c8791b;
-  --status-warn-soft: #fbf0dc;
-  --status-warn-ink: #99610f;
-  --status-error: #c8493b;
-  --status-error-soft: #fbe9e6;
+  --status-info: var(--accent);
+  --status-info-soft: var(--accent-tint);
+  --status-info-ink: var(--accent-ink);
+  --status-warn: var(--amber);
+  --status-warn-soft: var(--amber-tint);
+  --status-warn-ink: var(--amber-ink);
+  --status-error: var(--danger);
+  --status-error-soft: var(--danger-tint);
   --status-error-ink: #9c3528;
-  --status-neutral: #8b909d;
-  --status-neutral-soft: #eef0f4;
-  --status-neutral-ink: #565c69;
-
-  --radius-card: 14px;
-  --radius-control: 9px;
-
-  /* ── Hue palette — 8 disciplined accents (mirrors the hub's skill hues).
-        Use as SMALL signals only: top bars, dots, icon wells, chips. ─────── */
-  --hue-1: #2a5bff;
-  --hue-1-tint: #e9f0ff; /* blue */
-  --hue-2: #7a4fe0;
-  --hue-2-tint: #efeafd; /* violet */
-  --hue-3: #d24d83;
-  --hue-3-tint: #fce9f1; /* pink */
-  --hue-4: #c8791b;
-  --hue-4-tint: #fbf0dc; /* amber */
-  --hue-5: #179a72;
-  --hue-5-tint: #e2f4ed; /* green */
-  --hue-6: #3a8ec9;
-  --hue-6-tint: #e7f3fb; /* sky */
-  --hue-7: #5563d6;
-  --hue-7-tint: #ebedfc; /* indigo */
-  --hue-8: #bb573b;
-  --hue-8-tint: #fbe8e2; /* rust */
+  --status-neutral: var(--ink-soft);
+  --status-neutral-soft: var(--surface-sunken);
+  --status-neutral-ink: var(--ink-muted);
 }
 
 * {
@@ -143,23 +231,36 @@ input::placeholder {
   opacity: 1;
 }
 
-/* ── Typography scale (design handoff v3) ───────────────────────────────── */
+/* ── Typography scale (cool direction) ──────────────────────────────────── */
+/* Eyebrow: UPPERCASE JetBrains Mono in accent — leads every section/page. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 .page-title {
-  font-size: 26px;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.04;
 }
 
 .section-title {
-  font-size: 15px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 h1,
 h2,
 h3 {
+  font-family: var(--font-display);
   letter-spacing: -0.02em;
 }
 
@@ -168,21 +269,24 @@ h3 {
 .btn-blue {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: var(--brand-fill);
+  gap: 7px;
+  background: var(--accent);
   color: #ffffff;
   border: none;
-  border-radius: var(--radius-control);
-  font-weight: 700;
-  font-size: 13.5px;
-  padding: 9px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0 16px;
+  height: 38px;
   cursor: pointer;
-  transition: opacity 120ms ease;
+  box-shadow: 0 3px 12px var(--accent-glow);
+  transition: filter 120ms ease, box-shadow 120ms ease;
 }
 
 .btn-primary:hover,
 .btn-blue:hover {
-  opacity: 0.88;
+  filter: brightness(1.07);
+  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 .btn-primary:disabled,
@@ -259,7 +363,7 @@ h3 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--line-strong);
+  background: var(--scroll, var(--line-strong));
   border-radius: 3px;
 }
 

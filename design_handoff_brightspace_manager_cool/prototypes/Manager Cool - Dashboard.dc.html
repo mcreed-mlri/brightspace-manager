@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  textarea,input,select,button{font-family:inherit;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--scroll,#cdd3de);border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+</style>
+</helmet>
+
+<div style="{{ themeStyle }}">
+
+  <!-- SIDEBAR -->
+  <aside style="width:236px;flex:none;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line);">
+    <div style="display:flex;align-items:center;gap:11px;padding:18px 16px 16px;">
+      <span style="width:32px;height:32px;border-radius:8px;background:var(--ink);display:grid;place-items:center;flex:none;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--surface)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 7h6zM17 7l-3 7h6z"></path></svg>
+      </span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink);">LACE</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;color:var(--accent);background:var(--accent-tint);padding:3px 7px;border-radius:5px;">OPS</span>
+    </div>
+
+    <div style="padding:4px 12px 12px;">
+      <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--ink-soft)" stroke-width="1.7"><circle cx="7" cy="7" r="5"></circle><path d="M14 14l-3.2-3.2"></path></svg>
+        <span style="font-size:12.5px;color:var(--ink-soft);flex:1;">Search</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--ink-soft);border:1px solid var(--line);border-radius:4px;padding:1px 5px;">⌘K</span>
+      </div>
+    </div>
+
+    <div style="padding:2px 12px;">
+      <div style="display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px;">
+        <button type="button" style="flex:1;border:none;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--ink-soft);">Author</button>
+        <button type="button" style="flex:1;border:none;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow);">Operator</button>
+      </div>
+    </div>
+
+    <nav style="flex:1;overflow-y:auto;padding:12px 11px;">
+      <sc-for list="{{ navGroups }}" as="grp" hint-placeholder-count="3">
+        <div style="margin-bottom:6px;">
+          <sc-if value="{{ grp.hasLabel }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-soft);padding:13px 8px 6px;">{{ grp.label }}</div>
+          </sc-if>
+          <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="3">
+            <button type="button" style="{{ it.style }}">
+              <span style="width:6px;height:6px;border-radius:2px;flex:none;background:{{ it.dot }};"></span>
+              <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ it.label }}</span>
+              <sc-if value="{{ it.hasCount }}" hint-placeholder-val="{{ false }}"><span style="font-family:var(--mono);font-size:11px;color:var(--ink-soft);">{{ it.count }}</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line);">
+      <span style="width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;flex:none;font-size:11px;font-weight:700;color:#fff;">AL</span>
+      <span style="min-width:0;flex:1;">
+        <span style="display:block;font-size:12px;font-weight:600;color:var(--ink);line-height:1.2;">A. Liang</span>
+        <span style="display:block;font-family:var(--mono);font-size:10px;color:var(--ink-soft);">MLRI · admin</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+
+    <!-- TOP BAR -->
+    <header style="display:flex;align-items:center;gap:14px;height:60px;flex:none;padding:0 30px;background:var(--surface);border-bottom:1px solid var(--line);">
+      <span style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-soft);">operator / dashboard</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--amber-ink);background:var(--amber-tint);border-radius:6px;padding:4px 9px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);"></span>MOCK DATA
+      </span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+        <button type="button" onClick="{{ onToggleTheme }}" title="Toggle theme" style="width:38px;height:38px;border:1px solid var(--line);background:var(--surface);border-radius:10px;display:grid;place-items:center;color:var(--ink-muted);cursor:pointer;">{{ themeIcon }}</button>
+        <button type="button" style="display:flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 12px var(--accent-glow);">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a6 6 0 0110-4.5L14 5"></path><path d="M14 2v3h-3"></path></svg>
+          Run sync check
+        </button>
+      </div>
+    </header>
+
+    <!-- SCROLL -->
+    <main style="flex:1;min-width:0;overflow-y:auto;background:var(--bg);">
+      <div style="max-width:1000px;margin:0 auto;padding:38px 34px 80px;">
+
+        <!-- HERO -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:30px;">
+          <div style="min-width:0;">
+            <div style="font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Operations console</div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-size:46px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink);margin:0;">Everything's running.</h1>
+            <p style="font-size:14px;line-height:1.5;color:var(--ink-muted);margin:12px 0 0;max-width:540px;">9 offerings live across Massachusetts. Two need a look — the rest synced clean within the hour.</p>
+          </div>
+          <div style="display:flex;gap:10px;flex:none;">
+            <sc-for list="{{ connections }}" as="c" hint-placeholder-count="3">
+              <div style="min-width:128px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:13px 15px;">
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <span style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ c.dot }};box-shadow:0 0 0 3px {{ c.glow }};"></span>
+                  <span style="font-size:12px;font-weight:600;color:var(--ink);">{{ c.name }}</span>
+                </div>
+                <div style="font-family:var(--mono);font-size:10px;color:var(--ink-soft);margin-top:7px;">{{ c.meta }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- METRIC BAND -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:30px;">
+          <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="4">
+            <div style="{{ m.cellStyle }}">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:{{ m.labelColor }};">{{ m.label }}</span>
+                <sc-if value="{{ m.flagShow }}" hint-placeholder-val="{{ false }}"><span style="{{ m.flagStyle }}">{{ m.flag }}</span></sc-if>
+              </div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1;color:{{ m.valueColor }};margin-top:12px;">{{ m.value }}</div>
+              <div style="font-size:11.5px;color:var(--ink-soft);margin-top:7px;line-height:1.4;">{{ m.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- NEEDS ATTENTION -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Needs attention</span>
+            <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--danger);background:var(--danger-tint);border-radius:6px;padding:3px 8px;">3 OPEN</span>
+          </div>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);cursor:pointer;">view all →</span>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;">
+          <sc-for list="{{ attention }}" as="a" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line-soft);">
+              <span style="width:3px;height:36px;border-radius:3px;flex:none;background:{{ a.bar }};"></span>
+              <span style="{{ a.badgeStyle }}">{{ a.badge }}</span>
+              <span style="min-width:0;flex:1;">
+                <span style="display:block;font-size:14px;font-weight:600;color:var(--ink);">{{ a.name }}</span>
+                <span style="display:block;font-size:12.5px;color:var(--ink-muted);margin-top:2px;">{{ a.msg }}</span>
+              </span>
+              <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent);flex:none;">#{{ a.id }} →</span>
+            </div>
+          </sc-for>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  state = { theme: 'dark' };
+
+  CAT = { blue:'#3b82f6', violet:'#8b5cf6', pink:'#ec4899', amber:'#f59e0b', green:'#10b981', teal:'#14b8a6' };
+
+  themeVars() {
+    if (this.state.theme === 'light') return {
+      '--bg':'#f4f6fa','--surface':'#ffffff','--surface-2':'#eef1f7','--scroll':'#cdd3de',
+      '--ink':'#0d1117','--ink-muted':'#48505e','--ink-soft':'#8b94a3',
+      '--line':'#e4e8ef','--line-soft':'#eef1f6',
+      '--accent':'#2f5bff','--accent-ink':'#1e44e0','--accent-tint':'#e9eeff','--accent-glow':'rgba(47,91,255,.28)',
+      '--amber':'#e0941f','--amber-ink':'#9a6510','--amber-tint':'#fdf2dd',
+      '--danger':'#e0463a','--danger-tint':'#fdeae8',
+      '--ok':'#10b981','--ok-glow':'rgba(16,185,129,.2)',
+    };
+    return {
+      '--bg':'#0b0d12','--surface':'#13161d','--surface-2':'#1b1f28','--scroll':'#2a3039',
+      '--ink':'#f3f5f9','--ink-muted':'#9aa3b2','--ink-soft':'#5e6675',
+      '--line':'#242a34','--line-soft':'#1c212a',
+      '--accent':'#5b7dff','--accent-ink':'#94aaff','--accent-tint':'rgba(91,125,255,.15)','--accent-glow':'rgba(91,125,255,.4)',
+      '--amber':'#f0a93a','--amber-ink':'#f0b860','--amber-tint':'rgba(240,169,58,.14)',
+      '--danger':'#ff6257','--danger-tint':'rgba(255,98,87,.14)',
+      '--ok':'#2fd397','--ok-glow':'rgba(47,211,151,.22)',
+    };
+  }
+
+  badge(tone) {
+    const map = {
+      warn:['var(--amber-tint)','var(--amber-ink)'],
+      error:['var(--danger-tint)','var(--danger)'],
+      info:['var(--accent-tint)','var(--accent-ink)'],
+    };
+    const [bg,fg]=map[tone]||map.info;
+    return `display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:${fg};background:${bg};padding:4px 9px;border-radius:6px;white-space:nowrap;flex:none;`;
+  }
+
+  NAV = [
+    { label:null, items:[['Dashboard',null,'var(--accent)',true]] },
+    { label:'Monitor', items:[['Course Inventory','9','var(--ink-soft)'],['Sync Diagnostics','2','var(--ink-soft)'],['Integrity Checker',null,'var(--ink-soft)'],['Learner Progress',null,'var(--ink-soft)']] },
+    { label:'Under the hood', items:[['Manage Files',null,'var(--ink-soft)'],['Supabase Data',null,'var(--ink-soft)'],['Settings',null,'var(--ink-soft)']] },
+  ];
+
+  renderVals() {
+    const st = this.state;
+    const vars = this.themeVars();
+    const themeStyle = Object.entries(vars).map(([k,v])=>`${k}:${v}`).join(';') + `;display:flex;height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);`;
+
+    const navGroups = this.NAV.map(g=>({
+      hasLabel: !!g.label, label: g.label||'',
+      items: g.items.map(([label,count,dot,active])=>({
+        label, count: count||'', hasCount: !!count, dot,
+        style: `display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:${active?600:500};color:${active?'var(--ink)':'var(--ink-muted)'};background:${active?'var(--accent-tint)':'transparent'};margin-bottom:2px;`,
+      })),
+    }));
+
+    const connections = [
+      { name:'Brightspace', meta:'2m ago', dot:'var(--ok)', glow:'var(--ok-glow)' },
+      { name:'Supabase', meta:'2m ago', dot:'var(--ok)', glow:'var(--ok-glow)' },
+      { name:'Sync', meta:'2h ago', dot:'var(--amber)', glow:'var(--amber-tint)' },
+    ];
+
+    const cell = (hero) => `background:var(--surface);padding:20px 22px;${hero?'':''}`;
+    const metrics = [
+      { label:'Active offerings', value:'9', sub:'Courses learners can reach right now', cellStyle:cell(true), labelColor:'var(--accent)', valueColor:'var(--ink)', flagShow:false },
+      { label:'Updated', value:'4', sub:'Synced within 7 days', cellStyle:cell(), labelColor:'var(--ink-soft)', valueColor:'var(--ink)', flagShow:false },
+      { label:'Sync drift', value:'2', sub:'9 BS / 7 SB', cellStyle:cell(), labelColor:'var(--ink-soft)', valueColor:'var(--amber-ink)', flagShow:true, flag:'REVIEW', flagStyle:this.badge('warn') },
+      { label:'Warnings', value:'2', sub:'Open from last check', cellStyle:cell(), labelColor:'var(--ink-soft)', valueColor:'var(--danger)', flagShow:false },
+    ];
+
+    const attention = [
+      { bar:this.CAT.pink, badge:'STALE', badgeStyle:this.badge('warn'), name:'Emergency Assistance Shelter Advocacy', msg:'Last synced 40 days ago — content may be out of date', id:'6721' },
+      { bar:this.CAT.amber, badge:'METADATA', badgeStyle:this.badge('warn'), name:'Blank-Course', msg:'Missing code, jurisdiction and program', id:'6707' },
+      { bar:this.CAT.blue, badge:'BROKEN', badgeStyle:this.badge('error'), name:'SNAP Benefits: Eligibility and Appeals', msg:'Linked HTML file not found in Manage Files', id:'6718' },
+    ];
+
+    const themeIcon = st.theme==='dark'
+      ? React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round'},
+          React.createElement('circle',{key:'c',cx:12,cy:12,r:4}),
+          ['M12 2v2','M12 20v2','M4 12H2','M22 12h-2','M5.6 5.6l1.4 1.4','M17 17l1.4 1.4','M18.4 5.6L17 7','M7 17l-1.4 1.4'].map((d,i)=>React.createElement('path',{key:i,d})))
+      : React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round'},
+          React.createElement('path',{key:'m',d:'M20 14.5A8 8 0 119.5 4 6.5 6.5 0 0020 14.5z'}));
+
+    return {
+      themeStyle, themeIcon,
+      onToggleTheme: ()=> this.setState(s=>({ theme:s.theme==='dark'?'light':'dark' })),
+      navGroups, connections, metrics, attention,
+    };
+  }
+}
+</script>
+</body>
+</html>

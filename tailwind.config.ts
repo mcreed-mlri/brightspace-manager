@@ -46,6 +46,11 @@ const config: Config = {
           fill: "var(--brand-fill)",
           tint: "var(--brand-tint)",
         },
+        accent: {
+          DEFAULT: "var(--accent)",
+          ink: "var(--accent-ink)",
+          tint: "var(--accent-tint)",
+        },
         // Status — health / lifecycle signal
         status: {
           ok: {
@@ -80,6 +85,7 @@ const config: Config = {
         lift: "var(--shadow-md)",
       },
       fontFamily: {
+        display: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },

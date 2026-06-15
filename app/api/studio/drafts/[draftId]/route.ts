@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
-import { readDraft, writeDraft } from "@/lib/studio/drafts";
+import { deleteDraft, readDraft, writeDraft } from "@/lib/studio/drafts";
 import type { ApiResponse } from "@/types/api";
 import type { CourseDraft } from "@/types/studio";
 
@@ -58,6 +58,38 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const body: ApiResponse<never> = {
       ok: false,
       error: { message: "Failed to save the draft.", status: 500 },
+    };
+    return NextResponse.json(body, { status: 500 });
+  }
+}
+
+export async function DELETE(_request: NextRequest, { params }: Params) {
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
+
+  const { draftId } = await params;
+  const existing = await readDraft(draftId);
+  if (!existing) {
+    const body: ApiResponse<never> = {
+      ok: false,
+      error: { message: "Draft not found.", status: 404 },
+    };
+    return NextResponse.json(body, { status: 404 });
+  }
+
+  try {
+    await deleteDraft(draftId);
+    const body: ApiResponse<{ id: string }> = {
+      ok: true,
+      data: { id: draftId },
+      source: "live",
+      fetchedAt: new Date().toISOString(),
+    };
+    return NextResponse.json(body);
+  } catch {
+    const body: ApiResponse<never> = {
+      ok: false,
+      error: { message: "Failed to delete the course.", status: 500 },
     };
     return NextResponse.json(body, { status: 500 });
   }

@@ -1,9 +1,9 @@
-import Link from "next/link";
+import { CourseList } from "@/components/studio/course-list";
 import { NewCourseButton } from "@/components/studio/new-course-button";
 import { StatusBadge } from "@/components/status-badge";
 import { listDrafts } from "@/lib/studio/drafts";
 import { getTemplateInfo } from "@/lib/studio/template";
-import { formatBytes, formatRelative } from "@/components/courses/course-presentation";
+import { formatBytes } from "@/components/courses/course-presentation";
 
 export const dynamic = "force-dynamic";
 
@@ -27,33 +27,7 @@ export default async function CourseStudioPage() {
 
       <p className="section-title mb-2 text-ink">Your courses</p>
       <div className="editorial-card mb-[22px]">
-        {drafts.length === 0 ? (
-          <p className="px-5 py-5 text-[13px] text-ink-muted">
-            No courses yet. Hit <strong>+ New course</strong> to open a blank builder — a guided
-            form with a live preview of what learners will see.
-          </p>
-        ) : (
-          drafts.map((draft) => (
-            <Link
-              key={draft.id}
-              href={`/course-studio/${draft.id}/`}
-              className="flex items-center gap-[13px] border-b border-line-soft px-5 py-3.5 transition-colors last:border-b-0 hover:bg-hover"
-            >
-              <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-ink-soft" aria-hidden />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-ink">
-                  {draft.courseTitle}
-                </span>
-                <span className="block text-xs text-ink-soft">
-                  {draft.topicCount} lesson{draft.topicCount === 1 ? "" : "s"} ·{" "}
-                  {draft.totalMinutes} min · edited {formatRelative(draft.updatedAt)}
-                </span>
-              </span>
-              <StatusBadge tone="neutral">draft</StatusBadge>
-              <span className="shrink-0 text-[13px] font-semibold text-brand">Open →</span>
-            </Link>
-          ))
-        )}
+        <CourseList drafts={drafts} />
       </div>
 
       <p className="section-title mb-2 text-ink">Wrapper template</p>

@@ -31,21 +31,23 @@ export function Drawer({
         type="button"
         aria-label="Close panel"
         onClick={onClose}
-        className="absolute inset-0 bg-ink/20"
+        className="absolute inset-0 bg-[rgba(6,8,12,0.55)] backdrop-blur-[2px]"
       />
-      <div className="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-line bg-surface shadow-lift">
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
-          <h2 className="text-[17px] font-bold text-ink">{title}</h2>
+      <div className="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-[452px] flex-col border-l border-line bg-surface shadow-[var(--shadow-drawer)]">
+        <div className="flex items-center justify-between border-b border-line px-6 py-5">
+          <h2 className="font-display text-[19px] font-semibold tracking-[-0.01em] text-ink">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-1.5 text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
           >
-            <IconClose size={18} />
+            <IconClose size={16} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
       </div>
     </div>
   );

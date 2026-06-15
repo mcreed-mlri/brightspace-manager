@@ -13,6 +13,7 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Under the hood · Settings"
         title="Settings"
         description="API connection status. Credentials live in environment variables on the server — values are never shown here or sent to the browser."
       />

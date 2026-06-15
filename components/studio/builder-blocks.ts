@@ -1,4 +1,5 @@
-import type { TopicDraft } from "@/types/studio";
+import type { CSSProperties } from "react";
+import type { TopicDraft, TopicFamily } from "@/types/studio";
 
 /* Design handoff v3 section system, mapped onto the TopicDraft model.
    The design's dynamic section list corresponds 1:1 to the draft's fixed
@@ -101,6 +102,48 @@ export function sectionsWithContent(topic: TopicDraft): SectionType[] {
 export function activeSections(topic: TopicDraft, added: SectionType[]): SectionType[] {
   const present = new Set([...sectionsWithContent(topic), ...added]);
   return SECTION_ORDER.filter((type) => present.has(type));
+}
+
+/* ── Per-course accent (cool direction) ─────────────────────────────────────
+   The Course Details "Topic family" picker sets the course accent from the
+   category palette. Foundations keeps the theme's default electric-blue; every
+   other family re-tints the whole builder (chrome, pills, S-markers, the
+   correct-answer radio) by overriding the accent CSS vars on the builder root. */
+const FAMILY_HUE: Partial<Record<TopicFamily, { accent: string; ink: string }>> = {
+  court: { accent: "#8b5cf6", ink: "#b69bff" },
+  client: { accent: "#14b8a6", ink: "#5fd0c4" },
+  ethics: { accent: "#f59e0b", ink: "#f7c46b" },
+  research: { accent: "#3b82f6", ink: "#7aa7f9" },
+  drafting: { accent: "#ec4899", ink: "#f48fc4" },
+  trauma: { accent: "#10b981", ink: "#4fd9a6" },
+  /* foundations → theme default (no override) */
+};
+
+function hexToRgba(hex: string, alpha: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+/* The swatch shown beside the Topic family picker. */
+export function familyColor(family: TopicFamily): string {
+  return FAMILY_HUE[family]?.accent ?? "var(--accent)";
+}
+
+/* CSS-var overrides applied to the builder root; undefined = keep theme accent. */
+export function familyAccentStyle(family: TopicFamily): CSSProperties | undefined {
+  const hue = FAMILY_HUE[family];
+  if (!hue) return undefined;
+  const tint = hexToRgba(hue.accent, 0.15);
+  return {
+    "--accent": hue.accent,
+    "--accent-ink": hue.ink,
+    "--accent-tint": tint,
+    "--accent-glow": hexToRgba(hue.accent, 0.4),
+    "--brand": hue.accent,
+    "--brand-ink": hue.ink,
+    "--brand-fill": hue.accent,
+    "--brand-tint": tint,
+  } as CSSProperties;
 }
 
 /* Clear a section's underlying draft fields (called on remove). */

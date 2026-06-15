@@ -7,6 +7,7 @@ export default function LearnersPage() {
   return (
     <div className="max-w-[820px]">
       <PageHeader
+        eyebrow="LACE · Learners"
         title="How everyone's doing"
         description="Progress across all active learners enrolled in LACE courses."
       />

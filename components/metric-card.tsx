@@ -17,17 +17,17 @@ export function MetricCard({
 }) {
   return (
     <div className="editorial-card relative px-5 py-[18px]">
-      <p className="mb-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ink-soft">
+      <p className="mb-2.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.07em] text-ink-soft">
         {label}
       </p>
       <div
-        className={`font-mono text-[28px] font-extrabold leading-none tracking-[-0.03em] ${
-          warn ? "text-status-warn" : "text-ink"
+        className={`font-display text-[40px] font-bold leading-none tracking-[-0.03em] ${
+          warn ? "text-status-warn-ink" : "text-ink"
         }`}
       >
         {value}
       </div>
-      {sub ? <p className="mt-1 text-xs text-ink-soft">{sub}</p> : null}
+      {sub ? <p className="mt-2 text-[11.5px] text-ink-soft">{sub}</p> : null}
       {badge ? <div className="absolute right-4 top-4">{badge}</div> : null}
     </div>
   );

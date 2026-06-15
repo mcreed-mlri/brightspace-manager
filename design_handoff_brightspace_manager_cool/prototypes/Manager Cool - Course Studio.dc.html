@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  textarea,input,select,button{font-family:inherit;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--scroll,#2a3039);border-radius:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  @keyframes drawerIn{from{transform:translateX(34px);opacity:.3;}to{transform:translateX(0);opacity:1;}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+</helmet>
+
+<div style="{{ themeStyle }}">
+
+  <!-- TOP BAR -->
+  <header style="display:flex;align-items:center;gap:16px;height:60px;flex:none;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line);z-index:5;">
+    <span style="width:30px;height:30px;border-radius:8px;background:var(--ink);display:grid;place-items:center;flex:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--surface)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 7h6zM17 7l-3 7h6z"></path></svg>
+    </span>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+      <input value="{{ courseTitle }}" style="border:none;background:transparent;outline:none;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em;color:var(--ink);min-width:120px;max-width:380px;padding:5px 8px;border-radius:8px;" style-focus="background:var(--surface-2);" />
+      <span style="font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink-soft);white-space:nowrap;">{{ courseMeta }}</span>
+      <span style="font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--accent);background:var(--accent-tint);padding:3px 8px;border-radius:5px;">DRAFT</span>
+      <button type="button" onClick="{{ onOpenDetails }}" title="Course details" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border:1px solid var(--line);background:var(--surface);border-radius:8px;font-size:12px;font-weight:600;color:var(--ink-muted);cursor:pointer;" style-hover="background:var(--surface-2);color:var(--ink);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13a1.6 1.6 0 00.3 1.8 2 2 0 11-2.8 2.8 1.6 1.6 0 00-2.7 1.1 2 2 0 11-4 0 1.6 1.6 0 00-2.7-1.1 2 2 0 11-2.8-2.8A1.6 1.6 0 003 13a2 2 0 110-4 1.6 1.6 0 001.5-2.6 2 2 0 112.8-2.8A1.6 1.6 0 0010 4a2 2 0 114 0 1.6 1.6 0 002.7 1.1 2 2 0 112.8 2.8A1.6 1.6 0 0021 11a2 2 0 110 4 1.6 1.6 0 00-1.6 1z"></path></svg>
+        Details
+      </button>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+      <button type="button" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 13px;border:1px solid var(--line);background:var(--surface);border-radius:9px;font-size:12.5px;font-weight:600;color:var(--ink-muted);cursor:pointer;" style-hover="background:var(--surface-2);">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 8s2.7-4.5 7-4.5S15 8 15 8s-2.7 4.5-7 4.5S1 8 1 8z"></path><circle cx="8" cy="8" r="2"></circle></svg>
+        Preview as learner
+      </button>
+      <button type="button" onClick="{{ onToggleTheme }}" title="Toggle theme" style="width:36px;height:36px;border:1px solid var(--line);background:var(--surface);border-radius:9px;display:grid;place-items:center;color:var(--ink-muted);cursor:pointer;">{{ themeIcon }}</button>
+      <button type="button" style="display:flex;align-items:center;gap:8px;height:38px;padding:0 17px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 14px var(--accent-glow);">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V2.5M5 5L8 2l3 3"></path><path d="M2.5 9.5V13h11V9.5"></path></svg>
+        Share with learners
+      </button>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div style="flex:1;display:flex;min-height:0;">
+
+    <!-- RAIL -->
+    <aside style="width:280px;flex:none;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line);">
+      <div style="padding:18px 18px 8px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);">Your course</span>
+        <span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);">{{ courseMeta }}</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:6px 12px 14px;">
+        <sc-for list="{{ modules }}" as="mod" hint-placeholder-count="2">
+          <div style="margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-soft);padding:9px 8px 6px;">{{ mod.title }}</div>
+            <sc-for list="{{ mod.lessons }}" as="ls" hint-placeholder-count="2">
+              <button type="button" style="{{ ls.rowStyle }}">
+                <span style="{{ ls.numStyle }}">{{ ls.num }}</span>
+                <span style="min-width:0;flex:1;text-align:left;">
+                  <span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:{{ ls.weight }};color:{{ ls.titleColor }};">{{ ls.title }}</span>
+                  <span style="display:flex;align-items:center;gap:7px;margin-top:4px;">
+                    <span style="font-family:var(--mono);font-size:10px;color:var(--ink-soft);">{{ ls.meta }}</span>
+                    <span style="display:flex;gap:3px;">
+                      <sc-for list="{{ ls.dots }}" as="dot" hint-placeholder-count="3"><span style="{{ dot.style }}"></span></sc-for>
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+        <button type="button" style="display:flex;align-items:center;gap:7px;width:100%;margin-top:4px;padding:11px;border:1px dashed var(--line-strong);background:transparent;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;justify-content:center;" style-hover="border-color:var(--accent);color:var(--accent);">
+          <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"></path></svg>
+          New part of the course
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;padding:13px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-glow);"></span>
+        Saved automatically
+      </div>
+    </aside>
+
+    <!-- CANVAS -->
+    <main style="flex:1;min-width:0;overflow-y:auto;background:var(--bg);">
+      <div style="max-width:680px;margin:0 auto;padding:36px 44px 100px;">
+
+        <div style="font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;">{{ lessonEyebrow }}</div>
+        <input value="{{ lessonTitle }}" style="width:100%;border:none;background:transparent;outline:none;font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1.08;color:var(--ink);padding:0;" />
+        <input value="{{ lessonHook }}" style="width:100%;border:none;background:transparent;outline:none;font-size:16.5px;line-height:1.5;color:var(--ink-muted);padding:10px 0 0;margin-top:4px;" />
+
+        <!-- controls -->
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:24px 0 4px;padding:15px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);">Type</span>
+            <div style="display:flex;gap:6px;">
+              <sc-for list="{{ kindPills }}" as="k" hint-placeholder-count="3"><span style="{{ k.style }}">{{ k.label }}</span></sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);">Length</span>
+            <div style="display:flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:3px;">
+              <span style="width:26px;height:26px;display:grid;place-items:center;border-radius:6px;color:var(--ink-soft);font-size:16px;cursor:pointer;">−</span>
+              <span style="min-width:50px;text-align:center;font-size:13px;font-weight:600;color:var(--ink);">2 min</span>
+              <span style="width:26px;height:26px;display:grid;place-items:center;border-radius:6px;color:var(--ink-soft);font-size:16px;cursor:pointer;">+</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCKS -->
+        <div style="margin-top:26px;display:flex;flex-direction:column;gap:22px;">
+          <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">
+                <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);">{{ b.marker }}</span>
+                <span style="height:1px;flex:1;background:var(--line);"></span>
+                <span style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);">{{ b.kind }}</span>
+              </div>
+
+              <sc-if value="{{ b.isText }}" hint-placeholder-val="{{ true }}">
+                <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;">
+                  <textarea rows="{{ b.rows }}" value="{{ b.text }}" style="width:100%;border:none;background:transparent;outline:none;resize:vertical;font-size:15px;line-height:1.65;color:var(--ink);"></textarea>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ b.isRule }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <sc-for list="{{ b.rows3 }}" as="r" hint-placeholder-count="3">
+                    <div style="display:flex;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px 18px;">
+                      <span style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;color:var(--accent);width:74px;flex:none;padding-top:2px;">{{ r.tag }}</span>
+                      <span style="min-width:0;">
+                        <span style="display:block;font-size:14.5px;font-weight:600;color:var(--ink);">{{ r.title }}</span>
+                        <span style="display:block;font-size:13px;line-height:1.55;color:var(--ink-muted);margin-top:3px;">{{ r.body }}</span>
+                      </span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ b.isTry }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;">
+                  <textarea rows="2" value="{{ b.question }}" style="width:100%;border:none;background:transparent;outline:none;resize:vertical;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.35;color:var(--ink);"></textarea>
+                  <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin:14px 0 9px;">Tap the circle by the right answer</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <sc-for list="{{ b.options }}" as="o" hint-placeholder-count="3">
+                      <div style="{{ o.rowStyle }}">
+                        <span style="{{ o.radioStyle }}"><sc-if value="{{ o.correct }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5L5 9l4.5-5"></path></svg></sc-if></span>
+                        <span style="font-size:14px;color:var(--ink);">{{ o.text }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <!-- add block -->
+          <button type="button" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:17px;border:1px dashed var(--line-strong);background:transparent;border-radius:14px;font-size:13.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;" style-hover="border-color:var(--accent);color:var(--accent);background:var(--accent-tint);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"></path></svg>
+            Add something to this lesson
+          </button>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- COURSE DETAILS DRAWER -->
+  <sc-if value="{{ detailsOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseDetails }}" style="position:fixed;inset:0;z-index:60;display:flex;justify-content:flex-end;background:rgba(6,8,12,.55);backdrop-filter:blur(2px);animation:fadeIn .18s ease both;">
+      <div onClick="{{ stop }}" style="width:452px;max-width:92vw;height:100%;overflow-y:auto;background:var(--surface);border-left:1px solid var(--line);box-shadow:-26px 0 70px rgba(0,0,0,.4);animation:drawerIn .26s cubic-bezier(.2,.7,.2,1) both;">
+        <div style="position:sticky;top:0;display:flex;align-items:center;gap:12px;padding:20px 26px;background:var(--surface);border-bottom:1px solid var(--line);z-index:1;">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Course details</span>
+          <button type="button" onClick="{{ onCloseDetails }}" aria-label="Close" style="margin-left:auto;width:32px;height:32px;border:1px solid var(--line);background:var(--surface);border-radius:8px;color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--surface-2);color:var(--ink);"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"></path></svg></button>
+        </div>
+        <div style="padding:24px 26px 44px;display:flex;flex-direction:column;gap:24px;">
+
+          <div>
+            <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Course ID</div>
+            <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">Unique — namespaces learner progress. Lowercase + hyphens.</div>
+            <input value="eviction-defense-101" style="width:100%;height:44px;padding:0 13px;border:1.5px solid var(--accent);background:var(--bg);border-radius:10px;outline:none;font-family:var(--mono);font-size:13.5px;color:var(--ink);box-shadow:0 0 0 3px var(--accent-tint);" />
+          </div>
+
+          <div>
+            <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Subtitle</div>
+            <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">One sentence under the title.</div>
+            <input value="What to do in the first two days of an eviction case." style="width:100%;height:44px;padding:0 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;outline:none;font-size:13.5px;color:var(--ink);" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint);" />
+          </div>
+
+          <div>
+            <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Practice area</div>
+            <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">Breadcrumb label, e.g. "Court Skills".</div>
+            <input value="Housing" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;outline:none;font-size:13.5px;color:var(--ink);" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint);" />
+          </div>
+
+          <div>
+            <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Blurb</div>
+            <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">Outline-page lead. Supports **bold** and _italic_.</div>
+            <textarea rows="3" style="width:100%;padding:11px 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;outline:none;resize:vertical;font-size:13.5px;line-height:1.55;color:var(--ink);">The clock is the case. Learn to find the date that starts the timeline, read the notice and summons, and walk into the first appearance ready.</textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Topic family</div>
+              <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">Sets the accent colour.</div>
+              <div style="display:flex;align-items:center;gap:9px;height:44px;padding:0 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;">
+                <span style="width:11px;height:11px;border-radius:3px;background:var(--accent);flex:none;"></span>
+                <span style="flex:1;font-size:13.5px;color:var(--ink);">Foundations</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"><path d="M3 5l3 3 3-3"></path></svg>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Chrome</div>
+              <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">bar = top bar · rail = sidebar.</div>
+              <div style="display:flex;align-items:center;gap:9px;height:44px;padding:0 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;">
+                <span style="flex:1;font-size:13.5px;color:var(--ink);">bar</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"><path d="M3 5l3 3 3-3"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);">Home link URL</div>
+            <div style="font-size:12.5px;line-height:1.4;color:var(--ink-soft);margin:5px 0 9px;">Where the wrapper's home button points.</div>
+            <input value="https://lms-discovery.vercel.app/" style="width:100%;height:44px;padding:0 13px;border:1px solid var(--line);background:var(--bg);border-radius:10px;outline:none;font-family:var(--mono);font-size:12.5px;color:var(--ink);" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint);" />
+          </div>
+
+          <button type="button" onClick="{{ onCloseDetails }}" style="align-self:flex-start;height:42px;padding:0 22px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 3px 14px var(--accent-glow);">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = { theme: 'dark', detailsOpen: false };
+  CAT = { blue:'#3b82f6', violet:'#8b5cf6', pink:'#ec4899', amber:'#f59e0b', green:'#10b981', teal:'#14b8a6' };
+
+  themeVars() {
+    if (this.state.theme === 'light') return {
+      '--bg':'#f4f6fa','--surface':'#ffffff','--surface-2':'#eef1f7','--scroll':'#cdd3de',
+      '--ink':'#0d1117','--ink-muted':'#48505e','--ink-soft':'#8b94a3',
+      '--line':'#e4e8ef','--line-soft':'#eef1f6','--line-strong':'#cdd5e1',
+      '--accent':'#2f5bff','--accent-ink':'#1e44e0','--accent-tint':'#e9eeff','--accent-glow':'rgba(47,91,255,.26)',
+      '--ok':'#10b981','--ok-glow':'rgba(16,185,129,.18)',
+    };
+    return {
+      '--bg':'#0b0d12','--surface':'#13161d','--surface-2':'#1b1f28','--scroll':'#2a3039',
+      '--ink':'#f3f5f9','--ink-muted':'#9aa3b2','--ink-soft':'#5e6675',
+      '--line':'#242a34','--line-soft':'#1c212a','--line-strong':'#333b48',
+      '--accent':'#5b7dff','--accent-ink':'#94aaff','--accent-tint':'rgba(91,125,255,.15)','--accent-glow':'rgba(91,125,255,.4)',
+      '--ok':'#2fd397','--ok-glow':'rgba(47,211,151,.22)',
+    };
+  }
+
+  pill(active) {
+    return `display:inline-flex;align-items:center;padding:5px 12px;border-radius:8px;border:1px solid ${active?'var(--accent)':'var(--line)'};background:${active?'var(--accent-tint)':'transparent'};font-size:12px;font-weight:600;color:${active?'var(--accent-ink)':'var(--ink-soft)'};cursor:pointer;`;
+  }
+
+  renderVals() {
+    const st = this.state;
+    const vars = this.themeVars();
+    const themeStyle = Object.entries(vars).map(([k,v])=>`${k}:${v}`).join(';') + `;display:flex;flex-direction:column;height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);`;
+
+    const dot = (filled) => ({ style:`width:5px;height:5px;border-radius:50%;display:inline-block;background:${filled?'var(--accent)':'var(--line-strong)'};` });
+    const lessonRow = (num, title, meta, active, filled, total) => {
+      const dots = Array.from({length:total}).map((_,i)=>dot(i<filled));
+      return {
+        num, title, meta, dots,
+        weight: active?700:600,
+        titleColor: active?'var(--ink)':'var(--ink-muted)',
+        numStyle:`width:24px;height:24px;border-radius:7px;flex:none;display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:600;background:${active?'var(--accent)':'var(--surface-2)'};color:${active?'#fff':'var(--ink-soft)'};`,
+        rowStyle:`display:flex;align-items:flex-start;gap:11px;width:100%;padding:9px 10px;border:none;border-radius:10px;cursor:pointer;text-align:left;background:${active?'var(--accent-tint)':'transparent'};margin-bottom:2px;`,
+      };
+    };
+
+    const modules = [
+      { title:'Getting your bearings', lessons:[
+        lessonRow('1','When the clock starts','Concept · 2 min', true, 3, 3),
+        lessonRow('2','The four notice types','Concept · 3 min', false, 1, 3),
+      ]},
+      { title:'Building the defense', lessons:[
+        lessonRow('3','Reading the summons','Concept · 4 min', false, 0, 3),
+        lessonRow('4','The first appearance checklist','Practice · 2 min', false, 0, 4),
+      ]},
+    ];
+
+    const kindPills = [['Concept',true],['Practice',false],['Reflection',false]].map(([label,a])=>({label,style:this.pill(a)}));
+
+    const blocks = [
+      { marker:'S1', kind:'The scenario', isText:true, rows:3,
+        text:'A client brings in a notice to quit, a summons, and a screenshot from the landlord. Three dates appear in three different places. Only one of them starts the court timeline.' },
+      { marker:'S2', kind:'The rule', isRule:true, rows3:[
+        { tag:'NOTICE', title:'Receipt date', body:'The notice period usually runs from when the tenant receives the notice, not when the landlord prints it.' },
+        { tag:'SUMMONS', title:'Service date', body:'The answer date depends on proper service of the summons and complaint.' },
+        { tag:'COURT', title:'Entry date', body:'Check the docket — a late or early entry can create a procedural defense.' },
+      ]},
+      { marker:'S3', kind:'Try it', isTry:true,
+        question:'A 14-day notice is dated May 1, mailed May 2, and received by the tenant May 6. Which date do you use first?',
+        options:[
+          { text:'May 1, because it is printed on the notice.', correct:false },
+          { text:'May 2, because mailing started the landlord\u2019s action.', correct:false },
+          { text:'May 6, because that is when the tenant received it.', correct:true },
+        ].map(o=>({
+          text:o.text, correct:o.correct,
+          rowStyle:`display:flex;align-items:center;gap:11px;padding:13px 15px;border-radius:11px;border:1px solid ${o.correct?'var(--accent)':'var(--line)'};background:${o.correct?'var(--accent-tint)':'var(--surface-2)'};`,
+          radioStyle:`width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;border:2px solid ${o.correct?'var(--accent)':'var(--line-strong)'};background:${o.correct?'var(--accent)':'transparent'};`,
+        })),
+      },
+    ];
+
+    const themeIcon = st.theme==='dark'
+      ? React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round'},
+          React.createElement('circle',{key:'c',cx:12,cy:12,r:4}),
+          ['M12 2v2','M12 20v2','M4 12H2','M22 12h-2','M5.6 5.6l1.4 1.4','M17 17l1.4 1.4','M18.4 5.6L17 7','M7 17l-1.4 1.4'].map((d,i)=>React.createElement('path',{key:i,d})))
+      : React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round'},
+          React.createElement('path',{key:'m',d:'M20 14.5A8 8 0 119.5 4 6.5 6.5 0 0020 14.5z'}));
+
+    return {
+      themeStyle, themeIcon,
+      detailsOpen: st.detailsOpen,
+      onOpenDetails: ()=> this.setState({ detailsOpen:true }),
+      onCloseDetails: ()=> this.setState({ detailsOpen:false }),
+      stop: e=> e.stopPropagation(),
+      onToggleTheme: ()=> this.setState(s=>({ theme:s.theme==='dark'?'light':'dark' })),
+      courseTitle:'Eviction Defense: The First 48 Hours',
+      courseMeta:'2 parts · 4 lessons',
+      lessonEyebrow:'Concept · Topic 1 of 4',
+      lessonTitle:'When the clock starts',
+      lessonHook:'The first defense move is not the argument. It is finding the date that makes every later deadline honest.',
+      modules, kindPills, blocks,
+    };
+  }
+}
+</script>
+</body>
+</html>

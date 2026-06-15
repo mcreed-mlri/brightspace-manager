@@ -1,0 +1,165 @@
+{
+  "id": "eviction-defense-101",
+  "createdAt": "2026-06-15T12:00:00.000Z",
+  "updatedAt": "2026-06-15T18:52:57.848Z",
+  "courseId": "eviction-defense-101",
+  "courseTitle": "Eviction Defense: The First 48 Hours",
+  "courseSubtitle": "What to do in the first two days of an eviction case.",
+  "courseBlurb": "The clock is the case. Learn to find the date that starts the timeline, read the notice and summons, and walk into the first appearance ready.",
+  "courseArea": "Housing",
+  "topic": "foundations",
+  "chromeMode": "bar",
+  "homeLinkUrl": "https://lms-discovery.vercel.app/",
+  "modules": [
+    {
+      "id": "module-1",
+      "title": "Getting your bearings",
+      "description": "",
+      "topics": [
+        {
+          "slug": "when-the-clock-starts",
+          "title": "When the clock starts",
+          "kind": "Concept",
+          "minutes": 2,
+          "description": "Find the date that starts the court timeline.",
+          "updated": "",
+          "standfirst": "The first defense move is not the argument. It is finding the date that makes every later deadline honest.",
+          "scenario": "A client brings in a notice to quit, a summons, and a screenshot from the landlord. Three dates appear in three different places. Only one of them starts the court timeline.",
+          "rule": "**Notice — receipt date.** The notice period usually runs from when the tenant receives the notice, not when the landlord prints it.\n\n**Summons — service date.** The answer date depends on proper service of the summons and complaint.\n\n**Court — entry date.** Check the docket — a late or early entry can create a procedural defense.",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "media": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "A 14-day notice is dated May 1, mailed May 2, and received by the tenant May 6. Which date do you use first?",
+            "options": [
+              {
+                "text": "May 1, because it is printed on the notice.",
+                "correct": false
+              },
+              {
+                "text": "May 2, because mailing started the landlord's action.",
+                "correct": false
+              },
+              {
+                "text": "May 6, because that is when the tenant received it.",
+                "correct": true
+              }
+            ],
+            "answer": "Use May 6 — the notice period runs from receipt, not the date printed on the notice or the day it was mailed."
+          },
+          "remember": []
+        },
+        {
+          "slug": "the-four-notice-types",
+          "title": "The four notice types",
+          "kind": "Reflection",
+          "minutes": 3,
+          "description": "Tell a 14-day from a 30-day at a glance.",
+          "updated": "",
+          "standfirst": "",
+          "scenario": "",
+          "rule": "",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "media": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "",
+            "options": [
+              {
+                "text": "",
+                "correct": false
+              },
+              {
+                "text": "",
+                "correct": true
+              },
+              {
+                "text": "",
+                "correct": false
+              }
+            ],
+            "answer": ""
+          },
+          "remember": []
+        }
+      ]
+    },
+    {
+      "id": "module-2",
+      "title": "Building the defense",
+      "description": "",
+      "topics": [
+        {
+          "slug": "reading-the-summons",
+          "title": "Reading the summons",
+          "kind": "Concept",
+          "minutes": 4,
+          "description": "Where the deadlines actually live.",
+          "updated": "",
+          "standfirst": "",
+          "scenario": "",
+          "rule": "",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "media": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "",
+            "options": [
+              {
+                "text": "",
+                "correct": false
+              },
+              {
+                "text": "",
+                "correct": true
+              },
+              {
+                "text": "",
+                "correct": false
+              }
+            ],
+            "answer": ""
+          },
+          "remember": []
+        },
+        {
+          "slug": "the-first-appearance-checklist",
+          "title": "The first appearance checklist",
+          "kind": "Practice",
+          "minutes": 2,
+          "description": "Walk in with the right five things.",
+          "updated": "",
+          "standfirst": "",
+          "scenario": "",
+          "rule": "",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "media": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "",
+            "options": [
+              {
+                "text": "",
+                "correct": false
+              },
+              {
+                "text": "",
+                "correct": true
+              },
+              {
+                "text": "",
+                "correct": false
+              }
+            ],
+            "answer": ""
+          },
+          "remember": []
+        }
+      ]
+    }
+  ]
+}

@@ -3,32 +3,23 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { ComponentType, SVGProps } from "react";
-import {
-  IconCourses,
-  IconDashboard,
-  IconDatabase,
-  IconFiles,
-  IconHome,
-  IconLearners,
-  IconSettings,
-  IconShield,
-  IconStudio,
-  IconSync,
-} from "@/components/icons";
+import { IconScales, IconSearch } from "@/components/icons";
 import { SessionBadge } from "@/components/auth/session-badge";
 
-/* Dark rail per design handoff v3: one sidebar, two audiences. Author mode
-   shows just the essentials for attorneys; Operator mode is the full
-   monitoring console. The toggle is sticky (localStorage) and route-aware:
-   landing on an operator-only page flips the rail to operator mode. */
+/* Sidebar — cool direction. One rail, two audiences. Themed surface (no longer
+   a permanent dark rail): in dark mode it's the dark surface, in light mode
+   white. Brand row + decorative search + segmented Author/Operator toggle +
+   grouped nav with category dots + identity chip. The mode toggle is sticky
+   (localStorage) and route-aware: landing on an operator-only page flips the
+   rail to operator mode. */
 
 type Mode = "author" | "operator";
 
 type NavItem = {
   label: string;
   href: string;
-  icon: ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
+  dot: string; // category palette colour
+  count?: string;
 };
 
 type NavGroup = {
@@ -41,9 +32,9 @@ const AUTHOR_NAV: NavGroup[] = [
   {
     label: null,
     items: [
-      { label: "Home", href: "/", icon: IconHome },
-      { label: "Course Studio", href: "/course-studio/", icon: IconStudio },
-      { label: "How everyone's doing", href: "/learners/", icon: IconLearners },
+      { label: "Home", href: "/", dot: "var(--cat-blue)" },
+      { label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" },
+      { label: "How everyone's doing", href: "/learners/", dot: "var(--cat-green)" },
     ],
   },
 ];
@@ -51,32 +42,26 @@ const AUTHOR_NAV: NavGroup[] = [
 const OPERATOR_NAV: NavGroup[] = [
   {
     label: null,
-    items: [{ label: "Dashboard", href: "/dashboard/", icon: IconDashboard }],
+    items: [{ label: "Dashboard", href: "/dashboard/", dot: "var(--accent)" }],
   },
   {
     label: "Monitor",
     items: [
-      { label: "Course Inventory", href: "/courses/", icon: IconCourses },
-      { label: "Sync Diagnostics", href: "/sync/", icon: IconSync },
-      { label: "Integrity Checker", href: "/integrity/", icon: IconShield },
-      { label: "Learner Progress", href: "/learners/", icon: IconLearners },
+      { label: "Course Inventory", href: "/courses/", dot: "var(--cat-blue)" },
+      { label: "Sync Diagnostics", href: "/sync/", dot: "var(--cat-amber)" },
+      { label: "Integrity Checker", href: "/integrity/", dot: "var(--cat-teal)" },
+      { label: "Learner Progress", href: "/learners/", dot: "var(--cat-green)" },
     ],
   },
   {
     label: "Under the hood",
     items: [
-      { label: "Manage Files", href: "/files/", icon: IconFiles },
-      { label: "Supabase Data", href: "/supabase-data/", icon: IconDatabase },
+      { label: "Manage Files", href: "/files/", dot: "var(--cat-violet)" },
+      { label: "Supabase Data", href: "/supabase-data/", dot: "var(--cat-pink)" },
+      { label: "Settings", href: "/settings/", dot: "var(--ink-soft)" },
     ],
   },
 ];
-
-const SETTINGS_ITEM: NavItem = { label: "Settings", href: "/settings/", icon: IconSettings };
-
-const MODE_SUBTITLE: Record<Mode, string> = {
-  author: "Just the essentials: build courses and see how learners are doing.",
-  operator: "Full console: connections, sync, files and the cache.",
-};
 
 const OPERATOR_PREFIXES = [
   "/dashboard",
@@ -101,20 +86,26 @@ function isActive(pathname: string, href: string) {
 }
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {
-  const Icon = item.icon;
   return (
     <li>
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex w-full items-center gap-[9px] rounded-[7px] px-2.5 py-2 text-[13px] transition-colors duration-100 ${
+        className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-[13px] transition-colors duration-100 ${
           active
-            ? "bg-sb-active font-semibold text-white"
-            : "font-medium text-sb-ink hover:bg-sb-hover"
+            ? "bg-[var(--accent-tint)] font-semibold text-ink"
+            : "font-medium text-ink-muted hover:bg-sb-hover hover:text-ink"
         }`}
       >
-        <Icon size={16} className={`shrink-0 ${active ? "opacity-100" : "opacity-60"}`} />
-        {item.label}
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-[2px]"
+          style={{ background: active ? "var(--accent)" : item.dot }}
+          aria-hidden
+        />
+        <span className="flex-1 truncate text-left">{item.label}</span>
+        {item.count ? (
+          <span className="font-mono text-[11px] text-ink-soft">{item.count}</span>
+        ) : null}
       </Link>
     </li>
   );
@@ -151,82 +142,80 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
 
   return (
     <aside
-      className={`flex shrink-0 flex-col overflow-hidden bg-sb transition-[width,opacity] duration-200 ease-in-out ${
-        hidden ? "pointer-events-none w-0 opacity-0" : "w-[232px]"
+      className={`flex shrink-0 flex-col overflow-hidden border-r border-line bg-surface transition-[width,opacity] duration-200 ease-in-out ${
+        hidden ? "pointer-events-none w-0 opacity-0" : "w-[236px]"
       }`}
       aria-hidden={hidden}
     >
-      <div className="flex items-center gap-2.5 border-b border-sb-line px-4 pb-3.5 pt-[17px]">
-        <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-brand-fill font-mono text-[11px] font-bold text-white">
-          BM
+      {/* Brand row */}
+      <div className="flex items-center gap-2.5 px-4 pb-4 pt-[18px]">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink text-surface">
+          <IconScales size={17} />
         </span>
-        <span className="min-w-0">
-          <span className="block text-[10px] font-semibold uppercase leading-none tracking-[0.09em] text-sb-muted">
-            LACE
-          </span>
-          <span className="mt-0.5 block truncate text-[13px] font-bold leading-tight tracking-[-0.01em] text-white">
-            Brightspace Manager
-          </span>
+        <span className="font-display text-[17px] font-bold tracking-[-0.02em] text-ink">LACE</span>
+        <span className="ml-auto rounded-[5px] bg-[var(--accent-tint)] px-[7px] py-[3px] font-mono text-[9.5px] font-semibold tracking-[0.08em] text-accent">
+          OPS
         </span>
       </div>
 
-      <div className="flex gap-1 border-b border-sb-line px-3.5 pb-3 pt-2.5" role="tablist">
-        {(["author", "operator"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="tab"
-            aria-selected={mode === m}
-            onClick={() => switchMode(m)}
-            className={`flex-1 rounded-[7px] py-1.5 text-[12.5px] font-semibold capitalize transition-colors duration-100 ${
-              mode === m
-                ? "bg-white/[0.13] text-white"
-                : "text-sb-muted hover:bg-sb-hover hover:text-sb-ink"
-            }`}
-          >
-            {m}
-          </button>
-        ))}
+      {/* Decorative search */}
+      <div className="px-3 pb-3">
+        <div className="flex h-9 items-center gap-2 rounded-[9px] border border-line bg-surface-sunken px-[11px]">
+          <IconSearch size={14} className="shrink-0 text-ink-soft" />
+          <span className="flex-1 text-[12.5px] text-ink-soft">Search</span>
+          <span className="rounded-[4px] border border-line px-[5px] py-px font-mono text-[10px] text-ink-soft">
+            ⌘K
+          </span>
+        </div>
       </div>
 
-      <p className="px-4 pt-2.5 text-[11.5px] italic leading-normal text-sb-muted">
-        {MODE_SUBTITLE[mode]}
-      </p>
+      {/* Mode toggle */}
+      <div className="px-3 pb-1">
+        <div
+          className="flex gap-[3px] rounded-[9px] border border-line bg-surface-sunken p-[3px]"
+          role="tablist"
+        >
+          {(["author", "operator"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="tab"
+              aria-selected={mode === m}
+              onClick={() => switchMode(m)}
+              className={`flex-1 rounded-[7px] py-[7px] text-[12px] font-semibold capitalize transition-colors duration-100 ${
+                mode === m
+                  ? "bg-accent text-white shadow-[0_2px_8px_var(--accent-glow)]"
+                  : "text-ink-muted hover:bg-surface hover:text-ink"
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <nav
-        className="flex flex-1 flex-col gap-px overflow-y-auto px-2.5 pb-1.5 pt-2"
+        className="flex flex-1 flex-col overflow-y-auto px-[11px] pb-1.5 pt-3"
         aria-label="Main navigation"
       >
         {groups.map((group) => (
-          <div key={group.label ?? "top"}>
+          <div key={group.label ?? "top"} className="mb-1.5">
             {group.label ? (
-              <p className="px-2 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[0.1em] text-sb-muted">
+              <p className="px-2 pb-1.5 pt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] text-ink-soft">
                 {group.label}
               </p>
             ) : null}
-            <ul className="flex flex-col gap-px">
+            <ul className="flex flex-col gap-0.5">
               {group.items.map((item) => (
                 <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />
               ))}
             </ul>
           </div>
         ))}
-        {mode === "operator" ? (
-          <>
-            <div className="flex-1" aria-hidden />
-            <ul className="mt-1">
-              <NavLink item={SETTINGS_ITEM} active={isActive(pathname, SETTINGS_ITEM.href)} />
-            </ul>
-          </>
-        ) : null}
       </nav>
 
+      {/* Identity chip */}
       <SessionBadge />
-
-      <div className="flex items-center gap-[7px] border-t border-sb-line px-3 py-2.5">
-        <span className="h-[7px] w-[7px] shrink-0 animate-pulse rounded-full bg-status-ok" aria-hidden />
-        <span className="text-[11px] text-sb-muted">v0.3 · writes: sync only</span>
-      </div>
     </aside>
   );
 }

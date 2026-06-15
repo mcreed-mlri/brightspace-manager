@@ -3,11 +3,12 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { TopBar } from "@/components/top-bar";
 
-/* App shell per design handoff v3: full-viewport flex row, dark rail +
-   scrolling content. The Studio builder ( /course-studio/[draftId] ) is a
-   full-screen editor — the sidebar slides away and the page owns the
-   whole viewport with no padding. */
+/* App shell — cool direction: full-viewport flex row, themed sidebar + a 60px
+   top bar over scrolling content. The Studio builder
+   ( /course-studio/[draftId] ) is a full-screen editor — the sidebar and top
+   bar slide away and the page owns the whole viewport with no padding. */
 
 function isBuilderRoute(pathname: string) {
   return /^\/course-studio\/[^/]+\/?$/.test(pathname);
@@ -24,9 +25,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         {builder ? (
           children
         ) : (
-          <div key={pathname} className="fade-up flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-6xl px-11 pb-16 pt-9">{children}</div>
-          </div>
+          <>
+            <TopBar />
+            <div key={pathname} className="fade-up flex-1 overflow-y-auto">
+              <div className="mx-auto w-full max-w-[1000px] px-9 pb-20 pt-9">{children}</div>
+            </div>
+          </>
         )}
       </main>
     </div>

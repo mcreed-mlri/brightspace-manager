@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 
 function greeting(): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning, counsel.";
-  if (hour < 17) return "Good afternoon, counsel.";
-  return "Good evening, counsel.";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 function dateLine(): string {
@@ -35,28 +35,18 @@ export default async function AuthorHomePage() {
       <header className="mb-[26px]">
         <p className="mb-[5px] font-mono text-[11px] text-ink-soft">{dateLine()}</p>
         <h1 className="page-title text-ink">{greeting()}</h1>
-        <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
-          Your courses on the LACE Learning Hub, in plain language. Everything here is safe to
-          read — nothing changes until you choose to publish.
-        </p>
       </header>
 
-      <section className="mb-[30px] rounded-[14px] border border-[rgba(42,91,255,0.16)] bg-brand-tint px-[30px] py-[26px]">
-        <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.1em] text-brand">
-          Course Studio
-        </p>
-        <h2 className="mb-1.5 text-xl font-extrabold tracking-[-0.025em] text-ink">
-          Build a course without touching any code.
+      <section className="mb-[30px] rounded-[14px] border border-[var(--accent-tint)] bg-brand-tint px-[30px] py-[26px]">
+        <p className="eyebrow mb-2.5">Course Studio</p>
+        <h2 className="mb-[18px] font-display text-[24px] font-bold tracking-[-0.025em] text-ink">
+          Start a draft
         </h2>
-        <p className="mb-[18px] max-w-[480px] text-[13.5px] leading-relaxed text-ink-muted">
-          Fill in a few plain-English boxes — a scenario, a rule, a question — and watch the
-          finished course build itself on the right.
-        </p>
         <div className="flex items-center gap-[9px]">
-          <NewCourseButton label="+ Start a new course" />
+          <NewCourseButton label="+ New course" />
           {lastDraft ? (
             <Link href={`/course-studio/${lastDraft.id}/`} className="btn-secondary">
-              Continue last draft
+              Continue draft
             </Link>
           ) : null}
         </div>
@@ -70,10 +60,7 @@ export default async function AuthorHomePage() {
       </div>
       <div className="editorial-card mb-[26px]">
         {drafts.length === 0 ? (
-          <p className="px-5 py-5 text-[13px] text-ink-muted">
-            No courses yet — start your first one above. It stays a private draft until you
-            publish it.
-          </p>
+          <p className="px-5 py-5 text-[13px] text-ink-muted">No drafts yet.</p>
         ) : (
           drafts.slice(0, 5).map((draft) => (
             <Link
@@ -122,17 +109,13 @@ export default async function AuthorHomePage() {
       </div>
 
       <div className="mb-2.5 flex items-center justify-between">
-        <span className="section-title text-ink">Who could use a nudge</span>
+        <span className="section-title text-ink">Learner progress</span>
         <Link href="/learners/" className="text-[12.5px] font-semibold text-brand">
           See everyone →
         </Link>
       </div>
       <div className="editorial-card px-5 py-5">
-        <p className="text-[13px] leading-relaxed text-ink-muted">
-          Learner progress is on its way — once courses report progress to Supabase, the people
-          who are stuck or haven&apos;t started will show up here so you know who to check in
-          with.
-        </p>
+        <p className="text-[13px] text-ink-muted">Not available yet.</p>
       </div>
     </div>
   );

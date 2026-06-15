@@ -106,6 +106,20 @@ export async function writeDraft(draft: CourseDraft): Promise<CourseDraft> {
   return next;
 }
 
+/* Deletes a draft from the writable store. On Vercel only /tmp is writable,
+   so a bundled-only draft can't be removed there — the same write-back
+   limitation that applies to saves. Returns whether a file was removed. */
+export async function deleteDraft(id: string): Promise<boolean> {
+  validateDraftId(id);
+  try {
+    await fs.unlink(draftPath(writableDraftsDir(), id));
+    return true;
+  } catch {
+    /* not present in the writable dir — nothing to remove */
+    return false;
+  }
+}
+
 export async function createDraft(courseTitle: string): Promise<CourseDraft> {
   const base = slugify(courseTitle);
   let id = base;

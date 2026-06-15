@@ -14,22 +14,29 @@ import {
 import {
   TEMPLATES,
   clearSection,
+  familyAccentStyle,
+  familyColor,
   sectionsWithContent,
   type SectionType,
 } from "@/components/studio/builder-blocks";
-import { BuilderForm } from "@/components/studio/builder-form";
-import { BuilderOutline } from "@/components/studio/builder-outline";
-import { BuilderPreview } from "@/components/studio/builder-preview";
+import { BuilderCanvas } from "@/components/studio/builder-canvas";
+import { BuilderRail } from "@/components/studio/builder-rail";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { formatRelative } from "@/components/courses/course-presentation";
+import { IconScales } from "@/components/icons";
+import { useTheme } from "@/components/theme-provider";
 
 /* Course Studio builder (design handoff v3) — full-screen three-pane editor:
    lesson outline → plain-English form → live learner preview. The sidebar
    hides while this screen is open (AppShell handles that). Saves are
    debounced 2s after the last keystroke. */
 
+/* Course Details fields — cool spec: 44px, radius 10, --bg fill, accent focus
+   ring. Textareas drop the fixed height and add vertical padding instead. */
 const drawerInputClass =
-  "w-full rounded-[9px] border border-line bg-surface px-3 py-[9px] text-[13.5px] text-ink outline-none transition-colors focus:border-brand-fill focus:ring-[3px] focus:ring-brand-fill/10";
+  "h-11 w-full rounded-[10px] border border-line bg-paper px-[13px] text-[13.5px] text-ink outline-none transition-colors focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-tint)]";
+const drawerAreaClass =
+  "w-full rounded-[10px] border border-line bg-paper px-[13px] py-[11px] text-[13.5px] leading-relaxed text-ink outline-none transition-colors focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-tint)]";
 
 function locate(draft: CourseDraft, slug: string | null) {
   if (!slug) return null;
@@ -63,7 +70,6 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(
     initialDraft.modules[0]?.topics[0]?.slug ?? null,
   );
-  const [collapsed, setCollapsed] = useState(false);
   const [added, setAdded] = useState<Record<string, SectionType[]>>({});
   const [autoFocusType, setAutoFocusType] = useState<SectionType | null>(null);
 
@@ -72,6 +78,9 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const [preview, setPreview] = useState<{ slug: string; html: string } | null>(null);
   const [previewBusy, setPreviewBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { theme, toggleTheme } = useTheme();
 
   /* Race-safe saves: only clear `dirty` if nothing changed while the PUT
      was in flight. */
@@ -112,6 +121,16 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
     }, 2000);
     return () => clearTimeout(timer);
   }, [draft, dirty]);
+
+  /* Close the overflow menu on any outside click. */
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onDocClick(event: MouseEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    }
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [menuOpen]);
 
   function mutate(fn: (next: CourseDraft) => void) {
     const next = structuredClone(draftRef.current);
@@ -357,72 +376,138 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
         };
 
   return (
-    <div className="fade-up flex h-full flex-1 flex-col overflow-hidden">
+    <div
+      className="fade-up flex h-full flex-1 flex-col overflow-hidden"
+      style={familyAccentStyle(draft.topic)}
+    >
       {/* ── top bar ── */}
-      <div className="flex shrink-0 items-center gap-2.5 border-b border-line bg-surface px-5 py-[9px]">
+      <div className="flex h-[60px] shrink-0 items-center gap-3 border-b border-line bg-surface px-[22px]">
         <Link
           href="/course-studio/"
-          className="flex items-center gap-[5px] rounded-md px-2 py-[5px] text-[12.5px] text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+          title="All courses"
+          aria-label="All courses"
+          className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-ink text-surface transition-transform hover:-translate-x-0.5"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-            <path d="M8 2L4 6l4 4" />
-          </svg>
-          All courses
+          <IconScales size={16} />
         </Link>
-        <span className="h-[22px] w-px shrink-0 bg-line" aria-hidden />
-        <input
-          value={draft.courseTitle}
-          onChange={(e) => mutate((n) => void (n.courseTitle = e.target.value))}
-          aria-label="Course title"
-          className="min-w-0 max-w-[320px] flex-shrink rounded-[5px] border-none bg-transparent px-[5px] py-0.5 text-sm font-bold tracking-[-0.01em] text-ink outline-none focus:bg-surface-sunken"
-          style={{ width: `${Math.max(draft.courseTitle.length, 12)}ch` }}
-        />
+        <div className="flex min-w-0 items-center gap-2.5">
+          <input
+            value={draft.courseTitle}
+            onChange={(e) => mutate((n) => void (n.courseTitle = e.target.value))}
+            aria-label="Course title"
+            className="min-w-0 max-w-[360px] flex-shrink rounded-lg border-none bg-transparent px-2 py-[5px] font-display text-[17px] font-semibold tracking-[-0.02em] text-ink outline-none focus:bg-surface-sunken"
+            style={{ width: `${Math.max(draft.courseTitle.length, 10)}ch` }}
+          />
+          <span className="rounded-[5px] bg-[var(--accent-tint)] px-2 py-[3px] font-mono text-[9.5px] font-semibold tracking-[0.06em] text-accent">
+            DRAFT
+          </span>
+        </div>
         {error ? (
           <span className="truncate text-xs font-semibold text-status-error-ink">{error}</span>
         ) : null}
 
-        <div className="ml-auto flex items-center gap-[7px]">
-          <button
-            type="button"
-            onClick={() => setDetailsOpen(true)}
-            className="flex items-center gap-[5px] rounded-[7px] border border-line bg-surface px-3 py-1.5 text-[12.5px] font-semibold text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
-          >
-            Course details
-          </button>
-          <button
-            type="button"
-            onClick={() => void showServerPreview()}
-            disabled={previewBusy || !topic}
-            className="flex items-center gap-[5px] rounded-[7px] border border-line bg-surface px-3 py-1.5 text-[12.5px] font-semibold text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-50"
-          >
-            {previewBusy ? "Building…" : "Preview"}
-          </button>
+        <div className="ml-auto flex items-center gap-2.5">
           <span
-            className={`whitespace-nowrap rounded-full px-[9px] py-[3px] text-[11px] font-bold transition-colors ${savePill.tone}`}
+            className={`whitespace-nowrap rounded-[6px] px-[9px] py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] transition-colors ${savePill.tone}`}
           >
             {savePill.label}
           </span>
           <button
             type="button"
+            onClick={() => void showServerPreview()}
+            disabled={previewBusy || !topic}
+            className="flex h-9 items-center gap-[7px] rounded-[9px] border border-line bg-surface px-[13px] text-[12.5px] font-semibold text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-50"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+              <path d="M1 8s2.7-4.5 7-4.5S15 8 15 8s-2.7 4.5-7 4.5S1 8 1 8z" />
+              <circle cx="8" cy="8" r="2" />
+            </svg>
+            {previewBusy ? "Building…" : "Preview as learner"}
+          </button>
+          <button
+            type="button"
             onClick={() => void exportZip()}
             disabled={exporting}
-            className="flex items-center gap-1.5 rounded-[7px] border-none bg-brand-fill px-4 py-[7px] text-[13px] font-bold text-white transition-opacity hover:opacity-[0.88] disabled:opacity-50"
+            className="btn-primary disabled:opacity-50"
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-              <path d="M6 8V2M3 5l3-3 3 3M2 10h8" />
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M8 11V2.5M5 5L8 2l3 3" />
+              <path d="M2.5 9.5V13h11V9.5" />
             </svg>
-            {exporting ? "Exporting…" : "Export package"}
+            {exporting ? "Exporting…" : "Share with learners"}
           </button>
+
+          <div ref={menuRef} className="relative">
+            <button
+              type="button"
+              aria-label="More options"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((v) => !v)}
+              className={`grid h-9 w-9 place-items-center rounded-[10px] border border-line bg-surface text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink ${
+                menuOpen ? "bg-surface-sunken text-ink" : ""
+              }`}
+            >
+              <svg width="15" height="15" viewBox="0 0 14 14" fill="currentColor" aria-hidden>
+                <circle cx="3" cy="7" r="1.3" />
+                <circle cx="7" cy="7" r="1.3" />
+                <circle cx="11" cy="7" r="1.3" />
+              </svg>
+            </button>
+
+            {menuOpen ? (
+              <div
+                role="menu"
+                className="absolute right-0 top-[42px] z-50 w-[188px] rounded-lg border border-line bg-surface p-1 shadow-[var(--shadow-lg)]"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setDetailsOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 13a1.6 1.6 0 00.3 1.8 2 2 0 11-2.8 2.8 1.6 1.6 0 00-2.7 1.1 2 2 0 11-4 0 1.6 1.6 0 00-2.7-1.1 2 2 0 11-2.8-2.8A1.6 1.6 0 003 13a2 2 0 110-4 1.6 1.6 0 001.5-2.6 2 2 0 112.8-2.8A1.6 1.6 0 0010 4a2 2 0 114 0 1.6 1.6 0 002.7 1.1 2 2 0 112.8 2.8A1.6 1.6 0 0021 11a2 2 0 110 4 1.6 1.6 0 00-1.6 1z" />
+                  </svg>
+                  Course details
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    toggleTheme();
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                >
+                  {theme === "dark" ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                      <circle cx="12" cy="12" r="4" />
+                      <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4" />
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                      <path d="M20 14.5A8 8 0 119.5 4 6.5 6.5 0 0020 14.5z" />
+                    </svg>
+                  )}
+                  {theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
 
-      {/* ── three panes ── */}
+      {/* ── rail + canvas ── */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <BuilderOutline
+        <BuilderRail
           modules={draft.modules}
           selectedSlug={selectedSlug}
-          collapsed={collapsed}
-          onToggleCollapsed={() => setCollapsed((v) => !v)}
+          saving={saving}
           onSelect={selectLesson}
           onRenameModule={renameModule}
           onAddLesson={addLesson}
@@ -432,11 +517,13 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           onDeleteLesson={requestDeleteLesson}
         />
         {topic ? (
-          <BuilderForm
+          <BuilderCanvas
             key={`${found!.mod.id}:${found!.index}`}
             topic={topic}
             added={added[topic.slug] ?? []}
             autoFocusType={autoFocusType}
+            lessonIndex={Math.max(flatIndex, 0)}
+            lessonTotal={flat.length}
             onTopicChange={(fn) => mutateTopic(topic.slug, fn)}
             onAddSection={addSection}
             onRemoveSection={removeSection}
@@ -448,15 +535,6 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
             Add a lesson to get started.
           </div>
         )}
-        {topic ? (
-          <BuilderPreview
-            draft={draft}
-            topic={topic}
-            added={added[topic.slug] ?? []}
-            lessonIndex={Math.max(flatIndex, 0)}
-            lessonTotal={flat.length}
-          />
-        ) : null}
       </div>
 
       {/* ── course details drawer ── */}
@@ -464,7 +542,7 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
         <div className="space-y-4">
           <DrawerField label="Course id" hint="Unique — namespaces learner progress. Lowercase + hyphens.">
             <input
-              className={drawerInputClass}
+              className={`${drawerInputClass} font-mono`}
               value={draft.courseId}
               onChange={(e) =>
                 mutate(
@@ -490,27 +568,34 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           </DrawerField>
           <DrawerField label="Blurb" hint="Outline-page lead. Supports **bold** and _italic_.">
             <textarea
-              rows={2}
-              className={`${drawerInputClass} resize-y leading-relaxed`}
+              rows={3}
+              className={`${drawerAreaClass} resize-y`}
               value={draft.courseBlurb}
               onChange={(e) => mutate((n) => void (n.courseBlurb = e.target.value))}
             />
           </DrawerField>
           <div className="grid grid-cols-2 gap-4">
             <DrawerField label="Topic family" hint="Sets the accent colour.">
-              <select
-                className={drawerInputClass}
-                value={draft.topic}
-                onChange={(e) =>
-                  mutate((n) => void (n.topic = e.target.value as CourseDraft["topic"]))
-                }
-              >
-                {TOPIC_FAMILIES.map((family) => (
-                  <option key={family} value={family}>
-                    {family}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <span
+                  className="pointer-events-none absolute left-[13px] top-1/2 z-10 h-[11px] w-[11px] -translate-y-1/2 rounded-[3px]"
+                  style={{ background: familyColor(draft.topic) }}
+                  aria-hidden
+                />
+                <select
+                  className={`${drawerInputClass} pl-[34px] capitalize`}
+                  value={draft.topic}
+                  onChange={(e) =>
+                    mutate((n) => void (n.topic = e.target.value as CourseDraft["topic"]))
+                  }
+                >
+                  {TOPIC_FAMILIES.map((family) => (
+                    <option key={family} value={family}>
+                      {family}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </DrawerField>
             <DrawerField label="Chrome" hint="bar = top bar · rail = sidebar.">
               <select
@@ -527,14 +612,14 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
           </div>
           <DrawerField label="Home link URL" hint="Where the wrapper's home button points.">
             <input
-              className={drawerInputClass}
+              className={`${drawerInputClass} font-mono !text-[12.5px]`}
               value={draft.homeLinkUrl}
               onChange={(e) => mutate((n) => void (n.homeLinkUrl = e.target.value))}
             />
           </DrawerField>
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-primary self-start"
             onClick={() => {
               setDetailsOpen(false);
               router.refresh();
@@ -600,10 +685,10 @@ function DrawerField({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[10.5px] font-bold uppercase tracking-[0.09em] text-ink-soft">
+      <span className="mb-1 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
         {label}
       </span>
-      {hint ? <span className="mb-1 block text-[11px] text-ink-soft">{hint}</span> : null}
+      {hint ? <span className="mb-2 block text-[12px] leading-snug text-ink-soft">{hint}</span> : null}
       {children}
     </label>
   );

@@ -14,6 +14,7 @@ export default async function SyncPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Monitor · Sync"
         title="Sync Diagnostics"
         description="Compares Brightspace course offerings against the Supabase learning_items cache and flags drift, mismatches, and missing metadata."
       />

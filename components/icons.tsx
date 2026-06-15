@@ -169,6 +169,14 @@ export function IconFile(props: IconProps) {
   );
 }
 
+export function IconScales(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3v18M5 7h14M7 7l-3 7h6zM17 7l-3 7h6z" />
+    </svg>
+  );
+}
+
 export function IconWarning(props: IconProps) {
   return (
     <svg {...base(props)}>

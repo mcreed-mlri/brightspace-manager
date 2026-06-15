@@ -1,22 +1,33 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Providers } from "./providers";
 import "./globals.css";
 
-// Inter — app-wide sans (design handoff v3). IBM Plex Mono — org unit IDs,
-// codes, counts. Both exposed as CSS vars consumed in globals.css.
+// Cool direction: Space Grotesk (display voice), Inter (UI/body), JetBrains
+// Mono (structural labels, IDs, counts). Each exposed as a CSS var consumed in
+// globals.css.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+});
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
-const plexMono = IBM_Plex_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-plex-mono",
+  variable: "--font-jetbrains-mono",
 });
+
+// Set the theme before first paint so the dark default (or a saved light
+// choice) never flashes. Mirrors the bm-theme key used by ThemeProvider.
+const themeInit = `(function(){try{var t=localStorage.getItem('bm-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: "Brightspace Manager",
@@ -37,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14161b",
+  themeColor: "#0b0d12",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -49,8 +60,13 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${plexMono.variable}`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
+      <body
+        className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      >
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

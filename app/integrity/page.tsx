@@ -7,6 +7,7 @@ export default function IntegrityPage() {
   return (
     <>
       <PageHeader
+        eyebrow="Monitor · Integrity"
         title="Integrity Checker"
         description="Cross-checks Brightspace Content, Manage Files, HTML links, and Supabase records to catch ghost topics and broken content."
         actions={<StatusBadge tone="neutral">Coming soon</StatusBadge>}
