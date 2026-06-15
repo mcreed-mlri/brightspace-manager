@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { requireUser } from "@/lib/auth/server";
 import { isTemplateAvailable, readWrapperFile } from "@/lib/studio/template";
 
 /* Serves the wrapper's course-style.css to the builder's live preview, so
@@ -11,9 +10,6 @@ import { isTemplateAvailable, readWrapperFile } from "@/lib/studio/template";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireUser();
-  if (!auth.ok) return auth.response;
-
   if (!isTemplateAvailable()) {
     return NextResponse.json(
       { ok: false, error: { message: "Wrapper template not found.", status: 404 } },

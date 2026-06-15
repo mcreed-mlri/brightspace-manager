@@ -36,6 +36,10 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isSignInPage = pathname === "/sign-in" || pathname === "/sign-in/";
+  const isPreviewStylesheet =
+    pathname === "/api/studio/template/css" || pathname === "/api/studio/template/css/";
+
+  if (isPreviewStylesheet) return response;
 
   if (!user && !isSignInPage) {
     /* API callers get the standard error envelope, not an HTML redirect. */
