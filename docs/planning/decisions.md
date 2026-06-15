@@ -5,6 +5,7 @@ re-litigating. Newest first.
 
 | Date | Decision | Why |
 | --- | --- | --- |
+| 2026-06-15 | Wrapper template also readable from GitHub raw (`COURSE_TEMPLATE_URL`) for Vercel; URL wins over `COURSE_TEMPLATE_DIR` when set | Vercel has no `C:\` drive, so preview/export were local-only; GitHub raw is the *same* courses-repo files over HTTPS, so the single-source-of-truth property holds. Caveats: tracks the repo's `main` branch (edits show in prod only after `git push`); relies on the courses repo staying **public** (no auth in the fetch — a private repo would need a token) |
 | 2026-06-11 | "Own the content, rent the LMS" — preserve LMS-exit optionality, don't build an LMS | 3-yr D2L contract (~2029 re-eval); content stays in JSON/Supabase, D2L behind adapters; option is leverage even if never exercised |
 | 2026-06-11 | Course drafts (`course-drafts/*.json`) are **tracked in git** | They're canonical content; git = free version history + offsite backup for a solo maintainer |
 | 2026-06-11 | Studio owns what Studio creates — no round-trip parsing of hand-made HTML | Parsing arbitrary HTML back to fields is unreliable; hand-made courses stay read-only / integrity-checked |
