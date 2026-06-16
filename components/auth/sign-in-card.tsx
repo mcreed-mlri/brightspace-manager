@@ -19,10 +19,10 @@ function sendErrorMessage(raw: string): string {
   }
   if (message.includes("security purposes")) {
     /* "For security purposes, you can only request this after N seconds." */
-    return `Too many requests — ${raw.replace("For security purposes, you", "you")}`;
+    return `Too many requests: ${raw.replace("For security purposes, you", "you")}`;
   }
   if (message.includes("rate limit")) {
-    return "Supabase's email limit is used up (the built-in sender allows ~2 emails per hour). Wait an hour and try again — your last code may still work below.";
+    return "Supabase's email limit is used up (the built-in sender allows ~2 emails per hour). Wait an hour and try again. Your last code may still work below.";
   }
   return `Couldn't send the code: ${raw}`;
 }
@@ -84,7 +84,9 @@ export function SignInCard() {
       return;
     }
     /* Full reload so the fresh session cookie reaches the middleware. */
-    window.location.assign("/");
+    localStorage.setItem("bm-mode", "operator");
+    localStorage.setItem("bm-mode-version", "2");
+    window.location.assign("/dashboard/");
   }
 
   return (
@@ -111,7 +113,7 @@ export function SignInCard() {
           <form onSubmit={sendCode}>
             <h1 className="text-lg font-semibold text-ink">Sign in</h1>
             <p className="mt-1 text-sm text-ink-muted">
-              No password needed — we&apos;ll email you a one-time code.
+              No password needed. We&apos;ll email you a one-time code.
             </p>
             <label className="mt-5 block text-xs font-semibold uppercase tracking-wider text-ink-soft">
               Work email
@@ -166,7 +168,7 @@ export function SignInCard() {
               className="mt-3 w-full text-center text-xs font-medium text-ink-muted hover:text-ink disabled:cursor-default disabled:opacity-60"
             >
               {cooldown > 0
-                ? `Code sent — you can resend in ${cooldown}s`
+                ? `Code sent. You can resend in ${cooldown}s`
                 : "Use a different email or resend the code"}
             </button>
           </form>

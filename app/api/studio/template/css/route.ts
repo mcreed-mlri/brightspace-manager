@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   if (!(await isTemplateAvailable())) {
     return NextResponse.json(
-      { ok: false, error: { message: "Wrapper template not found.", status: 404 } },
+      { ok: false, error: { message: "Course template not found.", status: 404 } },
       { status: 404 },
     );
   }

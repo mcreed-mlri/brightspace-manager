@@ -18,9 +18,9 @@ export default async function FilesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Under the hood · Files"
-        title="Manage Files"
-        description="Read-only view of a course's Manage Files area — see where HTML pages, wrapper assets, and images live without entering the LMS."
+        eyebrow="Infrastructure · Brightspace"
+        title="Brightspace Files"
+        description="Read-only view of a course's Manage Files area in Brightspace. See where HTML pages, wrapper assets, and images live without entering the LMS."
         actions={<StatusBadge tone="info">Read-only preview</StatusBadge>}
       />
       {treeResult.source === "mock" ? <MockDataBanner /> : null}

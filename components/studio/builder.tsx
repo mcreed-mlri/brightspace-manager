@@ -59,7 +59,13 @@ function uniqueSlug(draft: CourseDraft, base: string): string {
   }
 }
 
-export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
+export function Builder({
+  initialDraft,
+  openDetailsInitially = false,
+}: {
+  initialDraft: CourseDraft;
+  openDetailsInitially?: boolean;
+}) {
   const router = useRouter();
   const [draft, setDraft] = useState(initialDraft);
   const [dirty, setDirty] = useState(false);
@@ -73,7 +79,7 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const [added, setAdded] = useState<Record<string, SectionType[]>>({});
   const [autoFocusType, setAutoFocusType] = useState<SectionType | null>(null);
 
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(openDetailsInitially);
   const [pendingDelete, setPendingDelete] = useState<{ slug: string; title: string; sections: number } | null>(null);
   const [preview, setPreview] = useState<{ slug: string; html: string } | null>(null);
   const [previewBusy, setPreviewBusy] = useState(false);
@@ -81,6 +87,13 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
+
+  function closeDetails() {
+    setDetailsOpen(false);
+    if (openDetailsInitially) {
+      router.replace(`/course-studio/${draft.id}/`, { scroll: false });
+    }
+  }
 
   /* Race-safe saves: only clear `dirty` if nothing changed while the PUT
      was in flight. */
@@ -538,9 +551,9 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
       </div>
 
       {/* ── course details drawer ── */}
-      <Drawer open={detailsOpen} title="Course details" onClose={() => setDetailsOpen(false)}>
+      <Drawer open={detailsOpen} title="Course details" onClose={closeDetails}>
         <div className="space-y-4">
-          <DrawerField label="Course id" hint="Unique — namespaces learner progress. Lowercase + hyphens.">
+          <DrawerField label="Course id" hint="Unique. Namespaces learner progress. Lowercase + hyphens.">
             <input
               className={`${drawerInputClass} font-mono`}
               value={draft.courseId}
@@ -610,7 +623,7 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
               </select>
             </DrawerField>
           </div>
-          <DrawerField label="Home link URL" hint="Where the wrapper's home button points.">
+          <DrawerField label="Home link URL" hint="Where the course home button points.">
             <input
               className={`${drawerInputClass} font-mono !text-[12.5px]`}
               value={draft.homeLinkUrl}
@@ -621,7 +634,7 @@ export function Builder({ initialDraft }: { initialDraft: CourseDraft }) {
             type="button"
             className="btn-primary self-start"
             onClick={() => {
-              setDetailsOpen(false);
+              closeDetails();
               router.refresh();
             }}
           >

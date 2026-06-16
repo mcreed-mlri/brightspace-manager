@@ -8,6 +8,16 @@ import { getSupabaseAuthEnv, isAuthConfigured } from "@/lib/auth/config";
    themselves via requireUser() — never rely on middleware alone. */
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  /* Operator-first: always send the root URL to the ops console. */
+  if (pathname === "/" || pathname === "") {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/dashboard/";
+    dashboardUrl.search = "";
+    return NextResponse.redirect(dashboardUrl);
+  }
+
   /* No auth env configured → open mock/dev mode, nothing to do. */
   if (!isAuthConfigured()) return NextResponse.next();
 
@@ -37,7 +47,6 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
   const isSignInPage = pathname === "/sign-in" || pathname === "/sign-in/";
   const isPreviewStylesheet =
     pathname === "/api/studio/template/css" || pathname === "/api/studio/template/css/";
@@ -60,7 +69,7 @@ export async function middleware(request: NextRequest) {
 
   if (user && isSignInPage) {
     const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
+    homeUrl.pathname = "/dashboard/";
     homeUrl.search = "";
     return NextResponse.redirect(homeUrl);
   }

@@ -44,6 +44,41 @@ export type WhatChanged = {
   body: string;
 };
 
+/* ── Interactive content blocks ──────────────────────────────────────────────
+   A repeatable, ordered list of rich elements (the "Interactive" section).
+   Unlike the fixed pedagogical sections, a topic can hold several of these in
+   any order — so they live in an array, not as singleton fields. Each variant
+   is a Creator+-style element; Phase 1 ships the five that need no wrapper JS
+   (they export as self-contained HTML/CSS). Phase 2 adds tabs / flip cards /
+   carousel, which need behaviour in course-nav.js. Body text is markdown-lite
+   (**bold** _italic_, blank line = new paragraph), same as the prose fields. */
+export type CalloutVariant = "info" | "warn" | "tip";
+
+export type ContentBlock =
+  | { type: "accordion"; items: { title: string; body: string }[] }
+  | { type: "reveal"; items: { prompt: string; body: string }[] }
+  | { type: "callout"; variant: CalloutVariant; title: string; body: string }
+  | { type: "timeline"; steps: { label: string; body: string }[] }
+  | { type: "quote"; text: string; attribution: string };
+
+export type ContentBlockType = ContentBlock["type"];
+
+/* Default shape for a freshly added block of each type. */
+export function emptyBlock(type: ContentBlockType): ContentBlock {
+  switch (type) {
+    case "accordion":
+      return { type, items: [{ title: "", body: "" }] };
+    case "reveal":
+      return { type, items: [{ prompt: "", body: "" }] };
+    case "callout":
+      return { type, variant: "info", title: "", body: "" };
+    case "timeline":
+      return { type, steps: [{ label: "", body: "" }] };
+    case "quote":
+      return { type, text: "", attribution: "" };
+  }
+}
+
 export type TopicDraft = {
   slug: string;
   title: string;
@@ -72,6 +107,9 @@ export type TopicDraft = {
   };
   /* §5 — bullet list */
   remember: string[];
+  /* Interactive section — ordered, repeatable rich elements (optional;
+     absent on drafts created before this field, so read with `?? []`). */
+  blocks: ContentBlock[];
 };
 
 export type ModuleDraft = {
@@ -137,5 +175,6 @@ export function emptyTopic(slug: string, title: string): TopicDraft {
       answer: "",
     },
     remember: [],
+    blocks: [],
   };
 }

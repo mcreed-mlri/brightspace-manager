@@ -53,7 +53,7 @@ function diffChanges(course: CourseOffering, item: LearningItemRow): string[] {
     changes.push(`title: "${item.title}" → "${course.name}"`);
   }
   if ((item.practice_area ?? null) !== (course.program ?? null)) {
-    changes.push(`practice_area: ${item.practice_area ?? "—"} → ${course.program ?? "—"}`);
+    changes.push(`practice_area: ${item.practice_area ?? "(none)"} → ${course.program ?? "(none)"}`);
   }
   if ((item.brightspace_url ?? "") !== course.brightspaceUrl) {
     changes.push("brightspace_url updated");
@@ -63,7 +63,7 @@ function diffChanges(course: CourseOffering, item: LearningItemRow): string[] {
     changes.push(`active flag: ${String(meta.is_active ?? "unset")} → ${String(course.isActive)}`);
   }
   if ((meta.jurisdiction ?? null) !== (course.jurisdiction ?? null)) {
-    changes.push(`jurisdiction: ${String(meta.jurisdiction ?? "—")} → ${course.jurisdiction ?? "—"}`);
+    changes.push(`jurisdiction: ${String(meta.jurisdiction ?? "(none)")} → ${course.jurisdiction ?? "(none)"}`);
   }
   return changes;
 }

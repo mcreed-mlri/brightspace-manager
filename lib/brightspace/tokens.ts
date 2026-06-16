@@ -87,7 +87,7 @@ async function refreshTokens(): Promise<string> {
 
   if (!response.ok) {
     throw new Error(
-      `Brightspace token refresh failed (${response.status}). The refresh token may have been spent — run \`npm run authorize\` again.`,
+      `Brightspace token refresh failed (${response.status}). The refresh token may have been spent. Run \`npm run authorize\` again.`,
     );
   }
 

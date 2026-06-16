@@ -15,7 +15,7 @@ export default function LearnersPage() {
         <IconLearners size={28} className="mx-auto mb-3 text-ink-soft" />
         <p className="mb-1 font-bold text-ink">Learner progress screen</p>
         <p className="text-[13px] text-ink-muted">
-          Coming soon — this will read learner progress from Supabase once courses report it.
+          Coming soon. This will read learner progress from Supabase once courses report it.
         </p>
       </div>
     </div>

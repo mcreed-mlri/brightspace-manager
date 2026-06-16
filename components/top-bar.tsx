@@ -10,12 +10,12 @@ import { ThemeToggle } from "@/components/theme-provider";
    header. */
 
 const SECTION: Record<string, { mode: "author" | "operator" | "lace"; label: string }> = {
-  "": { mode: "author", label: "home" },
   dashboard: { mode: "operator", label: "dashboard" },
+  author: { mode: "author", label: "home" },
   courses: { mode: "operator", label: "course inventory" },
   sync: { mode: "operator", label: "sync diagnostics" },
   integrity: { mode: "operator", label: "integrity checker" },
-  files: { mode: "operator", label: "manage files" },
+  files: { mode: "operator", label: "brightspace files" },
   "supabase-data": { mode: "operator", label: "supabase data" },
   settings: { mode: "operator", label: "settings" },
   "course-studio": { mode: "author", label: "course studio" },

@@ -27,7 +27,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     const body: ApiResponse<never> = {
       ok: false,
       error: {
-        message: "Course template not found. Check the wrapper template source in Settings.",
+        message: "Course template not found. Check the template source in Settings.",
         status: 409,
       },
     };

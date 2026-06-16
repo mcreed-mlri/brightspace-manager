@@ -1,12 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { SessionBadge } from "@/components/auth/session-badge";
 import { IconScales } from "@/components/icons";
 
-/* Sidebar: one steady rail for the full admin surface. Dashboard stays first,
-   course authoring sits just beneath it, then monitoring and under-the-hood tools. */
+const MODE_STORAGE_KEY = "bm-mode";
+const MODE_VERSION_KEY = "bm-mode-version";
+/* Bump when the default landing mode changes — resets stored preference once. */
+const MODE_VERSION = "2";
+
+/* Sidebar: Author / Operator mode toggle swaps the nav set. Operator is the
+   default landing (dashboard); Author is the course-building surface. Mode
+   persists in localStorage; route-specific paths force the matching mode. */
+
+type NavMode = "author" | "operator";
 
 type NavItem = {
   label: string;
@@ -20,17 +29,31 @@ type NavGroup = {
   items: NavItem[];
 };
 
-const NAV_GROUPS: NavGroup[] = [
+const OPERATOR_ROUTES = new Set([
+  "dashboard",
+  "courses",
+  "sync",
+  "integrity",
+  "files",
+  "supabase-data",
+  "settings",
+]);
+
+const AUTHOR_NAV: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { label: "Home", href: "/author/", dot: "var(--cat-blue)" },
+      { label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" },
+      { label: "How everyone's doing", href: "/learners/", dot: "var(--cat-green)" },
+    ],
+  },
+];
+
+const OPERATOR_NAV: NavGroup[] = [
   {
     label: null,
     items: [{ label: "Dashboard", href: "/dashboard/", dot: "var(--accent)" }],
-  },
-  {
-    label: "Create",
-    items: [
-      { label: "Home", href: "/", dot: "var(--cat-blue)" },
-      { label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" },
-    ],
   },
   {
     label: "Monitor",
@@ -42,14 +65,53 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "Under the hood",
+    label: "Infrastructure",
     items: [
-      { label: "Manage Files", href: "/files/", dot: "var(--cat-violet)" },
+      { label: "Brightspace Files", href: "/files/", dot: "var(--cat-violet)" },
       { label: "Supabase Data", href: "/supabase-data/", dot: "var(--cat-pink)" },
       { label: "Settings", href: "/settings/", dot: "var(--ink-soft)" },
     ],
   },
 ];
+
+function routeMode(pathname: string): NavMode | null {
+  const segment = pathname.split("/").filter(Boolean)[0] ?? "";
+  if (OPERATOR_ROUTES.has(segment)) return "operator";
+  if (segment === "author" || segment === "course-studio") return "author";
+  return null;
+}
+
+function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: NavMode;
+  onChange: (mode: NavMode) => void;
+}) {
+  return (
+    <div className="px-3 pb-2 pt-0.5">
+      <div className="flex gap-[3px] rounded-[9px] border border-line bg-surface-sunken p-[3px]">
+        {(["operator", "author"] as const).map((value) => {
+          const active = mode === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onChange(value)}
+              className={`flex-1 rounded-[7px] py-[7px] text-[12px] font-semibold capitalize transition-colors ${
+                active
+                  ? "bg-accent text-white shadow-[0_2px_8px_var(--accent-glow)]"
+                  : "bg-transparent text-ink-soft hover:text-ink-muted"
+              }`}
+            >
+              {value}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -84,6 +146,38 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
 
 export function Sidebar({ hidden = false }: { hidden?: boolean }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const forcedMode = routeMode(pathname);
+  const [mode, setMode] = useState<NavMode>(() => forcedMode ?? "operator");
+
+  useEffect(() => {
+    const version = localStorage.getItem(MODE_VERSION_KEY);
+    if (version !== MODE_VERSION) {
+      localStorage.setItem(MODE_VERSION_KEY, MODE_VERSION);
+      localStorage.setItem(MODE_STORAGE_KEY, "operator");
+      if (forcedMode) {
+        setMode(forcedMode);
+      } else {
+        setMode("operator");
+      }
+      return;
+    }
+    if (forcedMode) {
+      setMode(forcedMode);
+      return;
+    }
+    const stored = localStorage.getItem(MODE_STORAGE_KEY);
+    if (stored === "author" || stored === "operator") setMode(stored);
+  }, [forcedMode]);
+
+  function switchMode(next: NavMode) {
+    if (next === mode) return;
+    setMode(next);
+    localStorage.setItem(MODE_STORAGE_KEY, next);
+    router.push(next === "author" ? "/author/" : "/dashboard/");
+  }
+
+  const navGroups = mode === "author" ? AUTHOR_NAV : OPERATOR_NAV;
 
   return (
     <aside
@@ -97,16 +191,15 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
           <IconScales size={17} />
         </span>
         <span className="font-display text-[17px] font-bold tracking-[-0.02em] text-ink">LACE</span>
-        <span className="ml-auto rounded-[5px] bg-[var(--accent-tint)] px-[7px] py-[3px] font-mono text-[9.5px] font-semibold tracking-[0.08em] text-accent">
-          OPS
-        </span>
       </div>
+
+      <ModeToggle mode={mode} onChange={switchMode} />
 
       <nav
         className="flex flex-1 flex-col overflow-y-auto px-[11px] pb-1.5 pt-1"
         aria-label="Main navigation"
       >
-        {NAV_GROUPS.map((group) => (
+        {navGroups.map((group) => (
           <div key={group.label ?? "top"} className="mb-1.5">
             {group.label ? (
               <p className="px-2 pb-1.5 pt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] text-ink-soft">

@@ -3,7 +3,7 @@
   "short_name": "BS Manager",
   "description": "Internal admin console for the LACE learning platform.",
   "display": "standalone",
-  "start_url": "/",
+  "start_url": "/dashboard/",
   "background_color": "#f5f6f8",
   "theme_color": "#14161b",
   "icons": [

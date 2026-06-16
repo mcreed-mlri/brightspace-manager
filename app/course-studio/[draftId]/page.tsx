@@ -8,12 +8,15 @@ export const dynamic = "force-dynamic";
    padding on this route; the Builder owns the whole viewport. */
 export default async function CourseBuilderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ draftId: string }>;
+  searchParams: Promise<{ details?: string }>;
 }) {
   const { draftId } = await params;
+  const { details } = await searchParams;
   const draft = await readDraft(draftId);
   if (!draft) notFound();
 
-  return <Builder initialDraft={draft} />;
+  return <Builder initialDraft={draft} openDetailsInitially={details === "1"} />;
 }

@@ -43,44 +43,40 @@ Now slot opens. One thing in **Now** at a time.
 
 ## 🎯 Now (one thing)
 
-**Present to the team + dogfood the Studio.**
-Build one real course start-to-finish in Course Studio Phase A, upload the exported ZIP to
-Brightspace by hand (today's normal workflow), and note every point of friction. That list
-*is* the Phase B spec. Nothing new gets built until this is done — it tells us what to build.
+**Integrity Checker v1 (read-only).**
+Cross-check Brightspace Content, Manage Files, and Supabase to catch ghost topics,
+orphaned files, and missing `?d2l_body_type=3` links. Needs `content:toc:read`
+scope on the test tenant (https://mlritest.brightspace.com). This is the highest-value
+operator gap — Studio Phase A already lets us author locally; we need to trust the
+platform before scaling writes or bulk production.
 
 ## 📋 Next (in order)
 
-1. **Drafts → Supabase (`course_drafts` table).** Promoted from the parking lot: the
-   Vercel deploy (https://brightspace-manager.vercel.app) is the "second machine" — file-backed
-   drafts can't save on serverless, so Studio is local-only in prod until this lands.
-   Keep the JSON shape as-is (one row per draft, jsonb column); local disk stays the
-   dev fallback.
-2. **Course Studio Phase B — deploy automation.** Manage Files upload + Content topic
-   creation + automatic URL backfill (kills the dual-URL dance). Needs new OAuth scopes
-   (content/managefiles write) registered in Manage Extensibility. Feature-flagged, dry-run
-   first. **Test tenant now available: https://mlritest.brightspace.com** — register the
-   OAuth app there and develop the write path against it instead of tip-toeing around
-   production (sandbox offering 6707 remains the prod-side validation target).
-3. **Integrity Checker v1.** Read-only: ghost topics (Content node → missing file), orphaned
-   files, missing `?d2l_body_type=3` links. Needs `content:toc:read` scope.
-4. **Section-schema sign-off.** Final list of topic sections + fields ("the spine") once the
-   official look is settled. Locks before any bulk course production. *(Cheap, important,
-   easily forgotten.)*
-5. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
-6. **Studio UX pass — "Harborside patterns."** ~~Always-on live preview beside the form,
-   progressive disclosure for optional sections~~ → shipped in M7 (design handoff v3).
-   Remaining: the "writing tips" checklist panel. Fold into the dogfooding friction list.
-
-## 🔮 Later
-
-- Attribute Monitor (read-only first; bulk edit with CSV preview/confirm much later)
-- Sync scheduling (background refresh — only if manual sync becomes a chore)
-- Course Creator: provision the Course Offering itself via API (after Phase B proves writes)
-- Multi-state jurisdiction expansion support (when a second state is real)
+1. **Manage Files live path hardened.** Real trees on the test tenant, not mocks —
+   the foundation Integrity Checker and deploy automation both depend on.
+2. **Course Studio Phase B — deploy automation (operator write path).** Manage Files
+   upload + Content topic creation + automatic URL backfill. Feature-flagged, dry-run
+   first. Develop against mlritest; sandbox offering 6707 remains prod validation.
+3. **Operator dashboard polish.** Needs-attention feed wired to Integrity Checker results.
+4. **Drafts → Supabase (`course_drafts` table).** Promoted when Vercel authoring matters;
+   file-backed drafts can't persist on serverless. Keep the JSON shape; local disk stays
+   the dev fallback.
+5. **Section-schema sign-off.** Final topic sections + fields once the official look is
+   settled. Locks before bulk course production.
+6. **TipTap rich-text** in Studio section fields (replaces markdown-lite).
+7. **Studio dogfooding (unblocked, not gating).** Build one real course in Phase A, note
+   friction for Phase B — but don't block operator work on it.
 
 ## 🅿️ Parking lot
 
 *Ideas land here so they stop taking up headspace. Nothing here is rejected.*
+
+**Author polish** (wait until the operator loop is solid):
+
+- "Writing tips" checklist panel in the builder
+- Author Home learner-progress card (needs hub data)
+
+**General:**
 
 - Dark mode (token names already match the hub's dark block — cheap when wanted)
 - "Prune broken nodes" cleanup action (behind feature flag, per original brief)
@@ -89,6 +85,13 @@ Brightspace by hand (today's normal workflow), and note every point of friction.
   [admin-boundaries.md](../admin-boundaries.md): editing would live here
 - Start.bat / desktop shortcut for one-click app launch
 - Lighthouse/PWA polish pass, app icon refresh
+
+## 🔮 Later
+
+- Attribute Monitor (read-only first; bulk edit with CSV preview/confirm much later)
+- Sync scheduling (background refresh — only if manual sync becomes a chore)
+- Course Creator: provision the Course Offering itself via API (after Phase B proves writes)
+- Multi-state jurisdiction expansion support (when a second state is real)
 
 ---
 

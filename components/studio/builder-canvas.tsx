@@ -2,13 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { TOPIC_KINDS, UPDATED_FLAGS, type TopicDraft } from "@/types/studio";
+import {
+  TOPIC_KINDS,
+  UPDATED_FLAGS,
+  emptyBlock,
+  type ContentBlock,
+  type ContentBlockType,
+  type TopicDraft,
+} from "@/types/studio";
 import {
   BLOCKS,
+  BLOCK_TYPES,
   TEMPLATES,
   activeSections,
   type SectionType,
 } from "@/components/studio/builder-blocks";
+
+/* Narrow a ContentBlock to a specific variant by its `type` tag. */
+type BlockOf<K extends ContentBlockType> = Extract<ContentBlock, { type: K }>;
 
 /* Canvas (cool direction) — the lesson IS the editor. Accent eyebrow, a 38px
    Space Grotesk title, the hook line, a bordered controls strip (Type pills +
@@ -23,6 +34,7 @@ const SECTION_LABEL: Record<SectionType, string> = {
   rule: "The rule",
   changed: "What changed",
   media: "Media",
+  interactive: "Interactive",
   tryit: "Try it",
   remember: "Remember",
 };
@@ -350,6 +362,9 @@ function BlockEditor({
         </div>
       );
 
+    case "interactive":
+      return <InteractiveBlocks topic={topic} onTopicChange={onTopicChange} />;
+
     case "tryit":
       return <TryItEditor autoFocus={autoFocus} topic={topic} onTopicChange={onTopicChange} />;
 
@@ -519,7 +534,7 @@ function MediaList({
   return (
     <div className="space-y-2.5">
       <p className="text-[11.5px] leading-relaxed text-ink-soft">
-        Name the image file and where it goes — the export adds an{" "}
+        Name the image file and where it goes. The export adds an{" "}
         <code className="font-mono text-[11px]">images/README.txt</code> listing what to drop in
         before uploading to Brightspace.
       </p>
@@ -572,6 +587,313 @@ function MediaList({
       >
         + Add image placeholder
       </button>
+    </div>
+  );
+}
+
+/* ── Interactive content blocks ─────────────────────────────────────────────
+   A repeatable, reorderable list of rich elements (the "Interactive" section).
+   Each block carries its own editor; the export renders them in this order. */
+
+function InteractiveBlocks({
+  topic,
+  onTopicChange,
+}: {
+  topic: TopicDraft;
+  onTopicChange: (fn: (topic: TopicDraft) => void) => void;
+}) {
+  const blocks = topic.blocks ?? [];
+
+  function addBlock(type: ContentBlockType) {
+    onTopicChange((t) => {
+      if (!t.blocks) t.blocks = [];
+      t.blocks.push(emptyBlock(type));
+    });
+  }
+  function removeBlock(i: number) {
+    onTopicChange((t) => void t.blocks?.splice(i, 1));
+  }
+  function moveBlock(i: number, dir: -1 | 1) {
+    onTopicChange((t) => {
+      const arr = t.blocks;
+      if (!arr) return;
+      const j = i + dir;
+      if (j < 0 || j >= arr.length) return;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    });
+  }
+  /* A mutator scoped to block i, re-narrowed to its variant so edits are type-safe. */
+  function mutateBlock<K extends ContentBlockType>(i: number, type: K, fn: (block: BlockOf<K>) => void) {
+    onTopicChange((t) => {
+      const block = t.blocks?.[i];
+      if (block && block.type === type) fn(block as BlockOf<K>);
+    });
+  }
+
+  return (
+    <div className="space-y-3">
+      {blocks.map((block, i) => {
+        const meta = BLOCK_TYPES.find((b) => b.type === block.type);
+        return (
+          <div key={i} className="rounded-[14px] border border-line bg-surface px-[18px] py-3.5">
+            <div className="mb-3 flex items-center gap-2">
+              <span aria-hidden>{meta?.emoji}</span>
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                {meta?.name ?? block.type}
+              </span>
+              <span className="flex-1" />
+              <RowIconButton
+                label="Move up"
+                onClick={() => moveBlock(i, -1)}
+                disabled={i === 0}
+                path="M8 3.5v9M4.5 7L8 3.5 11.5 7"
+              />
+              <RowIconButton
+                label="Move down"
+                onClick={() => moveBlock(i, 1)}
+                disabled={i === blocks.length - 1}
+                path="M8 12.5v-9M4.5 9L8 12.5 11.5 9"
+              />
+              <RowIconButton
+                label="Remove element"
+                onClick={() => removeBlock(i)}
+                danger
+                path="M2 2l8 8M10 2l-8 8"
+              />
+            </div>
+
+            {block.type === "accordion" ? (
+              <PairList
+                rows={block.items}
+                keyA="title"
+                keyB="body"
+                placeholderA="Section title"
+                placeholderB="Hidden until the learner expands this section…"
+                addLabel="+ Add section"
+                mutate={(fn) => mutateBlock(i, "accordion", (b) => fn(b.items))}
+              />
+            ) : block.type === "reveal" ? (
+              <PairList
+                rows={block.items}
+                keyA="prompt"
+                keyB="body"
+                placeholderA="Prompt (e.g. a question)"
+                placeholderB="The answer, revealed on click…"
+                addLabel="+ Add reveal"
+                mutate={(fn) => mutateBlock(i, "reveal", (b) => fn(b.items))}
+              />
+            ) : block.type === "timeline" ? (
+              <PairList
+                rows={block.steps}
+                keyA="label"
+                keyB="body"
+                placeholderA="Step label (e.g. a date or stage)"
+                placeholderB="What happens at this step…"
+                addLabel="+ Add step"
+                mutate={(fn) => mutateBlock(i, "timeline", (b) => fn(b.steps))}
+              />
+            ) : block.type === "callout" ? (
+              <CalloutEditor block={block} mutate={(fn) => mutateBlock(i, "callout", fn)} />
+            ) : (
+              <QuoteEditor block={block} mutate={(fn) => mutateBlock(i, "quote", fn)} />
+            )}
+          </div>
+        );
+      })}
+
+      <AddInteractive onAdd={addBlock} />
+    </div>
+  );
+}
+
+function AddInteractive({ onAdd }: { onAdd: (type: ContentBlockType) => void }) {
+  return (
+    <div className="rounded-[12px] border border-dashed border-line-strong p-2.5">
+      <div className="mb-2 px-1 font-mono text-[10px] uppercase tracking-[0.07em] text-ink-soft">
+        Add an element
+      </div>
+      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+        {BLOCK_TYPES.map((b) => (
+          <button
+            key={b.type}
+            type="button"
+            onClick={() => onAdd(b.type)}
+            title={b.hint}
+            className="flex items-center gap-2 rounded-[9px] border border-line bg-surface px-2.5 py-2 text-left transition-colors hover:border-accent hover:bg-[var(--accent-tint)]"
+          >
+            <span aria-hidden>{b.emoji}</span>
+            <span className="truncate text-[12px] font-semibold text-ink">{b.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* A small icon button used in block headers (move / remove). */
+function RowIconButton({
+  label,
+  onClick,
+  path,
+  disabled,
+  danger,
+}: {
+  label: string;
+  onClick: () => void;
+  path: string;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={label}
+      aria-label={label}
+      className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded text-ink-soft transition-colors disabled:opacity-25 ${
+        danger ? "hover:bg-status-error-soft hover:text-status-error" : "hover:bg-surface-sunken hover:text-ink"
+      }`}
+    >
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d={path} />
+      </svg>
+    </button>
+  );
+}
+
+/* Repeatable two-field rows (short label + body) — shared by accordion,
+   click-&-reveal, and timeline, which differ only in field names + copy. */
+function PairList({
+  rows,
+  keyA,
+  keyB,
+  placeholderA,
+  placeholderB,
+  addLabel,
+  mutate,
+}: {
+  rows: Record<string, string>[];
+  keyA: string;
+  keyB: string;
+  placeholderA: string;
+  placeholderB: string;
+  addLabel: string;
+  mutate: (fn: (rows: Record<string, string>[]) => void) => void;
+}) {
+  return (
+    <div className="space-y-2.5">
+      {rows.map((row, i) => (
+        <div key={i} className="rounded-[10px] border border-line bg-surface-sunken p-2.5">
+          <div className="flex items-center gap-1.5">
+            <input
+              className={`${fieldClass} flex-1`}
+              placeholder={placeholderA}
+              value={row[keyA] ?? ""}
+              onChange={(e) => mutate((r) => void (r[i][keyA] = e.target.value))}
+            />
+            <button
+              type="button"
+              onClick={() => mutate((r) => void r.splice(i, 1))}
+              disabled={rows.length <= 1}
+              className="shrink-0 rounded p-1 text-ink-soft transition-colors hover:text-status-error disabled:opacity-30"
+              aria-label="Remove row"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path d="M2 2l8 8M10 2l-8 8" />
+              </svg>
+            </button>
+          </div>
+          <textarea
+            rows={2}
+            className={`${fieldClass} mt-2 resize-y leading-relaxed`}
+            placeholder={placeholderB}
+            value={row[keyB] ?? ""}
+            onChange={(e) => mutate((r) => void (r[i][keyB] = e.target.value))}
+          />
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => mutate((r) => void r.push({ [keyA]: "", [keyB]: "" }))}
+        className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
+      >
+        {addLabel}
+      </button>
+    </div>
+  );
+}
+
+function CalloutEditor({
+  block,
+  mutate,
+}: {
+  block: BlockOf<"callout">;
+  mutate: (fn: (block: BlockOf<"callout">) => void) => void;
+}) {
+  const variants: { value: BlockOf<"callout">["variant"]; label: string }[] = [
+    { value: "info", label: "Info" },
+    { value: "tip", label: "Tip" },
+    { value: "warn", label: "Warning" },
+  ];
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-1.5">
+        {variants.map((v) => {
+          const active = block.variant === v.value;
+          return (
+            <button
+              key={v.value}
+              type="button"
+              onClick={() => mutate((b) => void (b.variant = v.value))}
+              className={`rounded-lg border px-3 py-[5px] text-[12px] font-semibold transition-colors ${
+                active ? "border-accent bg-[var(--accent-tint)] text-accent-ink" : "border-line text-ink-soft hover:text-ink-muted"
+              }`}
+            >
+              {v.label}
+            </button>
+          );
+        })}
+      </div>
+      <input
+        className={fieldClass}
+        placeholder="Callout heading (optional)"
+        value={block.title}
+        onChange={(e) => mutate((b) => void (b.title = e.target.value))}
+      />
+      <textarea
+        rows={3}
+        className={`${fieldClass} resize-y leading-relaxed`}
+        placeholder="The note, tip, or warning…"
+        value={block.body}
+        onChange={(e) => mutate((b) => void (b.body = e.target.value))}
+      />
+    </div>
+  );
+}
+
+function QuoteEditor({
+  block,
+  mutate,
+}: {
+  block: BlockOf<"quote">;
+  mutate: (fn: (block: BlockOf<"quote">) => void) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <textarea
+        rows={3}
+        className={`${fieldClass} resize-y leading-relaxed`}
+        placeholder="The quote…"
+        value={block.text}
+        onChange={(e) => mutate((b) => void (b.text = e.target.value))}
+      />
+      <input
+        className={fieldClass}
+        placeholder="Attribution (e.g. a statute, judge, or source)"
+        value={block.attribution}
+        onChange={(e) => mutate((b) => void (b.attribution = e.target.value))}
+      />
     </div>
   );
 }

@@ -69,7 +69,7 @@ export function SyncWritePanel({
       <div className="editorial-card px-5 py-4">
         <p className="text-sm text-ink-muted">
           Writes Brightspace course offerings into the Supabase{" "}
-          <code className="font-mono text-xs">learning_items</code> cache. Upsert only — rows whose
+          <code className="font-mono text-xs">learning_items</code> cache. Upsert only. Rows whose
           Brightspace course no longer exists are never touched. Every run is logged.
         </p>
 
@@ -117,7 +117,7 @@ export function SyncWritePanel({
 
             {pendingCount === 0 ? (
               <p className="text-sm text-ink-muted">
-                Everything is in sync — nothing to write.
+                Everything is in sync. Nothing to write.
               </p>
             ) : (
               <ul className="max-h-72 space-y-1.5 overflow-y-auto pr-2">
@@ -145,7 +145,7 @@ export function SyncWritePanel({
             <StatusBadge tone={result.failed > 0 ? "error" : "ok"}>
               {result.failed > 0
                 ? `${result.failed} failed`
-                : `synced — ${result.created} created, ${result.updated} updated`}
+                : `synced: ${result.created} created, ${result.updated} updated`}
             </StatusBadge>
             {result.errors.map((message) => (
               <p key={message} className="mt-2 text-xs text-status-error-ink">
@@ -166,7 +166,7 @@ export function SyncWritePanel({
             <ul className="space-y-1">
               {recentRuns.map((run) => (
                 <li key={run.ranAt} className="font-mono text-xs text-ink-muted">
-                  {formatRelative(run.ranAt)} — {run.created} created, {run.updated} updated
+                  {formatRelative(run.ranAt)} · {run.created} created, {run.updated} updated
                   {run.failed > 0 ? `, ${run.failed} failed` : ""}
                   {run.actor ? ` · by ${run.actor}` : ""}
                 </li>

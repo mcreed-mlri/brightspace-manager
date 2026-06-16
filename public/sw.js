@@ -1,5 +1,5 @@
-const CACHE_NAME = "bsm-admin-v2";
-const ASSETS_TO_CACHE = ["/", "/manifest.json", "/icon.svg", "/icon-192.png", "/icon-512.png"];
+const CACHE_NAME = "bsm-admin-v3";
+const ASSETS_TO_CACHE = ["/dashboard/", "/manifest.json", "/icon.svg", "/icon-192.png", "/icon-512.png"];
 
 // Install Event
 self.addEventListener("install", (event) => {
@@ -57,7 +57,11 @@ self.addEventListener("fetch", (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/"))),
+        .catch(() =>
+          caches
+            .match(event.request)
+            .then((cached) => cached || caches.match("/dashboard/")),
+        ),
     );
     return;
   }

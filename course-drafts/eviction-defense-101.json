@@ -1,14 +1,14 @@
 {
   "id": "eviction-defense-101",
   "createdAt": "2026-06-15T12:00:00.000Z",
-  "updatedAt": "2026-06-15T18:52:57.848Z",
+  "updatedAt": "2026-06-16T14:24:26.157Z",
   "courseId": "eviction-defense-101",
   "courseTitle": "Eviction Defense: The First 48 Hours",
   "courseSubtitle": "What to do in the first two days of an eviction case.",
   "courseBlurb": "The clock is the case. Learn to find the date that starts the timeline, read the notice and summons, and walk into the first appearance ready.",
   "courseArea": "Housing",
-  "topic": "foundations",
-  "chromeMode": "bar",
+  "topic": "court",
+  "chromeMode": "rail",
   "homeLinkUrl": "https://lms-discovery.vercel.app/",
   "modules": [
     {
@@ -131,6 +131,40 @@
           "kind": "Practice",
           "minutes": 2,
           "description": "Walk in with the right five things.",
+          "updated": "",
+          "standfirst": "",
+          "scenario": "",
+          "rule": "",
+          "ruleBoxLabel": "",
+          "ruleBoxItems": [],
+          "media": [],
+          "whatChanged": null,
+          "tryIt": {
+            "question": "",
+            "options": [
+              {
+                "text": "",
+                "correct": false
+              },
+              {
+                "text": "",
+                "correct": true
+              },
+              {
+                "text": "",
+                "correct": false
+              }
+            ],
+            "answer": ""
+          },
+          "remember": []
+        },
+        {
+          "slug": "topic-5",
+          "title": "New lesson",
+          "kind": "Drafting",
+          "minutes": 3,
+          "description": "",
           "updated": "",
           "standfirst": "",
           "scenario": "",

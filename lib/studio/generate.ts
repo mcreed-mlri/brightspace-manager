@@ -2,7 +2,7 @@ import "server-only";
 
 import { escapeHtml, inline, paragraphs } from "@/lib/studio/inline";
 import { readWrapperFile, WRAPPER_FILES } from "@/lib/studio/template";
-import type { CourseDraft, TopicDraft } from "@/types/studio";
+import type { ContentBlock, TopicDraft, CourseDraft } from "@/types/studio";
 
 /* Generates the LACE course package from a draft, faithful to the structures
    in brightspace-courses/Course-Template. Only course-config.js and the topic
@@ -228,6 +228,114 @@ function nextUpSection(draft: CourseDraft, flatIndex: number, flat: TopicDraft[]
     </section>`;
 }
 
+/* ── interactive blocks ──────────────────────────────────────────────────────
+   Repeatable rich elements (accordion, click-&-reveal, callout, timeline,
+   quote). Like mediaFigures, the markup is self-contained: inline styles read
+   wrapper CSS variables with hard fallbacks, so a package renders correctly
+   even before course-style.css grows rules for these. Phase 1 elements need no
+   JavaScript — accordion and reveal use native <details>. */
+
+function accordionBlock(items: { title: string; body: string }[], reveal: boolean): string {
+  const rows = items.filter((it) => it.title.trim() || it.body.trim());
+  if (rows.length === 0) return "";
+  const cls = reveal ? "lace-reveal" : "lace-accordion";
+  const summaryHint = reveal
+    ? ' <span style="font-weight:600;color:var(--accent,#1c3fb0);font-size:.8rem;">Reveal ›</span>'
+    : "";
+  const summaryKey = reveal ? "Prompt" : "Title";
+  const details = rows
+    .map(
+      (it) => `      <details class="${cls}-item" style="border:1px solid var(--line,#e4e7ed);border-radius:10px;margin-bottom:.55rem;overflow:hidden;">
+        <summary style="cursor:pointer;padding:.85rem 1rem;font-weight:600;color:var(--ink,#14161b);">${inline(it.title || summaryKey)}${summaryHint}</summary>
+        <div style="padding:.25rem 1rem 1rem;color:var(--muted,#565c69);">
+${paragraphs(it.body)}
+        </div>
+      </details>`,
+    )
+    .join("\n");
+  return `      <div class="${cls}" style="margin:1.5rem 0;">
+${details}
+      </div>`;
+}
+
+function calloutBlock(block: Extract<ContentBlock, { type: "callout" }>): string {
+  if (!block.title.trim() && !block.body.trim()) return "";
+  /* info reuses the course accent; tip/warn carry their own self-contained hues. */
+  const tone =
+    block.variant === "warn"
+      ? { accent: "#b45309", border: "#f6c177", bg: "#fdf6ec", label: "Warning" }
+      : block.variant === "tip"
+        ? { accent: "#0f766e", border: "#7fd1c7", bg: "#eefaf8", label: "Tip" }
+        : { accent: "var(--accent,#1c3fb0)", border: "var(--line,#cdd5e4)", bg: "var(--accent-tint,#eef2fb)", label: "Note" };
+  const heading = block.title.trim() ? inline(block.title) : tone.label;
+  return `      <div class="lace-callout lace-callout-${block.variant}" style="margin:1.5rem 0;border:1px solid ${tone.border};border-left:4px solid ${tone.accent};background:${tone.bg};border-radius:10px;padding:1rem 1.15rem;">
+        <div style="font-weight:700;color:${tone.accent};margin-bottom:.35rem;">${heading}</div>
+${paragraphs(block.body)}
+      </div>`;
+}
+
+function timelineBlock(steps: { label: string; body: string }[]): string {
+  const rows = steps.filter((s) => s.label.trim() || s.body.trim());
+  if (rows.length === 0) return "";
+  const items = rows
+    .map(
+      (s) => `        <li style="position:relative;padding:0 0 1.25rem 1.35rem;">
+          <span style="position:absolute;left:-7px;top:.25rem;width:12px;height:12px;border-radius:50%;background:var(--accent,#1c3fb0);border:2px solid var(--paper,#fff);"></span>
+          <div style="font-weight:700;color:var(--ink,#14161b);">${inline(s.label)}</div>
+          <div style="color:var(--muted,#565c69);">
+${paragraphs(s.body)}
+          </div>
+        </li>`,
+    )
+    .join("\n");
+  return `      <ol class="lace-timeline" style="list-style:none;margin:1.5rem 0;padding:0 0 0 .35rem;border-left:2px solid var(--line,#e4e7ed);">
+${items}
+      </ol>`;
+}
+
+function quoteBlock(block: Extract<ContentBlock, { type: "quote" }>): string {
+  if (!block.text.trim()) return "";
+  const cite = block.attribution.trim()
+    ? `\n        <figcaption style="margin-top:.5rem;font-size:.85rem;color:var(--muted,#565c69);">${inline(block.attribution)}</figcaption>`
+    : "";
+  return `      <figure class="lace-quote" style="margin:1.75rem 0;padding:.25rem 0 .25rem 1.25rem;border-left:4px solid var(--accent,#1c3fb0);">
+        <blockquote style="margin:0;font-size:1.15rem;line-height:1.5;font-style:italic;color:var(--ink,#14161b);">${inline(block.text)}</blockquote>${cite}
+      </figure>`;
+}
+
+function renderBlock(block: ContentBlock): string {
+  switch (block.type) {
+    case "accordion":
+      return accordionBlock(block.items, false);
+    case "reveal":
+      return accordionBlock(
+        block.items.map((it) => ({ title: it.prompt, body: it.body })),
+        true,
+      );
+    case "callout":
+      return calloutBlock(block);
+    case "timeline":
+      return timelineBlock(block.steps);
+    case "quote":
+      return quoteBlock(block);
+  }
+}
+
+/* The Interactive section — an un-numbered content band (it does not take a §
+   marker, to leave the pedagogical scenario→rule→try-it→remember count intact). */
+function interactiveSection(topic: TopicDraft): string {
+  const rendered = (topic.blocks ?? [])
+    .map(renderBlock)
+    .filter((html) => html.trim())
+    .join("\n");
+  if (!rendered.trim()) return "";
+  return `    <!-- ── Interactive ──────────────────────────────────────────────────── -->
+    <section class="section">
+${rendered}
+    </section>
+`;
+}
+
 export function generateTopicHtml(draft: CourseDraft, slug: string): string {
   const flat = draft.modules.flatMap((m) => m.topics);
   const flatIndex = flat.findIndex((t) => t.slug === slug);
@@ -293,7 +401,7 @@ ${mediaFigures(topic, "scenario")}    </section>
 ${paragraphs(topic.rule)}
 ${ruleBox(topic)}${mediaFigures(topic, "rule")}    </section>
 
-${whatChangedSection(topic)}${tryItSection(topic).replace("§ 4", `§ ${tryItNum}`)}
+${whatChangedSection(topic)}${interactiveSection(topic)}${tryItSection(topic).replace("§ 4", `§ ${tryItNum}`)}
 
     <!-- ── § ${rememberNum} · Remember ───────────────────────────────────────────── -->
     <section class="section">

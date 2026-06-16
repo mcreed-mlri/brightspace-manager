@@ -41,7 +41,7 @@ export function CourseList({ drafts }: { drafts: DraftSummary[] }) {
   if (drafts.length === 0) {
     return (
       <p className="px-5 py-5 text-[13px] text-ink-muted">
-        No courses yet. Hit <strong>+ New course</strong> to open a blank builder — a guided
+        No courses yet. Hit <strong>+ New course</strong> to open a blank builder for a guided
         form with a live preview of what learners will see.
       </p>
     );

@@ -24,7 +24,7 @@ export default async function SupabaseDataPage() {
       key: "jurisdictions",
       label: "jurisdictions",
       description:
-        "Planned reference table — which states LACE serves. Mock preview of the intended shape until the live table exists.",
+        "Planned reference table for which states LACE serves. Mock preview of the intended shape until the live table exists.",
       columns: ["code", "name", "active", "course_count"],
       rows: mockJurisdictions,
       source: "mock",
@@ -33,7 +33,7 @@ export default async function SupabaseDataPage() {
       key: "programs",
       label: "programs",
       description:
-        "Planned reference table — program/practice-area categories used across the catalog. Mock preview.",
+        "Planned reference table for program and practice-area categories used across the catalog. Mock preview.",
       columns: ["name", "practice_area", "course_count"],
       rows: mockPrograms,
       source: "mock",
@@ -41,7 +41,7 @@ export default async function SupabaseDataPage() {
     {
       key: "tags",
       label: "tags",
-      description: "Planned reference table — catalog tags and how often each is used. Mock preview.",
+      description: "Planned reference table for catalog tags and how often each is used. Mock preview.",
       columns: ["name", "usage_count"],
       rows: mockTags,
       source: "mock",
@@ -51,7 +51,7 @@ export default async function SupabaseDataPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Under the hood · Supabase"
+        eyebrow="Infrastructure · Supabase"
         title="Supabase Data"
         description="Read-only inspector for the Supabase cache layer. Search, sort, open a row for full detail, or export the current view to CSV."
         actions={<StatusBadge tone="info">Read-only</StatusBadge>}
@@ -59,7 +59,7 @@ export default async function SupabaseDataPage() {
       {items.source === "mock" ? <MockDataBanner /> : null}
       <DataBrowser tables={tables} />
       <p className="mt-6 text-xs text-ink-soft">
-        No destructive SQL runs from this UI — ever. Writes to Supabase happen only through the
+        No destructive SQL runs from this UI, ever. Writes to Supabase happen only through the
         logged sync pipeline in a later milestone.
       </p>
     </>

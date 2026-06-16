@@ -21,7 +21,7 @@ export default function IntegrityPage() {
           <li>Supabase records pointing at archived or missing Brightspace content</li>
         </ul>
         <p className="mt-2">
-          Cleanup follows MLRI governance: <strong>archive, do not delete</strong> — every action
+          Cleanup follows MLRI governance: <strong>archive, do not delete</strong>. Every action
           previews first, requires confirmation, and is logged.
         </p>
       </EmptyState>

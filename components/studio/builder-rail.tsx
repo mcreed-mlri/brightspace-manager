@@ -9,7 +9,10 @@ import { SECTION_ORDER, sectionsWithContent } from "@/components/studio/builder-
    title, mono meta, build-out dots). The active row sits on --accent-tint.
    Footer: a dashed "New part of the course" button and an auto-save line with
    a green haloed dot. The per-row ⋯ menu (move / duplicate / delete) and the
-   per-module "Add lesson" affordance are kept from the prior outline. */
+   per-module "Add lesson" affordance are kept from the prior outline.
+   Collapsible while editing — state persists in sessionStorage. */
+
+const RAIL_COLLAPSED_KEY = "lace-builder-rail-collapsed";
 
 export function BuilderRail({
   modules,
@@ -35,17 +38,120 @@ export function BuilderRail({
   onDeleteLesson: (slug: string) => void;
 }) {
   const total = modules.reduce((sum, mod) => sum + mod.topics.length, 0);
+  const [collapsed, setCollapsed] = useState(false);
+  const numberedLessons = modules.flatMap((mod, moduleIndex) =>
+    mod.topics.map((topic, topicIndex) => ({
+      topic,
+      number:
+        modules.slice(0, moduleIndex).reduce((sum, item) => sum + item.topics.length, 0) +
+        topicIndex +
+        1,
+      moduleIndex,
+    })),
+  );
+
+  useEffect(() => {
+    try {
+      setCollapsed(sessionStorage.getItem(RAIL_COLLAPSED_KEY) === "1");
+    } catch {
+      /* private browsing / blocked storage */
+    }
+  }, []);
+
+  function toggleCollapsed(next?: boolean) {
+    setCollapsed((current) => {
+      const value = next ?? !current;
+      try {
+        sessionStorage.setItem(RAIL_COLLAPSED_KEY, value ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return value;
+    });
+  }
 
   return (
-    <aside className="flex w-[280px] shrink-0 flex-col overflow-hidden border-r border-line bg-surface">
-      <div className="flex items-center justify-between px-[18px] pb-2 pt-[18px]">
+    <aside
+      className={`flex shrink-0 flex-col overflow-hidden border-r border-line bg-surface transition-[width] duration-200 ease-out ${
+        collapsed ? "w-11" : "w-[280px]"
+      }`}
+    >
+      {collapsed ? (
+        <div className="flex h-full min-h-0 flex-col">
+          <div className="flex shrink-0 justify-center px-1.5 pb-2 pt-[18px]">
+            <button
+              type="button"
+              onClick={() => toggleCollapsed(false)}
+              title="Show course outline"
+              aria-label="Show course outline"
+              className="grid h-8 w-8 place-items-center rounded-lg border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+            >
+              <PanelToggleGlyph expanded />
+            </button>
+          </div>
+
+          <div className="flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto px-1.5 pb-2">
+            {numberedLessons.map(({ topic, number, moduleIndex }, index) => {
+              const prev = numberedLessons[index - 1];
+              const active = topic.slug === selectedSlug;
+              const label = topic.title || `Lesson ${number}`;
+              return (
+                <div key={topic.slug} className="flex w-full flex-col items-center gap-1">
+                  {prev && prev.moduleIndex !== moduleIndex ? (
+                    <span className="my-0.5 h-px w-5 bg-line-strong" aria-hidden />
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => onSelect(topic.slug)}
+                    title={label}
+                    aria-label={label}
+                    aria-current={active ? "page" : undefined}
+                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] font-mono text-[11px] font-semibold transition-colors ${
+                      active
+                        ? "bg-accent text-white"
+                        : "bg-surface-sunken text-ink-soft hover:bg-[var(--accent-tint)] hover:text-accent"
+                    }`}
+                  >
+                    {number}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex shrink-0 justify-center border-t border-line px-1.5 py-[13px]">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                saving
+                  ? "bg-status-warn shadow-[0_0_0_3px_var(--amber-tint)]"
+                  : "bg-ok shadow-[0_0_0_3px_var(--ok-glow)]"
+              }`}
+              title={saving ? "Saving…" : "Saved automatically"}
+              aria-label={saving ? "Saving" : "Saved"}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
+      <div className="flex items-center justify-between gap-2 px-[18px] pb-2 pt-[18px]">
         <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">
           Your course
         </span>
-        <span className="font-mono text-[10.5px] text-ink-soft">
-          {modules.length} part{modules.length === 1 ? "" : "s"} · {total} lesson
-          {total === 1 ? "" : "s"}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10.5px] text-ink-soft">
+            {modules.length} part{modules.length === 1 ? "" : "s"} · {total} lesson
+            {total === 1 ? "" : "s"}
+          </span>
+          <button
+            type="button"
+            onClick={() => toggleCollapsed(true)}
+            title="Hide course outline"
+            aria-label="Hide course outline"
+            className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+          >
+            <PanelToggleGlyph expanded={false} />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-3.5 pt-1.5">
@@ -99,6 +205,8 @@ export function BuilderRail({
         />
         {saving ? "Saving…" : "Saved automatically"}
       </div>
+        </>
+      )}
     </aside>
   );
 }
@@ -290,6 +398,34 @@ function PlusGlyph() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
       <path d="M6 2v8M2 6h8" />
+    </svg>
+  );
+}
+
+function PanelToggleGlyph({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      {expanded ? (
+        <>
+          <path d="M4.5 3.5v7" />
+          <path d="M8 5.5l2.5 1.5L8 8.5" />
+        </>
+      ) : (
+        <>
+          <path d="M9.5 3.5v7" />
+          <path d="M6 5.5L3.5 7 6 8.5" />
+        </>
+      )}
     </svg>
   );
 }

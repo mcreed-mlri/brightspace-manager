@@ -168,7 +168,7 @@ export function SyncReportView({
             ))}
           </div>
           <p className="mt-3 text-xs text-ink-soft">
-            Cleanup follows MLRI governance — archive, do not delete. Orphan handling will be a
+            Cleanup follows MLRI governance: archive, do not delete. Orphan handling will be a
             previewed, confirmed, logged action in a later milestone.
           </p>
         </section>

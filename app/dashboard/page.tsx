@@ -110,10 +110,6 @@ export default async function OperatorDashboardPage() {
 
   const openCount = sync.warnings.length + needsAttention.length;
   const allClear = openCount === 0 && sync.driftCount === 0;
-  const headline = allClear ? "Everything's running." : "A couple things need a look.";
-  const summary = allClear
-    ? `${active.length} offerings live — everything synced clean within the hour.`
-    : `${active.length} offerings live. ${openCount} need${openCount === 1 ? "s" : ""} attention — the rest synced clean.`;
 
   let catIndex = 0;
   const nextCat = () => CAT[catIndex++ % CAT.length];
@@ -125,9 +121,8 @@ export default async function OperatorDashboardPage() {
         <div className="min-w-0">
           <p className="eyebrow mb-2.5 tracking-[0.14em]">Operations console</p>
           <h1 className="font-display text-[46px] font-bold leading-none tracking-[-0.03em] text-ink">
-            {headline}
+            Dashboard
           </h1>
-          <p className="mt-3 max-w-[540px] text-sm leading-relaxed text-ink-muted">{summary}</p>
         </div>
         <div className="flex shrink-0 gap-2.5">
           <ConnectionChip

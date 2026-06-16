@@ -18,7 +18,7 @@ export async function checkBrightspaceHealth(): Promise<HealthStatus> {
       service: "brightspace",
       status: "unconfigured",
       mode,
-      detail: "No Brightspace credentials set — running in mock mode.",
+      detail: "No Brightspace credentials set. Running in mock mode.",
       checkedAt,
     };
   }
@@ -71,7 +71,7 @@ export async function checkSupabaseHealth(): Promise<HealthStatus> {
       service: "supabase",
       status: "unconfigured",
       mode: "service-role",
-      detail: "No Supabase credentials set — running in mock mode.",
+      detail: "No Supabase credentials set. Running in mock mode.",
       checkedAt,
     };
   }

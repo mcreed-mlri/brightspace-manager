@@ -16,8 +16,9 @@ export default async function CourseStudioPage() {
         <div>
           <h1 className="page-title text-ink">Course Studio</h1>
           <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
-            Build LACE courses without touching wrapper code. Your words are the source of
-            truth — the course package is generated for you on publish.
+            Build Brightspace-ready courses from our shared template. Course Studio
+            walks you through each step. Write in plain English, export when you&apos;re
+            done.
           </p>
         </div>
         <span className="mt-1 shrink-0">
@@ -30,7 +31,7 @@ export default async function CourseStudioPage() {
         <CourseList drafts={drafts} />
       </div>
 
-      <p className="section-title mb-2 text-ink">Wrapper template</p>
+      <p className="section-title mb-2 text-ink">Course template source</p>
       <div className="editorial-card px-5 py-4">
         {template.available ? (
           <>
@@ -60,15 +61,15 @@ export default async function CourseStudioPage() {
               ))}
             </div>
             <p className="text-[12.5px] leading-[1.55] text-ink-soft">
-              Every course you build uses the latest version of these files automatically — so
-              your wrapper stays consistent even when you&apos;re not here.
+              Every course you build pulls from this template automatically, so the look and
+              feel stay consistent across all your courses.
             </p>
           </>
         ) : (
           <>
             <StatusBadge tone="error">not found</StatusBadge>
             <p className="mt-2 text-sm text-ink-muted">
-              Expected the wrapper template at{" "}
+              Expected the course template at{" "}
               <code className="font-mono text-xs">{template.dir}</code>. Set{" "}
               <code className="font-mono text-xs">COURSE_TEMPLATE_DIR</code> (local path) or{" "}
               <code className="font-mono text-xs">COURSE_TEMPLATE_URL</code> (GitHub raw, for

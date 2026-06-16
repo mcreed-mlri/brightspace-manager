@@ -29,7 +29,7 @@ export function NewCourseButton({
       });
       const body = (await response.json()) as ApiResponse<CourseDraft>;
       if (body.ok) {
-        router.push(`/course-studio/${body.data.id}/`);
+        router.push(`/course-studio/${body.data.id}/?details=1`);
       } else {
         setError(body.error.message);
         setBusy(false);
