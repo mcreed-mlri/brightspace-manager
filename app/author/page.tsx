@@ -10,13 +10,6 @@ export const dynamic = "force-dynamic";
    attorneys and legal aid staff. Reads only; nothing here changes anything
    until they choose to publish from the Studio. */
 
-function greeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
-
 function dateLine(): string {
   return new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -33,8 +26,7 @@ export default async function AuthorHomePage() {
   return (
     <div className="max-w-[820px]">
       <header className="mb-[26px]">
-        <p className="mb-[5px] font-mono text-[11px] text-ink-soft">{dateLine()}</p>
-        <h1 className="page-title text-ink">{greeting()}</h1>
+        <p className="font-mono text-[11px] text-ink-soft">{dateLine()}</p>
       </header>
 
       <section className="mb-[30px] rounded-[14px] border border-[var(--accent-tint)] bg-brand-tint px-[30px] py-[26px]">
