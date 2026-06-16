@@ -30,18 +30,26 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     let html = generateTopicHtml(draft, slug);
 
+    /* The preview iframe is sandboxed without allow-scripts, so the inline
+       data-topic script never runs. Set the topic accent as a static <html>
+       attribute instead, so it applies from CSS alone. */
+    html = html.replace('<html lang="en">', `<html lang="en" data-topic="${draft.topic}">`);
+
     if (await isTemplateAvailable()) {
       const css = await readWrapperFile("course-style.css");
       html = html
         .replace('<link rel="stylesheet" href="course-style.css">', `<style>\n${css}\n</style>`)
         .replace('<script src="course-config.js"></script>', "")
         .replace('<script src="course-nav.js" defer></script>', "");
-      /* Inline the topic accent since course-config.js is stripped. */
-      html = html.replace(
-        /<script>document\.documentElement\.dataset\.topic[^<]+<\/script>/,
-        `<script>document.documentElement.dataset.topic = "${draft.topic}";</script>`,
-      );
     }
+
+    /* Next-up/continue links target sibling topic files that exist only in the
+       exported package; inside the iframe they resolve against the app URL and
+       load the whole app. Neutralise them — the preview is content-only. */
+    html = html.replace(
+      "</head>",
+      '<style>[data-lace="next-link"]{pointer-events:none;cursor:default;}</style>\n</head>',
+    );
 
     /* Image files don't exist yet (placeholders) — render a labeled box so
        the preview shows where each figure will sit. */

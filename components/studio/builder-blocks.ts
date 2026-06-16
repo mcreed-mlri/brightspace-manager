@@ -133,17 +133,19 @@ export function activeSections(topic: TopicDraft, added: SectionType[]): Section
 
 /* ── Per-course accent (cool direction) ─────────────────────────────────────
    The Course Details "Topic family" picker sets the course accent from the
-   category palette. Foundations keeps the theme's default electric-blue; every
-   other family re-tints the whole builder (chrome, pills, S-markers, the
-   correct-answer radio) by overriding the accent CSS vars on the builder root. */
+   category palette. These hues MUST match the wrapper's --topic-* tokens in
+   brightspace-courses/Course-Template/course-style.css, so the builder swatch
+   and chrome show the same colour the learner will see. Each family re-tints
+   the whole builder (chrome, pills, S-markers, the correct-answer radio) by
+   overriding the accent CSS vars on the builder root. */
 const FAMILY_HUE: Partial<Record<TopicFamily, { accent: string; ink: string }>> = {
-  court: { accent: "#8b5cf6", ink: "#b69bff" },
-  client: { accent: "#14b8a6", ink: "#5fd0c4" },
-  ethics: { accent: "#f59e0b", ink: "#f7c46b" },
-  research: { accent: "#3b82f6", ink: "#7aa7f9" },
-  drafting: { accent: "#ec4899", ink: "#f48fc4" },
-  trauma: { accent: "#10b981", ink: "#4fd9a6" },
-  /* foundations → theme default (no override) */
+  court: { accent: "#bb573b", ink: "#8d472e" },
+  client: { accent: "#179a72", ink: "#0f6e52" },
+  ethics: { accent: "#5563d6", ink: "#3a45a8" },
+  research: { accent: "#3a8ec9", ink: "#2b6c99" },
+  drafting: { accent: "#7a4fe0", ink: "#5a32b0" },
+  trauma: { accent: "#d24d83", ink: "#a83464" },
+  foundations: { accent: "#c8791b", ink: "#8a5512" },
 };
 
 function hexToRgba(hex: string, alpha: number): string {

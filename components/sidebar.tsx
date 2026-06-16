@@ -39,13 +39,31 @@ const OPERATOR_ROUTES = new Set([
   "settings",
 ]);
 
+const AUTHOR_ROUTES = new Set([
+  "course-studio",
+  "guide",
+  "building-blocks",
+  "faculty",
+  "my-courses",
+]);
+
 const AUTHOR_NAV: NavGroup[] = [
   {
     label: null,
+    items: [{ label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" }],
+  },
+  {
+    label: "Reference",
     items: [
-      { label: "Home", href: "/author/", dot: "var(--cat-blue)" },
-      { label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" },
-      { label: "How everyone's doing", href: "/learners/", dot: "var(--cat-green)" },
+      { label: "How to build a course", href: "/guide/", dot: "var(--cat-amber)" },
+      { label: "Building blocks", href: "/building-blocks/", dot: "var(--cat-blue)" },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { label: "Faculty", href: "/faculty/", dot: "var(--cat-teal)" },
+      { label: "How my courses are doing", href: "/my-courses/", dot: "var(--cat-green)" },
     ],
   },
 ];
@@ -77,7 +95,7 @@ const OPERATOR_NAV: NavGroup[] = [
 function routeMode(pathname: string): NavMode | null {
   const segment = pathname.split("/").filter(Boolean)[0] ?? "";
   if (OPERATOR_ROUTES.has(segment)) return "operator";
-  if (segment === "author" || segment === "course-studio") return "author";
+  if (AUTHOR_ROUTES.has(segment)) return "author";
   return null;
 }
 
@@ -174,7 +192,7 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
     if (next === mode) return;
     setMode(next);
     localStorage.setItem(MODE_STORAGE_KEY, next);
-    router.push(next === "author" ? "/author/" : "/dashboard/");
+    router.push(next === "author" ? "/course-studio/" : "/dashboard/");
   }
 
   const navGroups = mode === "author" ? AUTHOR_NAV : OPERATOR_NAV;

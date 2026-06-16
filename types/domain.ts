@@ -121,6 +121,45 @@ export type SyncAuditEntry = {
   actor?: string;
 };
 
+/* Learner progress — org-wide monitoring of enrolled learners across LACE
+   courses. No live source yet; served from fixtures behind a DataResult so a
+   Supabase/Brightspace reader can slot in without touching the UI. */
+export type LearnerStatus = "completed" | "in-progress" | "not-started";
+
+export type CourseProgress = {
+  orgUnitId: number;
+  courseName: string;
+  jurisdiction: string | null;
+  enrolled: number;
+  completed: number;
+  inProgress: number;
+  notStarted: number;
+  /* Mean percent-complete across enrolled learners, 0–100. */
+  avgCompletionPct: number;
+  lastActivityAt: string | null;
+};
+
+export type LearnerActivity = {
+  name: string;
+  email: string;
+  courseName: string;
+  status: LearnerStatus;
+  progressPct: number;
+  lastActiveAt: string;
+};
+
+export type LearnerProgressReport = {
+  generatedAt: string;
+  totalLearners: number;
+  /* Active within the last 30 days. */
+  activeLearners: number;
+  coursesWithEnrollment: number;
+  /* Enrollment-weighted mean completion across all courses, 0–100. */
+  overallCompletionPct: number;
+  byCourse: CourseProgress[];
+  recent: LearnerActivity[];
+};
+
 export type HealthState = "ok" | "error" | "unconfigured";
 
 export type HealthStatus = {

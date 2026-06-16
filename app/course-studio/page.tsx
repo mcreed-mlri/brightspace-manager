@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CourseList } from "@/components/studio/course-list";
 import { NewCourseButton } from "@/components/studio/new-course-button";
 import { StatusBadge } from "@/components/status-badge";
@@ -9,22 +10,33 @@ export const dynamic = "force-dynamic";
 
 export default async function CourseStudioPage() {
   const [template, drafts] = await Promise.all([getTemplateInfo(), listDrafts()]);
+  const lastDraft = drafts[0];
 
   return (
     <div className="max-w-[820px]">
-      <header className="mb-[22px] flex items-start justify-between gap-4">
-        <div>
-          <h1 className="page-title text-ink">Course Studio</h1>
-          <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
-            Build Brightspace-ready courses from our shared template. Course Studio
-            walks you through each step. Write in plain English, export when you&apos;re
-            done.
-          </p>
-        </div>
-        <span className="mt-1 shrink-0">
-          <NewCourseButton />
-        </span>
+      <header className="mb-[22px]">
+        <h1 className="page-title text-ink">Course Studio</h1>
+        <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
+          Build Brightspace-ready courses from our shared template. Course Studio
+          walks you through each step. Write in plain English, export when you&apos;re
+          done.
+        </p>
       </header>
+
+      <section className="mb-[30px] rounded-[14px] border border-[var(--accent-tint)] bg-brand-tint px-[30px] py-[26px]">
+        <p className="eyebrow mb-2.5">Course Studio</p>
+        <h2 className="mb-[18px] font-display text-[24px] font-bold tracking-[-0.025em] text-ink">
+          Start a draft
+        </h2>
+        <div className="flex items-center gap-[9px]">
+          <NewCourseButton label="+ New course" />
+          {lastDraft ? (
+            <Link href={`/course-studio/${lastDraft.id}/`} className="btn-secondary">
+              Continue draft
+            </Link>
+          ) : null}
+        </div>
+      </section>
 
       <p className="section-title mb-2 text-ink">Your courses</p>
       <div className="editorial-card mb-[22px]">
