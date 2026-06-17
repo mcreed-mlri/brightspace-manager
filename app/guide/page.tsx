@@ -107,6 +107,9 @@ export default function GuidePage() {
               <IconCopy size={15} />
               View building blocks
             </Link>
+            <Link href="/publish/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+              Publish workflow
+            </Link>
           </div>
         </div>
 

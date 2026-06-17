@@ -139,6 +139,9 @@ export default function BuildingBlocksPage() {
               <IconStudio size={15} />
               Open Studio
             </Link>
+            <Link href="/publish/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+              Publish workflow
+            </Link>
           </div>
         </div>
 

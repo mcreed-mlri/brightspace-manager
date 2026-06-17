@@ -19,6 +19,7 @@ const SECTION: Record<string, { mode: "author" | "operator" | "lace"; label: str
   "supabase-data": { mode: "operator", label: "supabase data" },
   settings: { mode: "operator", label: "settings" },
   "course-studio": { mode: "author", label: "course studio" },
+  publish: { mode: "author", label: "publish workflow" },
   learners: { mode: "lace", label: "learner progress" },
   "sign-in": { mode: "lace", label: "sign in" },
 };
