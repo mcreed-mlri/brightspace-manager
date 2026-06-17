@@ -199,12 +199,12 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
 
   return (
     <aside
-      className={`flex shrink-0 flex-col overflow-hidden border-r border-line bg-surface transition-[width,opacity] duration-200 ease-in-out ${
-        hidden ? "pointer-events-none w-0 opacity-0" : "w-[236px]"
+      className={`flex shrink-0 flex-col overflow-hidden border-b border-line bg-surface transition-[width,opacity] duration-200 ease-in-out md:border-b-0 md:border-r ${
+        hidden ? "pointer-events-none h-0 opacity-0 md:h-auto md:w-0" : "max-h-[198px] w-full md:max-h-none md:w-[236px]"
       }`}
       aria-hidden={hidden}
     >
-      <div className="flex items-center gap-2.5 px-4 pb-4 pt-[18px]">
+      <div className="flex items-center gap-2.5 px-4 pb-3 pt-3 md:pb-4 md:pt-[18px]">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink text-surface">
           <IconScales size={17} />
         </span>
@@ -214,17 +214,17 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
       <ModeToggle mode={mode} onChange={switchMode} />
 
       <nav
-        className="flex flex-1 flex-col overflow-y-auto px-[11px] pb-1.5 pt-1"
+        className="flex gap-2 overflow-x-auto px-[11px] pb-2 pt-1 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto md:pb-1.5"
         aria-label="Main navigation"
       >
         {navGroups.map((group) => (
-          <div key={group.label ?? "top"} className="mb-1.5">
+          <div key={group.label ?? "top"} className="mb-1.5 shrink-0">
             {group.label ? (
-              <p className="px-2 pb-1.5 pt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] text-ink-soft">
+              <p className="hidden px-2 pb-1.5 pt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] text-ink-soft md:block">
                 {group.label}
               </p>
             ) : null}
-            <ul className="flex flex-col gap-0.5">
+            <ul className="flex gap-1 md:flex-col md:gap-0.5">
               {group.items.map((item) => (
                 <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />
               ))}
@@ -233,7 +233,9 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
         ))}
       </nav>
 
-      <SessionBadge />
+      <div className="hidden md:block">
+        <SessionBadge />
+      </div>
     </aside>
   );
 }

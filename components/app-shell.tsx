@@ -19,7 +19,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const builder = isBuilderRoute(pathname);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-paper">
+    <div className="flex h-screen flex-col overflow-hidden bg-paper md:flex-row">
       <Sidebar hidden={builder} />
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {builder ? (
@@ -28,7 +28,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <>
             <TopBar />
             <div key={pathname} className="fade-up flex-1 overflow-y-auto">
-              <div className="mx-auto w-full max-w-[1000px] px-9 pb-20 pt-9">{children}</div>
+              <div className="mx-auto w-full max-w-[1000px] px-4 pb-12 pt-5 sm:px-6 md:px-9 md:pb-20 md:pt-9">
+                {children}
+              </div>
             </div>
           </>
         )}

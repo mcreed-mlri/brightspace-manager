@@ -33,8 +33,8 @@ export function TopBar() {
   const pathname = usePathname();
 
   return (
-    <header className="flex h-[60px] shrink-0 items-center gap-3.5 border-b border-line bg-surface px-7">
-      <span className="font-mono text-[11px] tracking-[0.04em] text-ink-soft">
+    <header className="flex h-[52px] shrink-0 items-center gap-3.5 border-b border-line bg-surface px-4 md:h-[60px] md:px-7">
+      <span className="min-w-0 truncate font-mono text-[11px] tracking-[0.04em] text-ink-soft">
         {breadcrumb(pathname)}
       </span>
       <div className="ml-auto flex items-center gap-2.5">

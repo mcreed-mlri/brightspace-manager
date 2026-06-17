@@ -14,6 +14,27 @@ export default async function CourseStudioPage() {
 
   return (
     <div className="max-w-[820px]">
+      <section className="editorial-card mb-5 border-[var(--amber-tint)] bg-status-warn-soft px-4 py-4 md:hidden">
+        <StatusBadge tone="warn">Desktop required</StatusBadge>
+        <h1 className="mt-3 font-display text-[22px] font-bold leading-tight text-ink">
+          Course Studio is for a full-size screen.
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+          You can use Brightspace Manager on a phone to check status, confirm whether a
+          course is live, or inspect read-only details. Building and editing courses needs
+          the desktop Studio layout.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href="/courses/" className="btn-secondary">
+            Check course inventory
+          </Link>
+          <Link href="/dashboard/" className="btn-secondary">
+            View dashboard
+          </Link>
+        </div>
+      </section>
+
+      <div className="hidden md:block">
       <header className="mb-[22px]">
         <h1 className="page-title text-ink">Course Studio</h1>
         <p className="mt-[5px] max-w-[680px] text-sm leading-[1.55] text-ink-muted">
@@ -89,6 +110,7 @@ export default async function CourseStudioPage() {
             </p>
           </>
         )}
+      </div>
       </div>
     </div>
   );
