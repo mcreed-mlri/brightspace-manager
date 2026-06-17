@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconCourses, IconFiles, IconStudio, IconSync } from "@/components/icons";
+import { IconCourses, IconDatabase, IconFiles, IconStudio, IconSync } from "@/components/icons";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 
@@ -57,6 +57,7 @@ const workflowSteps = [
       "Course Inventory shows the offering.",
       "Sync Diagnostics has no blocking drift for the course.",
       "Supabase learning_items has the correct title, course id, and status.",
+      "Learning Hub listing metadata has been reviewed.",
       "The write is previewed, confirmed, and logged.",
     ],
   },
@@ -101,6 +102,12 @@ const quickLinks = [
     detail: "Preview and apply catalog sync changes.",
     icon: IconSync,
   },
+  {
+    href: "/hub-listing/",
+    label: "Learning Hub listing",
+    detail: "Collect catalog metadata and preview the Supabase row.",
+    icon: IconDatabase,
+  },
 ];
 
 export default function PublishPage() {
@@ -132,6 +139,10 @@ export default function PublishPage() {
             <Link href="/sync/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
               <IconSync size={15} />
               Check sync
+            </Link>
+            <Link href="/hub-listing/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+              <IconDatabase size={15} />
+              Add to Learning Hub
             </Link>
           </div>
         </div>

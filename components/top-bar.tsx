@@ -20,6 +20,7 @@ const SECTION: Record<string, { mode: "author" | "operator" | "lace"; label: str
   settings: { mode: "operator", label: "settings" },
   "course-studio": { mode: "author", label: "course studio" },
   publish: { mode: "author", label: "publish workflow" },
+  "hub-listing": { mode: "author", label: "learning hub listing" },
   learners: { mode: "lace", label: "learner progress" },
   "sign-in": { mode: "lace", label: "sign in" },
 };

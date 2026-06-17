@@ -44,6 +44,7 @@ const AUTHOR_ROUTES = new Set([
   "guide",
   "building-blocks",
   "publish",
+  "hub-listing",
   "faculty",
   "my-courses",
 ]);
@@ -59,6 +60,7 @@ const AUTHOR_NAV: NavGroup[] = [
       { label: "How to build a course", href: "/guide/", dot: "var(--cat-amber)" },
       { label: "Building blocks", href: "/building-blocks/", dot: "var(--cat-blue)" },
       { label: "Publish workflow", href: "/publish/", dot: "var(--cat-green)" },
+      { label: "Learning Hub listing", href: "/hub-listing/", dot: "var(--cat-pink)" },
     ],
   },
   {
