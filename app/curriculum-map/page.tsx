@@ -14,7 +14,7 @@ export default async function CurriculumMapPage() {
       <PageHeader
         eyebrow="Author / Curriculum Map"
         title="Curriculum Map"
-        description="The living map of how the LACE curriculum is organized — Legal Skills across the case lifecycle and Substantive Law practice areas. Click Edit map to rename, add, remove, or drag notes, then Save to share with the team."
+        description="The living map of how the LACE curriculum is organized. Click Edit map to rename, add, remove, or drag notes, then Save to share with the team."
       />
       <CurriculumMapEditor initial={data} />
     </div>

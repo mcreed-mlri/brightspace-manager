@@ -51,6 +51,11 @@ function EditableText({
       spellCheck={false}
       onBlur={(event) => {
         const next = (event.currentTarget.textContent ?? "").trim();
+        /* Never commit an empty card: restore the prior text and bail. */
+        if (!next) {
+          event.currentTarget.textContent = value;
+          return;
+        }
         if (next !== value) onCommit(next);
       }}
     >
@@ -69,6 +74,10 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
   const [dropTarget, setDropTarget] = useState<string | null>(null);
 
   const drag = useRef<DragItem | null>(null);
+  /* Baseline the board reverts to on Cancel/Done. Starts at the server snapshot
+     and advances to the current map after each successful save, so Done never
+     rolls back work that has already been persisted. */
+  const baseline = useRef<CurriculumMap>(clone(initial));
 
   const mutate = useCallback((fn: (draft: CurriculumMap) => void) => {
     setMap((prev) => {
@@ -289,6 +298,7 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
       if (!res.ok || !json.ok) {
         throw new Error(json.error?.message ?? "Save failed.");
       }
+      baseline.current = clone(map);
       setSave("saved");
       setDirty(false);
     } catch (err) {
@@ -298,7 +308,8 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
   }
 
   function handleCancel() {
-    setMap(clone(initial));
+    if (dirty && !window.confirm("Discard your unsaved changes?")) return;
+    setMap(clone(baseline.current));
     setDirty(false);
     setSave("idle");
     setError(null);
@@ -306,7 +317,13 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
   }
 
   const saveLabel =
-    save === "saving" ? "Saving…" : save === "saved" ? "Saved" : dirty ? "Save changes" : "Saved";
+    save === "saving"
+      ? "Saving…"
+      : dirty
+        ? "Save changes"
+        : save === "saved"
+          ? "Saved"
+          : "No changes";
 
   return (
     <div className={`${styles.board} fade-up`}>
@@ -694,7 +711,7 @@ function NoteRow({
         <textarea
           className={styles.commentBox}
           defaultValue={note.comment ?? ""}
-          placeholder="Personal note — hidden on the card, shown on hover. e.g. “Does this really belong here?”"
+          placeholder="Personal note — hidden on the card, shown on hover.”"
           rows={2}
           autoFocus
           onBlur={(e) => {

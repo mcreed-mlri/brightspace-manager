@@ -53,13 +53,15 @@ const AUTHOR_ROUTES = new Set([
 const AUTHOR_NAV: NavGroup[] = [
   {
     label: null,
-    items: [{ label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" }],
+    items: [
+      { label: "Course Studio", href: "/course-studio/", dot: "var(--cat-violet)" },
+      { label: "Curriculum Map", href: "/curriculum-map/", dot: "var(--cat-teal)" },
+    ],
   },
   {
     label: "Reference",
     items: [
       { label: "How to build a course", href: "/guide/", dot: "var(--cat-amber)" },
-      { label: "Curriculum Map", href: "/curriculum-map/", dot: "var(--cat-teal)" },
       { label: "Building blocks", href: "/building-blocks/", dot: "var(--cat-blue)" },
       { label: "Publish workflow", href: "/publish/", dot: "var(--cat-green)" },
       { label: "Learning Hub listing", href: "/hub-listing/", dot: "var(--cat-pink)" },
