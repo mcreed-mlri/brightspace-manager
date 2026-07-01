@@ -160,6 +160,39 @@ export type LearnerProgressReport = {
   recent: LearnerActivity[];
 };
 
+/* Curriculum Map — a team-editable planning wall (Legal Skills columns of
+   topic/sub-topic notes + a Substantive Law tile grid). Stored as one JSONB
+   document in the `curriculum_map` table; the whole map is saved at once. */
+export type CurriculumNote = {
+  id: string;
+  text: string;
+  level: "topic" | "sub";
+  /* Optional badge shown on the note, e.g. "tentative" or "unit intro". */
+  tag?: string;
+  /* Private margin note — never rendered as card text; surfaced only on hover.
+     For scratch remarks like "Does this really belong here?". */
+  comment?: string;
+};
+
+export type CurriculumColumn = {
+  id: string;
+  title: string;
+  notes: CurriculumNote[];
+};
+
+export type CurriculumTile = {
+  id: string;
+  text: string;
+};
+
+export type CurriculumBranch =
+  | { id: string; title: string; type: "columns"; columns: CurriculumColumn[] }
+  | { id: string; title: string; type: "grid"; tiles: CurriculumTile[] };
+
+export type CurriculumMap = {
+  branches: CurriculumBranch[];
+};
+
 export type HealthState = "ok" | "error" | "unconfigured";
 
 export type HealthStatus = {

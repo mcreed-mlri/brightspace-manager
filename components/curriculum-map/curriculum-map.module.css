@@ -1,0 +1,373 @@
+/* Sticky-note curriculum wall, ported from platform-wiki/curriculum-map.html.
+   Scoped as a CSS module so the distinctive look survives inside the app's
+   dark, Tailwind-driven chrome without leaking global classes. The notes keep
+   dark ink on bright paper colors, so they read on any surface. */
+
+.board {
+  --note-blue: #bfe0f2;
+  --note-orange: #f4b183;
+  --note-teal: #7fc7bc;
+  --note-green: #c6e86b;
+  --note-ink: #23303a;
+  --note-tape: rgba(255, 255, 255, 0.55);
+  --note-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.16);
+  --note-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.22), 0 2px 4px rgba(0, 0, 0, 0.14);
+  --note-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.swatch {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 3px;
+  box-shadow: var(--note-shadow-sm);
+  flex: none;
+}
+.swBlue {
+  background: var(--note-blue);
+}
+.swOrange {
+  background: var(--note-orange);
+}
+.swTeal {
+  background: var(--note-teal);
+}
+
+.branch {
+  margin-bottom: 2.5rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.25rem;
+}
+.branchTag {
+  display: inline-block;
+  background: var(--note-green);
+  color: var(--note-ink);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px;
+  box-shadow: var(--note-shadow-sm);
+  transform: rotate(-1.2deg);
+}
+.toolSpacer {
+  margin-left: auto;
+}
+.toolBtn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.toolBtn:hover {
+  background: var(--surface-sunken);
+  border-color: var(--line-strong);
+}
+
+/* Wall = row of columns */
+.wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.col {
+  align-self: start;
+}
+
+.colHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-weight: 700;
+  color: var(--note-ink);
+  background: var(--note-blue);
+  border: none;
+  border-radius: 4px;
+  padding: 0.85rem 0.9rem;
+  cursor: pointer;
+  position: relative;
+  box-shadow: var(--note-shadow-md);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.colHead::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 46px;
+  height: 16px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: var(--note-tape);
+  border-radius: 2px;
+}
+.colHead:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--note-shadow-lg);
+}
+.colHeadText {
+  flex: 1;
+  min-width: 0;
+}
+.caret {
+  margin-left: auto;
+  font-size: 0.7rem;
+  opacity: 0.65;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+.caretOpen {
+  transform: rotate(90deg);
+}
+.colCount {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--note-ink);
+  opacity: 0.7;
+  margin-top: 0.15rem;
+}
+.colTitleInput {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--note-ink);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px dashed rgba(35, 48, 58, 0.4);
+  border-radius: 3px;
+  padding: 0.15rem 0.35rem;
+}
+
+.notes {
+  padding: 0.5rem 0 0;
+  margin: 0;
+  list-style: none;
+}
+
+.noteRow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+}
+.noteMain {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.note {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background: var(--note-orange);
+  color: var(--note-ink);
+  border-radius: 3px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  box-shadow: var(--note-shadow-sm);
+  overflow-wrap: anywhere;
+}
+.noteSub {
+  background: var(--note-teal);
+  margin-left: 1.1rem;
+  font-size: 0.85rem;
+}
+.noteSub::before {
+  content: "";
+  position: absolute;
+  left: -0.7rem;
+  top: 50%;
+  width: 0.55rem;
+  height: 1px;
+  background: var(--ph-border, rgba(35, 48, 58, 0.45));
+}
+
+/* Private margin note: a corner dot that reveals its text via the native
+   tooltip on hover. Never shows the comment text on the card itself. */
+.commentDot {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--note-ink);
+  opacity: 0.5;
+  cursor: help;
+}
+.commentDot:hover {
+  opacity: 0.85;
+}
+.commentBox {
+  width: 100%;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--surface-sunken);
+  border: 1px dashed var(--line-strong);
+  border-radius: 6px;
+  padding: 0.4rem 0.55rem;
+}
+.commentBox:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a4b00;
+  vertical-align: 0.05em;
+}
+
+.editable {
+  outline: none;
+  cursor: text;
+  border-radius: 2px;
+}
+.editable:focus {
+  box-shadow: 0 0 0 2px rgba(35, 48, 58, 0.35);
+}
+
+/* Edit-mode controls */
+.noteCtrls {
+  display: flex;
+  gap: 0.15rem;
+  flex: none;
+}
+.ctrlBtn {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--ink-muted);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.ctrlBtn:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.ctrlOn {
+  color: var(--note-ink);
+  background: var(--note-green);
+  border-color: var(--note-green);
+}
+.ctrlDanger:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+.addBtn {
+  margin-top: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  width: 100%;
+}
+.addBtn:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* Drag affordances */
+.draggable {
+  cursor: grab;
+}
+.dragging {
+  opacity: 0.45;
+}
+.dropBefore {
+  box-shadow: 0 -3px 0 0 var(--accent);
+}
+.colDrop {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Substantive law grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.75rem;
+}
+.tileRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.tile {
+  flex: 1;
+  min-width: 0;
+  background: var(--note-blue);
+  color: var(--note-ink);
+  font-weight: 600;
+  text-align: center;
+  padding: 1.1rem 0.75rem;
+  border-radius: 4px;
+  box-shadow: var(--note-shadow-sm);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .colHead:hover {
+    transform: translateY(-2px);
+  }
+}
