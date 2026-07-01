@@ -50,8 +50,11 @@ export async function middleware(request: NextRequest) {
   const isSignInPage = pathname === "/sign-in" || pathname === "/sign-in/";
   const isPreviewStylesheet =
     pathname === "/api/studio/template/css" || pathname === "/api/studio/template/css/";
+  /* The OAuth callback runs BEFORE a session exists — it's what establishes
+     one. Gating it behind sign-in would trap the user in a redirect loop. */
+  const isAuthCallback = pathname === "/auth/callback" || pathname === "/auth/callback/";
 
-  if (isPreviewStylesheet) return response;
+  if (isPreviewStylesheet || isAuthCallback) return response;
 
   if (!user && !isSignInPage) {
     /* API callers get the standard error envelope, not an HTML redirect. */

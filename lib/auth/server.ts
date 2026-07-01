@@ -12,6 +12,24 @@ export type SessionUser = {
   email: string;
 };
 
+/* Google sign-ins auto-create a Supabase user for ANY Google account that
+   completes the flow — the OTP path's invite-only guard (shouldCreateUser:
+   false) does NOT cover them. This is the real gate: only emails on the
+   configured org domain(s) are allowed in. Set AUTH_ALLOWED_EMAIL_DOMAINS to a
+   comma-separated list (e.g. "ebhcs.org,mlri.org"). When it is unset, no domain
+   restriction is applied, so the app stays open in dev/mock. */
+export function isAllowedOrgEmail(email: string | null | undefined): boolean {
+  const raw = process.env["AUTH_ALLOWED_EMAIL_DOMAINS"]?.trim();
+  if (!raw) return true;
+  const domain = email?.split("@")[1]?.toLowerCase();
+  if (!domain) return false;
+  const allowed = raw
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+  return allowed.includes(domain);
+}
+
 async function createSupabaseAuthClient() {
   const cookieStore = await cookies();
   const { url, anonKey } = getSupabaseAuthEnv();
