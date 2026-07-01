@@ -78,13 +78,23 @@ export async function checkSupabaseHealth(): Promise<HealthStatus> {
 
   try {
     const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from("learning_items").select("id,title").limit(1);
-    if (error) {
+    const items = await supabase.from("learning_items").select("id,title").limit(1);
+    if (items.error) {
       return {
         service: "supabase",
         status: "error",
         mode: "service-role",
-        detail: `Supabase query failed: ${error.message}`,
+        detail: `Supabase query failed (learning_items): ${items.error.message}`,
+        checkedAt,
+      };
+    }
+    const map = await supabase.from("curriculum_map").select("id").limit(1);
+    if (map.error) {
+      return {
+        service: "supabase",
+        status: "error",
+        mode: "service-role",
+        detail: `Supabase query failed (curriculum_map): ${map.error.message}. Run scripts/setup-curriculum-map.sql.`,
         checkedAt,
       };
     }
@@ -92,7 +102,7 @@ export async function checkSupabaseHealth(): Promise<HealthStatus> {
       service: "supabase",
       status: "ok",
       mode: "service-role",
-      detail: "Connected to Supabase (learning_items reachable).",
+      detail: "Connected to Supabase (learning_items and curriculum_map reachable).",
       checkedAt,
     };
   } catch {

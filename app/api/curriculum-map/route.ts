@@ -109,7 +109,11 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(body, { status: 200 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Save failed.";
+    let message = error instanceof Error ? error.message : "Save failed.";
+    if (/permission denied/i.test(message)) {
+      message =
+        "Database permission denied for curriculum_map. In the Supabase SQL Editor, run scripts/setup-curriculum-map.sql for this project (create table, enable RLS, and grant service_role access).";
+    }
     const body: ApiResponse<never> = { ok: false, error: { message, status: 500 } };
     return NextResponse.json(body, { status: 500 });
   }

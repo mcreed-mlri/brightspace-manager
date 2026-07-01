@@ -12,7 +12,12 @@ create table if not exists curriculum_map (
 );
 
 -- The app reads and writes this table server-side with the service-role key
--- (see lib/data/curriculum-map.ts), so no policies are required for it to work.
--- Enabling RLS with NO policies denies all *direct* anon/browser access, which
--- is the safe default: the only way in is through the authenticated save route.
+-- (see lib/data/curriculum-map.ts), so no RLS policies are required for it to
+-- work. Enabling RLS with NO policies denies all *direct* anon/browser access,
+-- which is the safe default: the only way in is through the authenticated save
+-- route. Table-level GRANTs are still required — without them Postgres returns
+-- "permission denied" even for the service-role client.
 alter table curriculum_map enable row level security;
+
+grant all on table public.curriculum_map to service_role;
+grant all on table public.curriculum_map to postgres;
