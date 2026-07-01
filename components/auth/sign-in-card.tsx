@@ -34,6 +34,10 @@ export function SignInCard() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  /* Code login is a break-glass fallback, hidden behind a link so Google is
+     the clean primary path. Revealed on demand, or automatically if a Google
+     sign-in fails (see the OAuth-error effect below). */
+  const [showCodeLogin, setShowCodeLogin] = useState(false);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -50,6 +54,8 @@ export function SignInCard() {
     setError(
       `Google sign-in didn't complete: ${oauthError}. You can still use a sign-in code below.`,
     );
+    /* Auto-reveal the fallback so "below" actually points at something. */
+    setShowCodeLogin(true);
     window.history.replaceState({}, "", window.location.pathname);
   }, []);
 
@@ -171,33 +177,45 @@ export function SignInCard() {
               {busy ? "Redirecting…" : "Continue with Google"}
             </button>
 
-            <div className="my-5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-ink-soft">
-              <span className="h-px flex-1 bg-line" />
-              or use a sign-in code
-              <span className="h-px flex-1 bg-line" />
-            </div>
+            {!showCodeLogin ? (
+              <button
+                type="button"
+                onClick={() => setShowCodeLogin(true)}
+                className="mt-4 w-full text-center text-xs font-medium text-ink-muted hover:text-ink"
+              >
+                Trouble with Google? Use a sign-in code
+              </button>
+            ) : (
+              <>
+                <div className="my-5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-ink-soft">
+                  <span className="h-px flex-1 bg-line" />
+                  or use a sign-in code
+                  <span className="h-px flex-1 bg-line" />
+                </div>
 
-            <form onSubmit={sendCode}>
-              <p className="text-sm text-ink-muted">
-                No password needed. We&apos;ll email you a one-time code.
-              </p>
-            <label className="mt-5 block text-xs font-semibold uppercase tracking-wider text-ink-soft">
-              Work email
-              <input
-                autoFocus
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@mlri.org"
-                className={`${inputClass} mt-1.5 font-normal normal-case tracking-normal`}
-              />
-            </label>
-            <button type="submit" disabled={busy || !email.trim()} className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm">
-              {busy ? "Sending…" : "Email me a sign-in code"}
-            </button>
-            </form>
+                <form onSubmit={sendCode}>
+                  <p className="text-sm text-ink-muted">
+                    No password needed. We&apos;ll email you a one-time code.
+                  </p>
+                  <label className="mt-5 block text-xs font-semibold uppercase tracking-wider text-ink-soft">
+                    Work email
+                    <input
+                      autoFocus
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@mlri.org"
+                      className={`${inputClass} mt-1.5 font-normal normal-case tracking-normal`}
+                    />
+                  </label>
+                  <button type="submit" disabled={busy || !email.trim()} className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm">
+                    {busy ? "Sending…" : "Email me a sign-in code"}
+                  </button>
+                </form>
+              </>
+            )}
           </>
         ) : (
           <form onSubmit={verifyCode}>
