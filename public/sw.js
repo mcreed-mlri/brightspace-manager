@@ -1,5 +1,5 @@
-const CACHE_NAME = "bsm-admin-v3";
-const ASSETS_TO_CACHE = ["/dashboard/", "/manifest.json", "/icon.svg", "/icon-192.png", "/icon-512.png"];
+const CACHE_NAME = "bsm-admin-v4";
+const ASSETS_TO_CACHE = ["/manifest.json", "/icon.svg", "/icon-192.png", "/icon-512.png"];
 
 // Install Event
 self.addEventListener("install", (event) => {
@@ -27,49 +27,44 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch Event. Two regimes:
-//  - Navigations (HTML): network-FIRST, so sign-in redirects and sign-out
-//    always reach the server; cache is only an offline fallback. Cache-first
-//    here would keep serving authenticated pages after sign-out.
-//  - Static assets: cache-first with background refresh.
-//  - API: always network, never cached — admins must see fresh data.
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+function shouldBypassCache(event, url) {
+  if (event.request.method !== "GET") return true;
+  if (url.protocol !== "http:" && url.protocol !== "https:") return true;
 
+  // Authenticated app documents and Next.js route payloads must always hit the
+  // network so cookie/session changes are reflected immediately.
+  if (event.request.mode === "navigate") return true;
+  if (event.request.destination === "document") return true;
+  if (url.search) return true;
+  if (url.pathname.startsWith("/api/")) return true;
+  if (url.pathname.startsWith("/auth/")) return true;
+  if (url.pathname === "/sign-in" || url.pathname.startsWith("/sign-in/")) return true;
+  if (event.request.headers.get("rsc") === "1") return true;
+  if (event.request.headers.get("next-router-prefetch")) return true;
+  if (event.request.headers.get("next-router-state-tree")) return true;
+
+  return false;
+}
+
+function shouldCacheResponse(url, response) {
+  if (!response || response.status !== 200) return false;
+  if (url.pathname.startsWith("/_next/static/")) return true;
+  return ASSETS_TO_CACHE.includes(url.pathname);
+}
+
+// Fetch Event. Only cache safe public/static assets. Authenticated app
+// documents, API calls, and Next.js route payloads go straight to the network.
+self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Skip browser extensions and Next.js dev hot-reloading
-  if (url.protocol !== "http:" && url.protocol !== "https:") return;
-  if (url.pathname.includes("_next/webpack") || url.pathname.includes("hot-update")) return;
-
-  // Never cache API responses — admins must always see fresh health/inventory data.
-  if (url.pathname.startsWith("/api/")) return;
-
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() =>
-          caches
-            .match(event.request)
-            .then((cached) => cached || caches.match("/dashboard/")),
-        ),
-    );
+  if (shouldBypassCache(event, url)) {
     return;
   }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+        if (shouldCacheResponse(url, networkResponse)) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);

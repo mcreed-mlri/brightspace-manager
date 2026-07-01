@@ -5,7 +5,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+    if (
+      process.env.NODE_ENV === "production" &&
+      typeof window !== "undefined" &&
+      "serviceWorker" in navigator
+    ) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
           .register("/sw.js")
