@@ -71,6 +71,7 @@ export const mockEvaluationReport: EvaluationReport = {
   ],
   courseSignals: [
     {
+      orgUnitId: 6735,
       courseName: "Welcome to LACE",
       reach: 84,
       completionPct: 88,
@@ -79,6 +80,7 @@ export const mockEvaluationReport: EvaluationReport = {
       risk: "healthy",
     },
     {
+      orgUnitId: 6739,
       courseName: "Trauma-Informed Client Interviewing",
       reach: 47,
       completionPct: 72,
@@ -87,6 +89,7 @@ export const mockEvaluationReport: EvaluationReport = {
       risk: "healthy",
     },
     {
+      orgUnitId: 6703,
       courseName: "Eviction Defense: The First 48 Hours",
       reach: 52,
       completionPct: 61,
@@ -95,6 +98,7 @@ export const mockEvaluationReport: EvaluationReport = {
       risk: "watch",
     },
     {
+      orgUnitId: 6718,
       courseName: "SNAP Benefits: Eligibility and Appeals",
       reach: 41,
       completionPct: 58,
@@ -103,6 +107,7 @@ export const mockEvaluationReport: EvaluationReport = {
       risk: "watch",
     },
     {
+      orgUnitId: 6731,
       courseName: "Debt Collection Defense in District Court",
       reach: 33,
       completionPct: 41,
@@ -111,6 +116,7 @@ export const mockEvaluationReport: EvaluationReport = {
       risk: "intervene",
     },
     {
+      orgUnitId: 6721,
       courseName: "Emergency Assistance Shelter Advocacy",
       reach: 18,
       completionPct: 24,

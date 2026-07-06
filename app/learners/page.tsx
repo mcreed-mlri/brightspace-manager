@@ -1,23 +1,9 @@
 import { PageHeader } from "@/components/page-header";
 import { MockDataBanner } from "@/components/mock-data-banner";
-import { StatusBadge, type BadgeTone } from "@/components/status-badge";
 import { getLearnerProgress } from "@/lib/data/learners";
-import { formatRelative } from "@/components/courses/course-presentation";
-import type { CourseProgress, LearnerStatus } from "@/types/domain";
+import { LearnerRoster } from "@/components/learners/learner-roster";
 
 export const dynamic = "force-dynamic";
-
-const STATUS_TONE: Record<LearnerStatus, BadgeTone> = {
-  completed: "ok",
-  "in-progress": "info",
-  "not-started": "neutral",
-};
-
-const STATUS_LABEL: Record<LearnerStatus, string> = {
-  completed: "done",
-  "in-progress": "in progress",
-  "not-started": "not started",
-};
 
 function MetricCell({
   label,
@@ -43,27 +29,6 @@ function MetricCell({
         {value}
       </div>
       <div className="mt-[7px] text-[11.5px] leading-snug text-ink-soft">{sub}</div>
-    </div>
-  );
-}
-
-/* Stacked completion bar — completed / in progress / not started, sized by
-   share of enrollment. */
-function ProgressBar({ course }: { course: CourseProgress }) {
-  const total = Math.max(course.enrolled, 1);
-  const segments = [
-    { value: course.completed, color: "var(--ok)" },
-    { value: course.inProgress, color: "var(--accent)" },
-    { value: course.notStarted, color: "var(--surface-sunken)" },
-  ];
-  return (
-    <div className="flex h-2 overflow-hidden rounded-full bg-surface-sunken" aria-hidden>
-      {segments.map((seg, index) => (
-        <span
-          key={index}
-          style={{ width: `${(seg.value / total) * 100}%`, background: seg.color }}
-        />
-      ))}
     </div>
   );
 }
@@ -180,87 +145,7 @@ export default async function LearnersPage() {
         ))}
       </div>
 
-      {/* By course */}
-      <div className="mb-3 flex items-center justify-between">
-        <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
-          By course
-        </span>
-        <span className="flex items-center gap-3.5 font-mono text-[10.5px] uppercase tracking-[0.05em] text-ink-soft">
-          <LegendDot color="var(--ok)" label="done" />
-          <LegendDot color="var(--accent)" label="in progress" />
-          <LegendDot color="var(--surface-sunken)" label="not started" />
-        </span>
-      </div>
-      <div className="mb-[30px] overflow-hidden rounded-2xl border border-line bg-surface">
-        {report.byCourse.map((course) => (
-          <div key={course.orgUnitId} className="border-b border-line-soft px-[18px] py-4 last:border-b-0">
-            <div className="mb-2.5 flex items-baseline justify-between gap-4">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-ink">{course.courseName}</p>
-                <p className="mt-0.5 font-mono text-[11px] text-ink-soft">
-                  {course.enrolled} enrolled · {course.completed} done ·{" "}
-                  {course.medianDaysToComplete !== null
-                    ? `~${course.medianDaysToComplete}d to finish · `
-                    : ""}
-                  {course.survey && course.survey.avgUsefulness !== null
-                    ? `${course.survey.avgUsefulness}/5 (${course.survey.responses}) · `
-                    : ""}
-                  {course.lastActivityAt
-                    ? `active ${formatRelative(course.lastActivityAt)}`
-                    : "no activity yet"}
-                </p>
-                {course.dropOffModule ? (
-                  <p className="mt-0.5 font-mono text-[11px] text-status-warn-ink">
-                    drop-off: {course.dropOffModule}
-                  </p>
-                ) : null}
-              </div>
-              <span className="shrink-0 font-display text-[20px] font-bold tracking-[-0.02em] text-ink">
-                {course.avgCompletionPct}%
-              </span>
-            </div>
-            <ProgressBar course={course} />
-          </div>
-        ))}
-      </div>
-
-      {/* Recent activity */}
-      <div className="mb-3">
-        <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
-          Recent activity
-        </span>
-      </div>
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface">
-        {report.recent.map((row) => (
-          <div
-            key={`${row.email}-${row.courseName}`}
-            className="flex items-center gap-3.5 border-b border-line-soft px-[18px] py-3.5 last:border-b-0"
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-ink">{row.name}</p>
-              <p className="mt-0.5 truncate text-[12.5px] text-ink-muted">{row.courseName}</p>
-            </div>
-            <span className="hidden shrink-0 font-mono text-[11px] text-ink-soft sm:inline">
-              {row.progressPct}%
-            </span>
-            <span className="shrink-0">
-              <StatusBadge tone={STATUS_TONE[row.status]}>{STATUS_LABEL[row.status]}</StatusBadge>
-            </span>
-            <span className="hidden shrink-0 font-mono text-[11px] text-ink-soft md:inline">
-              {formatRelative(row.lastActiveAt)}
-            </span>
-          </div>
-        ))}
-      </div>
+      <LearnerRoster byCourse={report.byCourse} learners={report.learners} enrollments={report.enrollments} />
     </div>
-  );
-}
-
-function LegendDot({ color, label }: { color: string; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className="h-2 w-2 rounded-full" style={{ background: color }} aria-hidden />
-      {label}
-    </span>
   );
 }

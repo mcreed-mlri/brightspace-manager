@@ -168,12 +168,38 @@ export type CourseProgress = {
 };
 
 export type LearnerActivity = {
+  learnerId: string;
+  orgUnitId: number;
   name: string;
   email: string;
   courseName: string;
   status: LearnerStatus;
   progressPct: number;
   lastActiveAt: string;
+};
+
+export type LearnerRole = "attorney" | "advocate" | "paralegal" | "support";
+
+/* A distinct person, not an enrollment — a learner may appear in several
+   courses via Enrollment/LearnerActivity rows. */
+export type LearnerRecord = {
+  id: string;
+  name: string;
+  email: string;
+  role: LearnerRole;
+  jurisdiction: string;
+};
+
+/* One learner's standing in one course — the join row CourseProgress and
+   LearnerActivity are both derived from. */
+export type Enrollment = {
+  learnerId: string;
+  orgUnitId: number;
+  status: LearnerStatus;
+  progressPct: number;
+  enrolledAt: string;
+  completedAt: string | null;
+  lastActiveAt: string | null;
 };
 
 export type LearnerProgressReport = {
@@ -195,7 +221,10 @@ export type LearnerProgressReport = {
      just a metric — those learners are waiting on a human. */
   abandonment: AbandonmentReasons;
   byCourse: CourseProgress[];
-  recent: LearnerActivity[];
+  /* Full learner roster, for the learner drawer/filter lookups. */
+  learners: LearnerRecord[];
+  /* One row per enrollment (learner x course) — the full join, not a curated sample. */
+  enrollments: LearnerActivity[];
 };
 
 export type EvaluationKpi = {
@@ -222,6 +251,7 @@ export type EvaluationSegment = {
 };
 
 export type EvaluationCourseSignal = {
+  orgUnitId: number;
   courseName: string;
   reach: number;
   completionPct: number;

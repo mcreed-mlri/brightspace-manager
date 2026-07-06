@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MetricCard } from "@/components/metric-card";
 import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
@@ -127,7 +128,11 @@ function CourseSignalPanel({ courses }: { courses: EvaluationCourseSignal[] }) {
 
       <div className="space-y-3">
         {courses.map((course) => (
-          <div key={course.courseName} className="rounded-lg border border-line-soft bg-surface px-4 py-3">
+          <Link
+            key={course.courseName}
+            href={`/learners?course=${course.orgUnitId}`}
+            className="block rounded-lg border border-line-soft bg-surface px-4 py-3 transition-colors hover:bg-hover-tint"
+          >
             <div className="mb-2 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-ink">{course.courseName}</p>
@@ -148,7 +153,7 @@ function CourseSignalPanel({ courses }: { courses: EvaluationCourseSignal[] }) {
                 {course.completionPct}%
               </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
