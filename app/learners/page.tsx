@@ -104,6 +104,82 @@ export default async function LearnersPage() {
         />
       </div>
 
+      {/* Outcome band — efficiency + perception metrics, per
+          docs/planning/metrics-framework.md */}
+      <div className="mb-[30px] grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
+        <MetricCell
+          label="Days to finish"
+          value={report.medianDaysToComplete ?? "—"}
+          sub="Median, enrollment to completion"
+        />
+        <MetricCell
+          label="Done in 30d"
+          value={report.pctCompletedWithin30d !== null ? `${report.pctCompletedWithin30d}%` : "—"}
+          sub="Completed within 30 days of enrolling"
+        />
+        <MetricCell
+          label="Usefulness"
+          value={report.survey.avgUsefulness !== null ? `${report.survey.avgUsefulness}/5` : "—"}
+          sub={
+            report.survey.responseRatePct !== null
+              ? `${report.survey.responses} ratings · ${report.survey.responseRatePct}% of completers`
+              : "No ratings yet"
+          }
+        />
+        <MetricCell
+          label="Need help"
+          value={report.abandonment.needHelp}
+          sub="Stalled learners asking for support"
+        />
+      </div>
+
+      {/* Why learners stall — reasons from the hub's stalled-course nudge.
+          The signal completion rates can't show. */}
+      <div className="mb-3">
+        <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
+          Why learners stall
+        </span>
+      </div>
+      <div className="mb-[30px] overflow-hidden rounded-2xl border border-line bg-surface">
+        {(
+          [
+            {
+              label: "Too busy right now",
+              count: report.abandonment.tooBusy,
+              hint: "Timing problem, not a content problem",
+            },
+            {
+              label: "Course runs too long",
+              count: report.abandonment.tooLong,
+              hint: "Candidate for chunking or a shorter format",
+            },
+            {
+              label: "Not relevant to my work",
+              count: report.abandonment.notRelevant,
+              hint: "Targeting or catalog description problem",
+            },
+            {
+              label: "Needs help",
+              count: report.abandonment.needHelp,
+              hint: "Follow up personally — these learners are waiting on a human",
+            },
+          ] as const
+        ).map((reason) => (
+          <div
+            key={reason.label}
+            className="flex items-center gap-3.5 border-b border-line-soft px-[18px] py-3.5 last:border-b-0"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink">{reason.label}</p>
+              <p className="mt-0.5 truncate text-[12.5px] text-ink-muted">{reason.hint}</p>
+            </div>
+            <span className="shrink-0 font-display text-[20px] font-bold tracking-[-0.02em] text-ink">
+              {reason.count}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {/* By course */}
       <div className="mb-3 flex items-center justify-between">
         <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
@@ -123,10 +199,21 @@ export default async function LearnersPage() {
                 <p className="truncate text-sm font-semibold text-ink">{course.courseName}</p>
                 <p className="mt-0.5 font-mono text-[11px] text-ink-soft">
                   {course.enrolled} enrolled · {course.completed} done ·{" "}
+                  {course.medianDaysToComplete !== null
+                    ? `~${course.medianDaysToComplete}d to finish · `
+                    : ""}
+                  {course.survey && course.survey.avgUsefulness !== null
+                    ? `${course.survey.avgUsefulness}/5 (${course.survey.responses}) · `
+                    : ""}
                   {course.lastActivityAt
                     ? `active ${formatRelative(course.lastActivityAt)}`
                     : "no activity yet"}
                 </p>
+                {course.dropOffModule ? (
+                  <p className="mt-0.5 font-mono text-[11px] text-status-warn-ink">
+                    drop-off: {course.dropOffModule}
+                  </p>
+                ) : null}
               </div>
               <span className="shrink-0 font-display text-[20px] font-bold tracking-[-0.02em] text-ink">
                 {course.avgCompletionPct}%

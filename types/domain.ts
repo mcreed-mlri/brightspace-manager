@@ -126,6 +126,24 @@ export type SyncAuditEntry = {
    Supabase/Brightspace reader can slot in without touching the UI. */
 export type LearnerStatus = "completed" | "in-progress" | "not-started";
 
+/* Post-completion rating card results ("How useful was this course?"),
+   collected by the hub and stored in Supabase `feedback`. */
+export type SurveySummary = {
+  /* Mean 1–5 usefulness rating; null until anyone has answered. */
+  avgUsefulness: number | null;
+  responses: number;
+};
+
+/* Why learners say they stopped — counts from the hub's stalled-course nudge
+   (Supabase feedback.flag). The signal completion rates can't give: whether
+   busy people ran out of time, the course ran long, or they need a human. */
+export type AbandonmentReasons = {
+  tooBusy: number;
+  tooLong: number;
+  notRelevant: number;
+  needHelp: number;
+};
+
 export type CourseProgress = {
   orgUnitId: number;
   courseName: string;
@@ -137,6 +155,16 @@ export type CourseProgress = {
   /* Mean percent-complete across enrolled learners, 0–100. */
   avgCompletionPct: number;
   lastActivityAt: string | null;
+  /* Efficiency metrics — the "does it fit a busy week" frame from
+     docs/planning/metrics-framework.md. Null until a completion source exists
+     (or the course has no completers yet). */
+  medianDaysToComplete: number | null;
+  /* Completers within 30 days of enrolling ÷ everyone enrolled ≥30 days ago, 0–100. */
+  pctCompletedWithin30d: number | null;
+  /* Module with the largest visit fall-off — where learners stop. */
+  dropOffModule: string | null;
+  survey: SurveySummary | null;
+  abandonment: AbandonmentReasons | null;
 };
 
 export type LearnerActivity = {
@@ -156,6 +184,16 @@ export type LearnerProgressReport = {
   coursesWithEnrollment: number;
   /* Enrollment-weighted mean completion across all courses, 0–100. */
   overallCompletionPct: number;
+  /* Completers-weighted mean of per-course medians — approximate until the
+     live rollup computes a true org-wide median. Null with no completers. */
+  medianDaysToComplete: number | null;
+  /* Enrollment-weighted, 0–100. */
+  pctCompletedWithin30d: number | null;
+  /* Org-wide rating-card results; responseRatePct = responses ÷ completions, 0–100. */
+  survey: SurveySummary & { responseRatePct: number | null };
+  /* Org-wide stalled-course nudge counts. needHelp is a support queue, not
+     just a metric — those learners are waiting on a human. */
+  abandonment: AbandonmentReasons;
   byCourse: CourseProgress[];
   recent: LearnerActivity[];
 };

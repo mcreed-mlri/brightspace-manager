@@ -3,8 +3,13 @@ import type { CourseProgress, LearnerActivity } from "@/types/domain";
 /* Mock learner progress for the LACE platform. Course names and org unit IDs
    mirror lib/fixtures/courses.ts so the inventory and progress screens agree.
    Numbers are invented but internally consistent: completed + inProgress +
-   notStarted === enrolled for every course. Real Brightspace/Supabase
-   enrollment data replaces this once a reader exists (see lib/data/learners). */
+   notStarted === enrolled for every course, and survey/abandonment counts stay
+   plausible against completed/inProgress. Real Brightspace/Supabase enrollment
+   data replaces this once a reader exists (see lib/data/learners).
+
+   The v2 fields (medianDaysToComplete, pctCompletedWithin30d, dropOffModule,
+   survey, abandonment) follow docs/planning/metrics-framework.md — efficiency
+   and outcome metrics, not activity metrics. */
 
 function hoursAgo(hours: number) {
   return new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
@@ -25,6 +30,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 4,
     avgCompletionPct: 88,
     lastActivityAt: hoursAgo(2),
+    medianDaysToComplete: 5,
+    pctCompletedWithin30d: 82,
+    dropOffModule: null,
+    survey: { avgUsefulness: 4.6, responses: 52 },
+    abandonment: { tooBusy: 2, tooLong: 0, notRelevant: 1, needHelp: 0 },
   },
   {
     orgUnitId: 6739,
@@ -36,6 +46,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 5,
     avgCompletionPct: 72,
     lastActivityAt: daysAgo(1),
+    medianDaysToComplete: 11,
+    pctCompletedWithin30d: 55,
+    dropOffModule: "Module 3: Role-play scenarios",
+    survey: { avgUsefulness: 4.8, responses: 24 },
+    abandonment: { tooBusy: 2, tooLong: 1, notRelevant: 0, needHelp: 1 },
   },
   {
     orgUnitId: 6703,
@@ -47,6 +62,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 8,
     avgCompletionPct: 61,
     lastActivityAt: hoursAgo(5),
+    medianDaysToComplete: 14,
+    pctCompletedWithin30d: 38,
+    dropOffModule: "Module 4: Answer drafting workshop",
+    survey: { avgUsefulness: 4.4, responses: 17 },
+    abandonment: { tooBusy: 5, tooLong: 2, notRelevant: 0, needHelp: 2 },
   },
   {
     orgUnitId: 6718,
@@ -58,6 +78,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 8,
     avgCompletionPct: 58,
     lastActivityAt: daysAgo(1),
+    medianDaysToComplete: 12,
+    pctCompletedWithin30d: 41,
+    dropOffModule: "Module 5: Appeals practice",
+    survey: { avgUsefulness: 4.1, responses: 13 },
+    abandonment: { tooBusy: 3, tooLong: 1, notRelevant: 1, needHelp: 1 },
   },
   {
     orgUnitId: 6712,
@@ -69,6 +94,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 7,
     avgCompletionPct: 52,
     lastActivityAt: daysAgo(1),
+    medianDaysToComplete: 16,
+    pctCompletedWithin30d: 29,
+    dropOffModule: "Module 3: Discovery requests",
+    survey: { avgUsefulness: 4.3, responses: 9 },
+    abandonment: { tooBusy: 4, tooLong: 2, notRelevant: 0, needHelp: 1 },
   },
   {
     orgUnitId: 6726,
@@ -80,6 +110,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 6,
     avgCompletionPct: 49,
     lastActivityAt: daysAgo(2),
+    medianDaysToComplete: 13,
+    pctCompletedWithin30d: 34,
+    dropOffModule: "Module 2: Hearing preparation",
+    survey: { avgUsefulness: 4.5, responses: 8 },
+    abandonment: { tooBusy: 2, tooLong: 1, notRelevant: 1, needHelp: 0 },
   },
   {
     orgUnitId: 6731,
@@ -91,6 +126,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 10,
     avgCompletionPct: 41,
     lastActivityAt: daysAgo(2),
+    medianDaysToComplete: 19,
+    pctCompletedWithin30d: 21,
+    dropOffModule: "Module 2: Validation letters",
+    survey: { avgUsefulness: 3.9, responses: 5 },
+    abandonment: { tooBusy: 4, tooLong: 3, notRelevant: 1, needHelp: 1 },
   },
   {
     orgUnitId: 6748,
@@ -102,6 +142,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 7,
     avgCompletionPct: 38,
     lastActivityAt: daysAgo(3),
+    medianDaysToComplete: 17,
+    pctCompletedWithin30d: 23,
+    dropOffModule: "Module 3: Inspection walkthrough",
+    survey: { avgUsefulness: 4.0, responses: 4 },
+    abandonment: { tooBusy: 2, tooLong: 2, notRelevant: 0, needHelp: 1 },
   },
   {
     orgUnitId: 6721,
@@ -113,6 +158,11 @@ export const mockCourseProgress: CourseProgress[] = [
     notStarted: 10,
     avgCompletionPct: 24,
     lastActivityAt: daysAgo(11),
+    medianDaysToComplete: 24,
+    pctCompletedWithin30d: 11,
+    dropOffModule: "Module 1: EA eligibility rules",
+    survey: { avgUsefulness: 3.6, responses: 2 },
+    abandonment: { tooBusy: 4, tooLong: 1, notRelevant: 2, needHelp: 2 },
   },
 ];
 
