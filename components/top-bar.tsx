@@ -15,13 +15,14 @@ const SECTION: Record<string, { mode: "author" | "operator" | "lace"; label: str
   courses: { mode: "operator", label: "course inventory" },
   sync: { mode: "operator", label: "sync diagnostics" },
   integrity: { mode: "operator", label: "integrity checker" },
+  evaluation: { mode: "operator", label: "evaluation framework" },
+  learners: { mode: "operator", label: "learner progress" },
   files: { mode: "operator", label: "brightspace files" },
   "supabase-data": { mode: "operator", label: "supabase data" },
   settings: { mode: "operator", label: "settings" },
   "course-studio": { mode: "author", label: "course studio" },
   publish: { mode: "author", label: "publish workflow" },
   "hub-listing": { mode: "author", label: "learning hub listing" },
-  learners: { mode: "lace", label: "learner progress" },
   "sign-in": { mode: "lace", label: "sign in" },
 };
 

@@ -198,6 +198,56 @@ export type LearnerProgressReport = {
   recent: LearnerActivity[];
 };
 
+export type EvaluationKpi = {
+  label: string;
+  value: string;
+  sub: string;
+  trend: "up" | "down" | "flat";
+};
+
+export type EvaluationTrendPoint = {
+  month: string;
+  reach: number;
+  completion: number;
+  usefulness: number;
+  confidenceDelta: number;
+};
+
+export type EvaluationSegment = {
+  role: string;
+  learners: number;
+  completionPct: number;
+  usefulness: number;
+  confidenceDelta: number;
+};
+
+export type EvaluationCourseSignal = {
+  courseName: string;
+  reach: number;
+  completionPct: number;
+  usefulness: number;
+  medianDaysToComplete: number;
+  risk: "healthy" | "watch" | "intervene";
+};
+
+export type EvaluationMetricReadiness = {
+  metric: string;
+  source: string;
+  status: "ready" | "partial" | "planned";
+  note: string;
+};
+
+export type EvaluationReport = {
+  generatedAt: string;
+  pilotWindow: string;
+  thesis: string;
+  kpis: EvaluationKpi[];
+  trend: EvaluationTrendPoint[];
+  segments: EvaluationSegment[];
+  courseSignals: EvaluationCourseSignal[];
+  readiness: EvaluationMetricReadiness[];
+};
+
 /* Curriculum Map — a team-editable planning wall (Legal Skills columns of
    topic/sub-topic notes + a Substantive Law tile grid). Stored as one JSONB
    document in the `curriculum_map` table; the whole map is saved at once. */
