@@ -35,6 +35,11 @@ function isMissingTable(error: { code?: string }): boolean {
   return error.code === "42P01";
 }
 
+function logSupabaseFallback(context: string, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.warn(`[Course Studio] Supabase ${context} failed; using file drafts instead.`, message);
+}
+
 function draftPath(dir: string, id: string) {
   validateDraftId(id);
   return path.join(dir, `${id}.json`);
@@ -83,12 +88,19 @@ export async function listDrafts(): Promise<DraftSummary[]> {
   const draftsById = await listFileDrafts();
 
   if (isSupabaseConfigured()) {
-    const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.from(TABLE).select("data");
-    if (error && !isMissingTable(error)) throw new Error(error.message);
-    for (const row of data ?? []) {
-      const draft = row.data as CourseDraft;
-      draftsById.set(draft.id, draft);
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.from(TABLE).select("data");
+      if (error) {
+        if (!isMissingTable(error)) logSupabaseFallback("draft list", error);
+      } else {
+        for (const row of data ?? []) {
+          const draft = row.data as CourseDraft;
+          draftsById.set(draft.id, draft);
+        }
+      }
+    } catch (error) {
+      logSupabaseFallback("draft list", error);
     }
   }
 
@@ -101,11 +113,18 @@ export async function readDraft(id: string): Promise<CourseDraft | null> {
   validateDraftId(id);
 
   if (isSupabaseConfigured()) {
-    const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.from(TABLE).select("data").eq("id", id).maybeSingle();
-    if (error && !isMissingTable(error)) throw new Error(error.message);
-    if (data?.data) return data.data as CourseDraft;
-    /* fall through: bundled JSON drafts stay readable before the import */
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.from(TABLE).select("data").eq("id", id).maybeSingle();
+      if (error) {
+        if (!isMissingTable(error)) logSupabaseFallback(`draft read (${id})`, error);
+      } else if (data?.data) {
+        return data.data as CourseDraft;
+      }
+      /* fall through: bundled JSON drafts stay readable before the import */
+    } catch (error) {
+      logSupabaseFallback(`draft read (${id})`, error);
+    }
   }
 
   for (const dir of readableDraftsDirs()) {
@@ -123,21 +142,25 @@ export async function writeDraft(draft: CourseDraft, updatedBy?: string): Promis
   const next = { ...draft, updatedAt: new Date().toISOString() };
 
   if (isSupabaseConfigured()) {
-    const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from(TABLE).upsert(
-      {
-        id: next.id,
-        data: next,
-        course_title: next.courseTitle,
-        deploy_ready: isDeployReady(next),
-        updated_at: next.updatedAt,
-        updated_by: updatedBy ?? null,
-      },
-      { onConflict: "id" },
-    );
-    if (!error) return next;
-    if (!isMissingTable(error)) throw new Error(error.message);
-    /* table not created yet — fall through to the file write */
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { error } = await supabase.from(TABLE).upsert(
+        {
+          id: next.id,
+          data: next,
+          course_title: next.courseTitle,
+          deploy_ready: isDeployReady(next),
+          updated_at: next.updatedAt,
+          updated_by: updatedBy ?? null,
+        },
+        { onConflict: "id" },
+      );
+      if (!error) return next;
+      if (!isMissingTable(error)) logSupabaseFallback(`draft write (${draft.id})`, error);
+      /* table not created yet — fall through to the file write */
+    } catch (error) {
+      logSupabaseFallback(`draft write (${draft.id})`, error);
+    }
   }
 
   const dir = writableDraftsDir();
@@ -156,10 +179,17 @@ export async function deleteDraft(id: string): Promise<boolean> {
 
   let removed = false;
   if (isSupabaseConfigured()) {
-    const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.from(TABLE).delete().eq("id", id).select("id");
-    if (error && !isMissingTable(error)) throw new Error(error.message);
-    removed = (data?.length ?? 0) > 0;
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase.from(TABLE).delete().eq("id", id).select("id");
+      if (error) {
+        if (!isMissingTable(error)) logSupabaseFallback(`draft delete (${id})`, error);
+      } else {
+        removed = (data?.length ?? 0) > 0;
+      }
+    } catch (error) {
+      logSupabaseFallback(`draft delete (${id})`, error);
+    }
   }
 
   try {

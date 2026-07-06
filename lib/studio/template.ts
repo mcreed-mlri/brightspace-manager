@@ -64,19 +64,26 @@ export async function getTemplateInfo(): Promise<TemplateInfo> {
 
   const url = getTemplateUrl();
   if (url) {
-    const files = await Promise.all(
-      WRAPPER_FILES.map(async (name) => {
-        const res = await fetch(`${url}/${name}`);
-        const body = await res.text();
-        const lastModified = res.headers.get("last-modified");
-        return {
-          name,
-          sizeBytes: Buffer.byteLength(body, "utf8"),
-          modifiedAt: lastModified ? new Date(lastModified).toISOString() : "",
-        };
-      }),
-    );
-    return { available: true, dir, files };
+    try {
+      const files = await Promise.all(
+        WRAPPER_FILES.map(async (name) => {
+          const res = await fetch(`${url}/${name}`);
+          if (!res.ok) throw new Error(`Template file ${name} returned ${res.status}.`);
+          const body = await res.text();
+          const lastModified = res.headers.get("last-modified");
+          return {
+            name,
+            sizeBytes: Buffer.byteLength(body, "utf8"),
+            modifiedAt: lastModified ? new Date(lastModified).toISOString() : "",
+          };
+        }),
+      );
+      return { available: true, dir, files };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn("[Course Studio] Template metadata fetch failed.", message);
+      return { available: false, dir, files: [] };
+    }
   }
 
   const files = await Promise.all(
