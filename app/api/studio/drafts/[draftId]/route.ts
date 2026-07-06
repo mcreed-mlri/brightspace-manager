@@ -46,7 +46,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
   try {
     const incoming = (await request.json()) as CourseDraft;
     /* id and createdAt are server-owned. */
-    const saved = await writeDraft({ ...incoming, id: existing.id, createdAt: existing.createdAt });
+    const saved = await writeDraft(
+      { ...incoming, id: existing.id, createdAt: existing.createdAt },
+      auth.user?.email,
+    );
     const body: ApiResponse<CourseDraft> = {
       ok: true,
       data: saved,

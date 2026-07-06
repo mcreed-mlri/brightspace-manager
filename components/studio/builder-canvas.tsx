@@ -47,23 +47,27 @@ const monoLabelClass =
   "mb-1.5 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft";
 
 export function BuilderCanvas({
+  draftId,
   topic,
   added,
   autoFocusType,
   lessonIndex,
   lessonTotal,
   onTopicChange,
+  onTitleChange,
   onAddSection,
   onRemoveSection,
   onApplyTemplate,
   onSlugChange,
 }: {
+  draftId: string;
   topic: TopicDraft;
   added: SectionType[];
   autoFocusType: SectionType | null;
   lessonIndex: number;
   lessonTotal: number;
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
+  onTitleChange: (title: string) => void;
   onAddSection: (type: SectionType) => void;
   onRemoveSection: (type: SectionType) => void;
   onApplyTemplate: (name: keyof typeof TEMPLATES) => void;
@@ -91,7 +95,7 @@ export function BuilderCanvas({
 
         <input
           value={topic.title}
-          onChange={(e) => onTopicChange((t) => void (t.title = e.target.value))}
+          onChange={(e) => onTitleChange(e.target.value)}
           aria-label="Lesson title"
           placeholder="Untitled lesson"
           className="w-full border-none bg-transparent p-0 font-display text-[38px] font-bold leading-[1.08] tracking-[-0.03em] text-ink outline-none placeholder:text-ink-soft"
@@ -107,7 +111,9 @@ export function BuilderCanvas({
         {/* controls strip */}
         <div className="my-6 flex flex-wrap items-center gap-x-[18px] gap-y-3 border-y border-line py-[15px]">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">Type</span>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
+              Type
+            </span>
             <div className="flex flex-wrap gap-1.5">
               {TOPIC_KINDS.map((kind) => {
                 const active = topic.kind === kind;
@@ -130,7 +136,9 @@ export function BuilderCanvas({
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">Length</span>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
+              Length
+            </span>
             <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-surface p-[3px]">
               <Stepper label="−" onClick={() => setMinutes(-1)} disabled={topic.minutes <= 1} />
               <span className="min-w-[50px] text-center text-[13px] font-semibold text-ink">
@@ -141,7 +149,9 @@ export function BuilderCanvas({
           </div>
 
           <label className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">Flag</span>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
+              Flag
+            </span>
             <select
               value={topic.updated}
               onChange={(e) => onTopicChange((t) => void (t.updated = e.target.value))}
@@ -157,8 +167,9 @@ export function BuilderCanvas({
           </label>
         </div>
 
-        {/* summary + filename — secondary metadata kept from the form editor */}
-        <div className="mb-7 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+        {/* summary — the filename is auto-named from the title and tucked
+            behind Advanced so authors never have to think about it */}
+        <div className="mb-7 space-y-3">
           <label className="block">
             <span className={monoLabelClass}>Summary</span>
             <input
@@ -168,18 +179,27 @@ export function BuilderCanvas({
               onChange={(e) => onTopicChange((t) => void (t.description = e.target.value))}
             />
           </label>
-          <label className="block">
-            <span className={monoLabelClass}>Filename</span>
-            <div className="flex items-center gap-1.5">
-              <input
-                className={`${fieldClass} font-mono !text-[12px]`}
-                value={topic.slug}
-                onChange={(e) => onSlugChange(e.target.value)}
-                aria-label="Lesson filename"
-              />
-              <span className="font-mono text-[11px] text-ink-soft">.html</span>
-            </div>
-          </label>
+          <details>
+            <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
+              Advanced
+            </summary>
+            <label className="mt-2 block">
+              <span className={monoLabelClass}>Page name</span>
+              <span className="mb-1.5 block text-[11.5px] leading-snug text-ink-soft">
+                Auto-created from the title. Only change it if you need a specific file name —
+                changing it after publishing breaks bookmarks.
+              </span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  className={`${fieldClass} font-mono !text-[12px]`}
+                  value={topic.slug}
+                  onChange={(e) => onSlugChange(e.target.value)}
+                  aria-label="Page file name"
+                />
+                <span className="font-mono text-[11px] text-ink-soft">.html</span>
+              </div>
+            </label>
+          </details>
         </div>
 
         {/* content blocks */}
@@ -193,6 +213,7 @@ export function BuilderCanvas({
                 type={type}
                 marker={index + 1}
                 autoFocus={type === autoFocusType}
+                draftId={draftId}
                 topic={topic}
                 onTopicChange={onTopicChange}
                 onRemove={() => onRemoveSection(type)}
@@ -235,6 +256,7 @@ function Block({
   type,
   marker,
   autoFocus,
+  draftId,
   topic,
   onTopicChange,
   onRemove,
@@ -242,6 +264,7 @@ function Block({
   type: SectionType;
   marker: number;
   autoFocus: boolean;
+  draftId: string;
   topic: TopicDraft;
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
   onRemove: () => void;
@@ -261,12 +284,26 @@ function Block({
           aria-label={`Remove ${SECTION_LABEL[type]} block`}
           className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded text-ink-soft transition-colors hover:bg-status-error-soft hover:text-status-error"
         >
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden
+          >
             <path d="M2 2l8 8M10 2l-8 8" />
           </svg>
         </button>
       </div>
-      <BlockEditor type={type} autoFocus={autoFocus} topic={topic} onTopicChange={onTopicChange} />
+      <BlockEditor
+        type={type}
+        autoFocus={autoFocus}
+        draftId={draftId}
+        topic={topic}
+        onTopicChange={onTopicChange}
+      />
     </div>
   );
 }
@@ -274,11 +311,13 @@ function Block({
 function BlockEditor({
   type,
   autoFocus,
+  draftId,
   topic,
   onTopicChange,
 }: {
   type: SectionType;
   autoFocus: boolean;
+  draftId: string;
   topic: TopicDraft;
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
 }) {
@@ -358,7 +397,7 @@ function BlockEditor({
     case "media":
       return (
         <div className="rounded-[14px] border border-line bg-surface px-[18px] py-4">
-          <MediaList topic={topic} onTopicChange={onTopicChange} />
+          <MediaList draftId={draftId} topic={topic} onTopicChange={onTopicChange} />
         </div>
       );
 
@@ -420,7 +459,9 @@ function TryItEditor({
           >
             <button
               type="button"
-              onClick={() => onTopicChange((t) => t.tryIt.options.forEach((o, j) => (o.correct = j === i)))}
+              onClick={() =>
+                onTopicChange((t) => t.tryIt.options.forEach((o, j) => (o.correct = j === i)))
+              }
               aria-label={`Mark option ${i + 1} correct`}
               aria-pressed={option.correct}
               className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-2 transition-colors ${
@@ -428,7 +469,17 @@ function TryItEditor({
               }`}
             >
               {option.correct ? (
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="2.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
                   <path d="M2.5 6.5L5 9l4.5-5" />
                 </svg>
               ) : null}
@@ -437,7 +488,9 @@ function TryItEditor({
               className="min-w-0 flex-1 border-none bg-transparent text-[14px] text-ink outline-none placeholder:text-ink-soft"
               placeholder={`Option ${i + 1}`}
               value={option.text}
-              onChange={(e) => onTopicChange((t) => void (t.tryIt.options[i].text = e.target.value))}
+              onChange={(e) =>
+                onTopicChange((t) => void (t.tryIt.options[i].text = e.target.value))
+              }
             />
             <button
               type="button"
@@ -446,7 +499,15 @@ function TryItEditor({
               className="shrink-0 rounded p-1 text-ink-soft transition-colors hover:text-status-error disabled:opacity-30"
               aria-label="Remove option"
             >
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
                 <path d="M2 2l8 8M10 2l-8 8" />
               </svg>
             </button>
@@ -456,7 +517,9 @@ function TryItEditor({
       {topic.tryIt.options.length < 6 ? (
         <button
           type="button"
-          onClick={() => onTopicChange((t) => void t.tryIt.options.push({ text: "", correct: false }))}
+          onClick={() =>
+            onTopicChange((t) => void t.tryIt.options.push({ text: "", correct: false }))
+          }
           className="mt-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
         >
           + Add option
@@ -522,58 +585,37 @@ function RuleCallout({
   );
 }
 
-/* ── Media placeholders ─────────────────────────────────────────────────── */
+/* ── Media ──────────────────────────────────────────────────────────────────
+   Real uploads: drop or pick a file and it's stored with the draft, shown in
+   the preview, and bundled into the exported ZIP. A row can also just name a
+   file to add by hand later (the old placeholder flow still works). */
+
+const MAX_IMAGE_MB = 4;
+const IMAGE_ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
 
 function MediaList({
+  draftId,
   topic,
   onTopicChange,
 }: {
+  draftId: string;
   topic: TopicDraft;
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
 }) {
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       <p className="text-[11.5px] leading-relaxed text-ink-soft">
-        Name the image file and where it goes. The export adds an{" "}
-        <code className="font-mono text-[11px]">images/README.txt</code> listing what to drop in
-        before uploading to Brightspace.
+        Drop an image on a row (or click Choose image) and it travels with the course — preview,
+        export, everything. Uploaded images are bundled into the package automatically.
       </p>
       {(topic.media ?? []).map((media, i) => (
-        <div key={i} className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_1fr_auto_auto]">
-          <input
-            className={fieldClass}
-            placeholder="filename.png"
-            value={media.filename}
-            onChange={(e) => onTopicChange((t) => void (t.media[i].filename = e.target.value))}
-          />
-          <input
-            className={fieldClass}
-            placeholder="Alt text (what the image shows)"
-            value={media.alt}
-            onChange={(e) => onTopicChange((t) => void (t.media[i].alt = e.target.value))}
-          />
-          <select
-            className={fieldClass}
-            value={media.placement}
-            onChange={(e) =>
-              onTopicChange((t) => void (t.media[i].placement = e.target.value as "scenario" | "rule"))
-            }
-            aria-label="Placement"
-          >
-            <option value="scenario">after Scene</option>
-            <option value="rule">after Rule</option>
-          </select>
-          <button
-            type="button"
-            onClick={() => onTopicChange((t) => void t.media.splice(i, 1))}
-            className="rounded p-1 text-ink-soft transition-colors hover:text-status-error"
-            aria-label="Remove image"
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <path d="M2 2l8 8M10 2l-8 8" />
-            </svg>
-          </button>
-        </div>
+        <MediaRow
+          key={i}
+          draftId={draftId}
+          media={media}
+          onChange={(fn) => onTopicChange((t) => fn(t.media[i]))}
+          onRemove={() => onTopicChange((t) => void t.media.splice(i, 1))}
+        />
       ))}
       <button
         type="button"
@@ -585,8 +627,183 @@ function MediaList({
         }
         className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
       >
-        + Add image placeholder
+        + Add image
       </button>
+    </div>
+  );
+}
+
+function MediaRow({
+  draftId,
+  media,
+  onChange,
+  onRemove,
+}: {
+  draftId: string;
+  media: TopicDraft["media"][number];
+  onChange: (fn: (m: TopicDraft["media"][number]) => void) => void;
+  onRemove: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [thumbBroken, setThumbBroken] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function upload(file: File) {
+    setUploadError(null);
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      setUploadError(
+        `That image is ${mb} MB — the limit is ${MAX_IMAGE_MB} MB. Try exporting it smaller.`,
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const response = await fetch(`/api/studio/drafts/${draftId}/images/`, {
+        method: "POST",
+        body: form,
+      });
+      const body = (await response.json()) as
+        | { ok: true; data: { filename: string } }
+        | { ok: false; error: { message: string } };
+      if (body.ok) {
+        setThumbBroken(false);
+        onChange((m) => void (m.filename = body.data.filename));
+      } else {
+        setUploadError(body.error.message);
+      }
+    } catch {
+      setUploadError("Upload failed — try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const hasFile = media.filename.trim() !== "";
+
+  return (
+    <div
+      className={`rounded-[10px] border px-3 py-3 transition-colors ${
+        dragOver ? "border-accent bg-[var(--accent-tint)]" : "border-line bg-paper"
+      }`}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) void upload(file);
+      }}
+    >
+      <div className="flex flex-wrap items-start gap-3">
+        {/* thumbnail / drop target */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          title={hasFile ? "Replace image" : "Choose image"}
+          className="grid h-[72px] w-[96px] shrink-0 place-items-center overflow-hidden rounded-[8px] border border-dashed border-line bg-surface text-center text-[10.5px] leading-snug text-ink-soft transition-colors hover:border-accent hover:text-ink"
+        >
+          {busy ? (
+            "Uploading…"
+          ) : hasFile && !thumbBroken ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/studio/drafts/${draftId}/images/${media.filename.trim()}`}
+              alt=""
+              className="h-full w-full object-cover"
+              onError={() => setThumbBroken(true)}
+            />
+          ) : hasFile ? (
+            <span className="px-1">
+              Not uploaded yet —<br />
+              drop the file here
+            </span>
+          ) : (
+            <span className="px-1">
+              Drop an image or
+              <br />
+              <span className="font-semibold text-accent">Choose image</span>
+            </span>
+          )}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={IMAGE_ACCEPT}
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void upload(file);
+            e.target.value = "";
+          }}
+        />
+
+        <div className="grid min-w-0 flex-1 gap-2">
+          <input
+            className={fieldClass}
+            placeholder="Alt text (what the image shows — read aloud by screen readers)"
+            value={media.alt}
+            onChange={(e) => onChange((m) => void (m.alt = e.target.value))}
+          />
+          <input
+            className={fieldClass}
+            placeholder="Caption (optional, shown under the image)"
+            value={media.caption}
+            onChange={(e) => onChange((m) => void (m.caption = e.target.value))}
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              className={`${fieldClass} !w-auto`}
+              value={media.placement}
+              onChange={(e) =>
+                onChange((m) => void (m.placement = e.target.value as "scenario" | "rule"))
+              }
+              aria-label="Placement"
+            >
+              <option value="scenario">after Scene</option>
+              <option value="rule">after Rule</option>
+            </select>
+            <input
+              className={`${fieldClass} !w-auto flex-1 font-mono !text-[11.5px]`}
+              placeholder="…or name a file to add later (filename.png)"
+              value={media.filename}
+              onChange={(e) => {
+                setThumbBroken(false);
+                onChange((m) => void (m.filename = e.target.value));
+              }}
+              aria-label="Image file name"
+            />
+            <button
+              type="button"
+              onClick={onRemove}
+              className="rounded p-1 text-ink-soft transition-colors hover:text-status-error"
+              aria-label="Remove image"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
+                <path d="M2 2l8 8M10 2l-8 8" />
+              </svg>
+            </button>
+          </div>
+          {uploadError ? (
+            <p className="text-[11.5px] font-medium text-status-error-ink">{uploadError}</p>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }
@@ -623,7 +840,11 @@ function InteractiveBlocks({
     });
   }
   /* A mutator scoped to block i, re-narrowed to its variant so edits are type-safe. */
-  function mutateBlock<K extends ContentBlockType>(i: number, type: K, fn: (block: BlockOf<K>) => void) {
+  function mutateBlock<K extends ContentBlockType>(
+    i: number,
+    type: K,
+    fn: (block: BlockOf<K>) => void,
+  ) {
     onTopicChange((t) => {
       const block = t.blocks?.[i];
       if (block && block.type === type) fn(block as BlockOf<K>);
@@ -752,10 +973,22 @@ function RowIconButton({
       title={label}
       aria-label={label}
       className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded text-ink-soft transition-colors disabled:opacity-25 ${
-        danger ? "hover:bg-status-error-soft hover:text-status-error" : "hover:bg-surface-sunken hover:text-ink"
+        danger
+          ? "hover:bg-status-error-soft hover:text-status-error"
+          : "hover:bg-surface-sunken hover:text-ink"
       }`}
     >
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
         <path d={path} />
       </svg>
     </button>
@@ -799,7 +1032,15 @@ function PairList({
               className="shrink-0 rounded p-1 text-ink-soft transition-colors hover:text-status-error disabled:opacity-30"
               aria-label="Remove row"
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
                 <path d="M2 2l8 8M10 2l-8 8" />
               </svg>
             </button>
@@ -847,7 +1088,9 @@ function CalloutEditor({
               type="button"
               onClick={() => mutate((b) => void (b.variant = v.value))}
               className={`rounded-lg border px-3 py-[5px] text-[12px] font-semibold transition-colors ${
-                active ? "border-accent bg-[var(--accent-tint)] text-accent-ink" : "border-line text-ink-soft hover:text-ink-muted"
+                active
+                  ? "border-accent bg-[var(--accent-tint)] text-accent-ink"
+                  : "border-line text-ink-soft hover:text-ink-muted"
               }`}
             >
               {v.label}
@@ -957,7 +1200,16 @@ function AddBlock({
             : "border-line-strong text-ink-soft hover:border-accent hover:bg-[var(--accent-tint)] hover:text-accent-ink"
         }`}
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          aria-hidden
+        >
           <path d="M8 3v10M3 8h10" />
         </svg>
         Add something to this lesson
@@ -977,7 +1229,10 @@ function AddBlock({
                 }}
                 className="flex items-center gap-[9px] rounded-[10px] px-3 py-2.5 text-left transition-colors hover:bg-surface-sunken disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
               >
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] bg-surface-sunken text-sm" aria-hidden>
+                <span
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] bg-surface-sunken text-sm"
+                  aria-hidden
+                >
                   {BLOCKS[type].emoji}
                 </span>
                 <span className="min-w-0">

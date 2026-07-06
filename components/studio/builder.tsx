@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Drawer } from "@/components/drawer";
 import type { ApiResponse } from "@/types/api";
-import {
-  TOPIC_FAMILIES,
-  emptyTopic,
-  type CourseDraft,
-  type TopicDraft,
-} from "@/types/studio";
+import { TOPIC_FAMILIES, emptyTopic, type CourseDraft, type TopicDraft } from "@/types/studio";
 import {
   TEMPLATES,
   clearSection,
@@ -21,6 +16,9 @@ import {
 } from "@/components/studio/builder-blocks";
 import { BuilderCanvas } from "@/components/studio/builder-canvas";
 import { BuilderRail } from "@/components/studio/builder-rail";
+import { PublishSettingsSection } from "@/components/studio/publish-settings";
+import { isDeployReady } from "@/lib/studio/deploy";
+import { slugify } from "@/lib/studio/slug";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { formatRelative } from "@/components/courses/course-presentation";
 import { IconScales } from "@/components/icons";
@@ -51,12 +49,28 @@ function flatTopics(draft: CourseDraft): TopicDraft[] {
   return draft.modules.flatMap((m) => m.topics);
 }
 
-function uniqueSlug(draft: CourseDraft, base: string): string {
+function uniqueSlug(draft: CourseDraft, base: string, ignore?: string): string {
   const taken = new Set(flatTopics(draft).map((t) => t.slug));
+  if (ignore) taken.delete(ignore);
   if (!taken.has(base)) return base;
   for (let n = 2; ; n++) {
     if (!taken.has(`${base}-${n}`)) return `${base}-${n}`;
   }
+}
+
+/* True when the slug is the title's slugified form, allowing the -2/-3
+   suffix uniqueSlug may have appended. */
+function slugMatchesTitle(slug: string, title: string): boolean {
+  const base = slugify(title);
+  return (
+    slug === base || new RegExp(`^${base.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}-\\d+$`).test(slug)
+  );
+}
+
+/* Placeholder names a fresh lesson starts with — never treated as
+   hand-edited, so the first real title takes over the filename. */
+function isPlaceholderSlug(slug: string): boolean {
+  return /^topic-\d+(-\d+)?$/.test(slug) || /^new-lesson(-\d+)?$/.test(slug);
 }
 
 export function Builder({
@@ -80,7 +94,11 @@ export function Builder({
   const [autoFocusType, setAutoFocusType] = useState<SectionType | null>(null);
 
   const [detailsOpen, setDetailsOpen] = useState(openDetailsInitially);
-  const [pendingDelete, setPendingDelete] = useState<{ slug: string; title: string; sections: number } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{
+    slug: string;
+    title: string;
+    sections: number;
+  } | null>(null);
   const [preview, setPreview] = useState<{ slug: string; html: string } | null>(null);
   const [previewBusy, setPreviewBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -99,6 +117,18 @@ export function Builder({
      was in flight. */
   const draftRef = useRef(draft);
   draftRef.current = draft;
+
+  /* Lessons whose filename was hand-edited keep it; all others auto-follow
+     the title. Seeded once so slugs in existing drafts that already diverged
+     from their titles are never renamed behind the author's back. */
+  const manualSlugs = useRef<Set<string>>(
+    new Set(
+      initialDraft.modules
+        .flatMap((m) => m.topics)
+        .filter((t) => !slugMatchesTitle(t.slug, t.title) && !isPlaceholderSlug(t.slug))
+        .map((t) => t.slug),
+    ),
+  );
 
   async function save(): Promise<boolean> {
     const snapshot = draftRef.current;
@@ -145,12 +175,88 @@ export function Builder({
     return () => document.removeEventListener("click", onDocClick);
   }, [menuOpen]);
 
+  /* ── undo/redo ──
+     Snapshot history around mutate(). Since mutate always works on a fresh
+     structuredClone, the previous draft object is immutable — pushing the
+     reference is a safe snapshot. Typing bursts coalesce into one entry. */
+  const HISTORY_LIMIT = 100;
+  const COALESCE_MS = 800;
+  const historyRef = useRef<{ past: CourseDraft[]; future: CourseDraft[]; lastPushAt: number }>({
+    past: [],
+    future: [],
+    lastPushAt: 0,
+  });
+  /* bumped whenever the stacks change, so the toolbar buttons re-render */
+  const [, setHistoryVersion] = useState(0);
+
   function mutate(fn: (next: CourseDraft) => void) {
-    const next = structuredClone(draftRef.current);
+    const prev = draftRef.current;
+    const history = historyRef.current;
+    const now = Date.now();
+    if (now - history.lastPushAt > COALESCE_MS) {
+      history.past.push(prev);
+      if (history.past.length > HISTORY_LIMIT) history.past.shift();
+    }
+    history.lastPushAt = now;
+    history.future = [];
+    setHistoryVersion((v) => v + 1);
+
+    const next = structuredClone(prev);
     fn(next);
     setDraft(next);
     setDirty(true);
   }
+
+  /* After a restore the selected lesson may no longer exist. */
+  function restoreDraft(restored: CourseDraft) {
+    setDraft(restored);
+    setDirty(true);
+    if (!locate(restored, selectedSlug)) {
+      setSelectedSlug(restored.modules[0]?.topics[0]?.slug ?? null);
+    }
+  }
+
+  function undo() {
+    const history = historyRef.current;
+    const previous = history.past.pop();
+    if (!previous) return;
+    history.future.push(draftRef.current);
+    history.lastPushAt = 0;
+    setHistoryVersion((v) => v + 1);
+    restoreDraft(previous);
+  }
+
+  function redo() {
+    const history = historyRef.current;
+    const next = history.future.pop();
+    if (!next) return;
+    history.past.push(draftRef.current);
+    history.lastPushAt = 0;
+    setHistoryVersion((v) => v + 1);
+    restoreDraft(next);
+  }
+
+  /* Ctrl/Cmd+Z everywhere in the builder. Every field is a controlled input
+     driven by draft state, so app-level undo is the only coherent model —
+     native per-field undo would desync from the draft. */
+  const undoRef = useRef({ undo, redo });
+  undoRef.current = { undo, redo };
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLowerCase();
+      if (key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) undoRef.current.redo();
+        else undoRef.current.undo();
+      } else if (key === "y") {
+        event.preventDefault();
+        undoRef.current.redo();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   function mutateTopic(slug: string, fn: (topic: TopicDraft) => void) {
     mutate((next) => {
@@ -167,7 +273,8 @@ export function Builder({
     if (!selectedSlug) return;
     if (type === "changed") {
       mutateTopic(selectedSlug, (t) => {
-        if (!t.whatChanged) t.whatChanged = { pill: "Law changed", meta: "", heading: "", body: "" };
+        if (!t.whatChanged)
+          t.whatChanged = { pill: "Law changed", meta: "", heading: "", body: "" };
       });
     }
     setAdded((prev) => ({
@@ -192,7 +299,8 @@ export function Builder({
     const sections = TEMPLATES[name].sections;
     if (sections.includes("changed")) {
       mutateTopic(selectedSlug, (t) => {
-        if (!t.whatChanged) t.whatChanged = { pill: "Law changed", meta: "", heading: "", body: "" };
+        if (!t.whatChanged)
+          t.whatChanged = { pill: "Law changed", meta: "", heading: "", body: "" };
       });
     }
     setAdded((prev) => ({ ...prev, [selectedSlug]: [...sections] }));
@@ -238,18 +346,57 @@ export function Builder({
 
   /* Slug doubles as the lesson's identity (selection key, section-state
      key, export filename) — renaming it has to rename all three. */
+  function renameSlug(old: string, next: string) {
+    mutate((draft) => {
+      for (const mod of draft.modules) {
+        const t = mod.topics.find((topic) => topic.slug === old);
+        if (t) t.slug = next;
+      }
+    });
+    setAdded((prev) => {
+      const { [old]: sections, ...rest } = prev;
+      return sections ? { ...rest, [next]: sections } : rest;
+    });
+    setSelectedSlug(next);
+  }
+
+  /* Hand-editing the filename pins it — the title stops driving it. */
   function changeSlug(value: string) {
     if (!selectedSlug) return;
     const cleaned = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     const old = selectedSlug;
     if (cleaned === old) return;
     if (flatTopics(draftRef.current).some((t) => t.slug === cleaned && t.slug !== old)) return;
-    mutateTopic(old, (t) => void (t.slug = cleaned));
-    setAdded((prev) => {
-      const { [old]: sections, ...rest } = prev;
-      return sections ? { ...rest, [cleaned]: sections } : rest;
+    manualSlugs.current.delete(old);
+    manualSlugs.current.add(cleaned);
+    renameSlug(old, cleaned);
+  }
+
+  /* Title edits rename the file automatically unless it was hand-edited.
+     Title + slug move in one mutate so undo treats them as a single step. */
+  function changeTitle(slug: string, title: string) {
+    if (manualSlugs.current.has(slug)) {
+      mutateTopic(slug, (t) => void (t.title = title));
+      return;
+    }
+    const base = slugify(title);
+    const next = slugMatchesTitle(slug, title) ? slug : uniqueSlug(draftRef.current, base, slug);
+    mutate((draft) => {
+      for (const mod of draft.modules) {
+        const t = mod.topics.find((topic) => topic.slug === slug);
+        if (t) {
+          t.title = title;
+          t.slug = next;
+        }
+      }
     });
-    setSelectedSlug(cleaned);
+    if (next !== slug) {
+      setAdded((prev) => {
+        const { [slug]: sections, ...rest } = prev;
+        return sections ? { ...rest, [next]: sections } : rest;
+      });
+      if (selectedSlug === slug) setSelectedSlug(next);
+    }
   }
 
   function renameModule(moduleId: string, title: string) {
@@ -358,10 +505,9 @@ export function Builder({
     if (dirty && !(await save())) return;
     setPreviewBusy(true);
     try {
-      const response = await fetch(
-        `/api/studio/drafts/${draft.id}/preview/?slug=${selectedSlug}`,
-        { cache: "no-store" },
-      );
+      const response = await fetch(`/api/studio/drafts/${draft.id}/preview/?slug=${selectedSlug}`, {
+        cache: "no-store",
+      });
       const body = (await response.json()) as ApiResponse<{ html: string }>;
       if (body.ok) setPreview({ slug: selectedSlug, html: body.data.html });
       else setError(body.error.message);
@@ -387,6 +533,8 @@ export function Builder({
           label: savedAt ? `Saved · ${formatRelative(savedAt)}` : "Saved",
           tone: "bg-status-ok-soft text-status-ok-ink",
         };
+
+  const deployReady = isDeployReady(draft);
 
   return (
     <div
@@ -420,6 +568,70 @@ export function Builder({
         ) : null}
 
         <div className="ml-auto flex items-center gap-2.5">
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              aria-label="Undo"
+              title="Undo (Ctrl+Z)"
+              onClick={undo}
+              disabled={historyRef.current.past.length === 0}
+              className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M9 14 4 9l5-5" />
+                <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Redo"
+              title="Redo (Ctrl+Shift+Z)"
+              onClick={redo}
+              disabled={historyRef.current.future.length === 0}
+              className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="m15 14 5-5-5-5" />
+                <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+              </svg>
+            </button>
+          </div>
+          <button
+            type="button"
+            title={
+              deployReady
+                ? "Exports are pre-wired for Brightspace. Click to review."
+                : "Exports work on your computer only. Click to pick a Brightspace course."
+            }
+            onClick={() => setDetailsOpen(true)}
+            className={`whitespace-nowrap rounded-[6px] px-[9px] py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] transition-colors ${
+              deployReady
+                ? "bg-status-ok-soft text-status-ok-ink"
+                : "bg-surface-sunken text-ink-soft hover:text-ink"
+            }`}
+          >
+            {deployReady ? "Deploy-ready" : "Local preview"}
+          </button>
           <span
             className={`whitespace-nowrap rounded-[6px] px-[9px] py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] transition-colors ${savePill.tone}`}
           >
@@ -431,7 +643,15 @@ export function Builder({
             disabled={previewBusy || !topic}
             className="flex h-9 items-center gap-[7px] rounded-[9px] border border-line bg-surface px-[13px] text-[12.5px] font-semibold text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-50"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              aria-hidden
+            >
               <path d="M1 8s2.7-4.5 7-4.5S15 8 15 8s-2.7 4.5-7 4.5S1 8 1 8z" />
               <circle cx="8" cy="8" r="2" />
             </svg>
@@ -443,7 +663,17 @@ export function Builder({
             disabled={exporting}
             className="btn-primary disabled:opacity-50"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
               <path d="M8 11V2.5M5 5L8 2l3 3" />
               <path d="M2.5 9.5V13h11V9.5" />
             </svg>
@@ -482,7 +712,18 @@ export function Builder({
                   }}
                   className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="shrink-0"
+                    aria-hidden
+                  >
                     <circle cx="12" cy="12" r="3" />
                     <path d="M19.4 13a1.6 1.6 0 00.3 1.8 2 2 0 11-2.8 2.8 1.6 1.6 0 00-2.7 1.1 2 2 0 11-4 0 1.6 1.6 0 00-2.7-1.1 2 2 0 11-2.8-2.8A1.6 1.6 0 003 13a2 2 0 110-4 1.6 1.6 0 001.5-2.6 2 2 0 112.8-2.8A1.6 1.6 0 0010 4a2 2 0 114 0 1.6 1.6 0 002.7 1.1 2 2 0 112.8 2.8A1.6 1.6 0 0021 11a2 2 0 110 4 1.6 1.6 0 00-1.6 1z" />
                   </svg>
@@ -498,12 +739,34 @@ export function Builder({
                   className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
                 >
                   {theme === "dark" ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                      aria-hidden
+                    >
                       <circle cx="12" cy="12" r="4" />
                       <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4" />
                     </svg>
                   ) : (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                      aria-hidden
+                    >
                       <path d="M20 14.5A8 8 0 119.5 4 6.5 6.5 0 0020 14.5z" />
                     </svg>
                   )}
@@ -532,12 +795,14 @@ export function Builder({
         {topic ? (
           <BuilderCanvas
             key={`${found!.mod.id}:${found!.index}`}
+            draftId={draft.id}
             topic={topic}
             added={added[topic.slug] ?? []}
             autoFocusType={autoFocusType}
             lessonIndex={Math.max(flatIndex, 0)}
             lessonTotal={flat.length}
             onTopicChange={(fn) => mutateTopic(topic.slug, fn)}
+            onTitleChange={(title) => changeTitle(topic.slug, title)}
             onAddSection={addSection}
             onRemoveSection={removeSection}
             onApplyTemplate={applyTemplate}
@@ -553,18 +818,12 @@ export function Builder({
       {/* ── course details drawer ── */}
       <Drawer open={detailsOpen} title="Course details" onClose={closeDetails}>
         <div className="space-y-4">
-          <DrawerField label="Course id" hint="Unique. Namespaces learner progress. Lowercase + hyphens.">
-            <input
-              className={`${drawerInputClass} font-mono`}
-              value={draft.courseId}
-              onChange={(e) =>
-                mutate(
-                  (n) =>
-                    void (n.courseId = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")),
-                )
-              }
-            />
-          </DrawerField>
+          <PublishSettingsSection
+            publish={draft.publish}
+            firstPageFile={flat[0] ? `${flat[0].slug}.html` : null}
+            inputClass={drawerInputClass}
+            onChange={(next) => mutate((n) => void (n.publish = next))}
+          />
           <DrawerField label="Subtitle" hint="One sentence under the title.">
             <input
               className={drawerInputClass}
@@ -587,49 +846,72 @@ export function Builder({
               onChange={(e) => mutate((n) => void (n.courseBlurb = e.target.value))}
             />
           </DrawerField>
-          <div className="grid grid-cols-2 gap-4">
-            <DrawerField label="Topic family" hint="Sets the accent colour.">
-              <div className="relative">
-                <span
-                  className="pointer-events-none absolute left-[13px] top-1/2 z-10 h-[11px] w-[11px] -translate-y-1/2 rounded-[3px]"
-                  style={{ background: familyColor(draft.topic) }}
-                  aria-hidden
-                />
-                <select
-                  className={`${drawerInputClass} pl-[34px] capitalize`}
-                  value={draft.topic}
-                  onChange={(e) =>
-                    mutate((n) => void (n.topic = e.target.value as CourseDraft["topic"]))
-                  }
-                >
-                  {TOPIC_FAMILIES.map((family) => (
-                    <option key={family} value={family}>
-                      {family}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </DrawerField>
-            <DrawerField label="Chrome" hint="bar = top bar · rail = sidebar.">
+          <DrawerField label="Topic family" hint="Sets the accent colour.">
+            <div className="relative">
+              <span
+                className="pointer-events-none absolute left-[13px] top-1/2 z-10 h-[11px] w-[11px] -translate-y-1/2 rounded-[3px]"
+                style={{ background: familyColor(draft.topic) }}
+                aria-hidden
+              />
               <select
-                className={drawerInputClass}
-                value={draft.chromeMode}
+                className={`${drawerInputClass} pl-[34px] capitalize`}
+                value={draft.topic}
                 onChange={(e) =>
-                  mutate((n) => void (n.chromeMode = e.target.value as CourseDraft["chromeMode"]))
+                  mutate((n) => void (n.topic = e.target.value as CourseDraft["topic"]))
                 }
               >
-                <option value="bar">bar</option>
-                <option value="rail">rail</option>
+                {TOPIC_FAMILIES.map((family) => (
+                  <option key={family} value={family}>
+                    {family}
+                  </option>
+                ))}
               </select>
-            </DrawerField>
-          </div>
-          <DrawerField label="Home link URL" hint="Where the course home button points.">
-            <input
-              className={`${drawerInputClass} font-mono !text-[12.5px]`}
-              value={draft.homeLinkUrl}
-              onChange={(e) => mutate((n) => void (n.homeLinkUrl = e.target.value))}
-            />
+            </div>
           </DrawerField>
+
+          <details className="rounded-[10px] border border-line px-4 py-3">
+            <summary className="cursor-pointer font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+              Advanced
+            </summary>
+            <div className="mt-3 space-y-4">
+              <DrawerField
+                label="Progress key"
+                hint="Identifies this course in learners' saved progress. Don't change it after learners have started the course."
+              >
+                <input
+                  className={`${drawerInputClass} font-mono`}
+                  value={draft.courseId}
+                  onChange={(e) =>
+                    mutate(
+                      (n) =>
+                        void (n.courseId = e.target.value
+                          .toLowerCase()
+                          .replace(/[^a-z0-9-]/g, "-")),
+                    )
+                  }
+                />
+              </DrawerField>
+              <DrawerField label="Navigation style" hint="How learners move between lessons.">
+                <select
+                  className={drawerInputClass}
+                  value={draft.chromeMode}
+                  onChange={(e) =>
+                    mutate((n) => void (n.chromeMode = e.target.value as CourseDraft["chromeMode"]))
+                  }
+                >
+                  <option value="bar">Top bar</option>
+                  <option value="rail">Side rail</option>
+                </select>
+              </DrawerField>
+              <DrawerField label="Exit button link" hint="Where “Exit to Hub” takes learners.">
+                <input
+                  className={`${drawerInputClass} font-mono !text-[12.5px]`}
+                  value={draft.homeLinkUrl}
+                  onChange={(e) => mutate((n) => void (n.homeLinkUrl = e.target.value))}
+                />
+              </DrawerField>
+            </div>
+          </details>
           <button
             type="button"
             className="btn-primary self-start"
@@ -652,8 +934,8 @@ export function Builder({
         {preview ? (
           <>
             <p className="mb-3 text-xs text-ink-muted">
-              Content preview with real course styles. The chrome bar, progress, and prev/next
-              come alive in the exported package.
+              Content preview with real course styles. The chrome bar, progress, and prev/next come
+              alive in the exported package.
             </p>
             <iframe
               title="Topic preview"
@@ -673,7 +955,7 @@ export function Builder({
           pendingDelete
             ? `This removes ${pendingDelete.sections} section${
                 pendingDelete.sections === 1 ? "" : "s"
-              } and can't be undone.`
+              }. You can bring it back with Undo (Ctrl+Z).`
             : ""
         }
         confirmLabel="Delete lesson"
@@ -701,7 +983,9 @@ function DrawerField({
       <span className="mb-1 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
         {label}
       </span>
-      {hint ? <span className="mb-2 block text-[12px] leading-snug text-ink-soft">{hint}</span> : null}
+      {hint ? (
+        <span className="mb-2 block text-[12px] leading-snug text-ink-soft">{hint}</span>
+      ) : null}
       {children}
     </label>
   );

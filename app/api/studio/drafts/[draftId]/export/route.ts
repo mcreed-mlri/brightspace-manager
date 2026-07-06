@@ -2,6 +2,7 @@ import JSZip from "jszip";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { publishProblems } from "@/lib/studio/deploy";
 import { readDraft } from "@/lib/studio/drafts";
 import { buildPackageFiles, validateDraft } from "@/lib/studio/generate";
 import { isTemplateAvailable } from "@/lib/studio/template";
@@ -34,7 +35,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return NextResponse.json(body, { status: 409 });
   }
 
-  const problems = validateDraft(draft);
+  const problems = [...validateDraft(draft), ...publishProblems(draft)];
   if (problems.length > 0) {
     const body: ApiResponse<never> = {
       ok: false,

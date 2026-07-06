@@ -119,6 +119,20 @@ export type ModuleDraft = {
   topics: TopicDraft[];
 };
 
+/* Where the exported package will live in Brightspace. When set (and valid),
+   the export is "deploy-ready": course-config.js ships with deployMode "lms"
+   and every URL pre-filled, so nothing needs hand-editing after upload. */
+export type PublishSettings = {
+  /* Brightspace org unit id of the course offering, e.g. 6706 */
+  orgUnitId: number | null;
+  /* Org unit Code from Course Offering Information, e.g. "demo.onboarding_mc" */
+  orgUnitCode: string;
+  /* host only, e.g. "mlri.brightspace.com" */
+  baseHost: string;
+  /* subfolder inside Manage Files; "" = files uploaded at the root */
+  folderPath: string;
+};
+
 export type CourseDraft = {
   id: string;
   createdAt: string;
@@ -133,6 +147,8 @@ export type CourseDraft = {
   topic: TopicFamily;
   chromeMode: "bar" | "rail";
   homeLinkUrl: string;
+  /* absent on drafts created before publish settings existed */
+  publish?: PublishSettings;
   modules: ModuleDraft[];
 };
 
@@ -142,6 +158,7 @@ export type DraftSummary = {
   topicCount: number;
   totalMinutes: number;
   updatedAt: string;
+  deployReady: boolean;
 };
 
 export type TemplateInfo = {

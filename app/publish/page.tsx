@@ -7,72 +7,68 @@ const workflowSteps = [
   {
     step: "01",
     label: "Studio",
-    title: "Finish the course draft",
-    owner: "Author",
+    title: "Set the publish target",
+    owner: "You",
     summary:
-      "Complete the lessons in Course Studio, preview the learner view, and export the Brightspace-ready package.",
+      "In Course Studio, open Course details and pick the Brightspace course this will live in. The top bar shows a green Deploy-ready pill once it's set.",
     checks: [
-      "Course details are complete.",
+      'The Deploy-ready pill is green (not "Local preview").',
+      "The course id and code match the real Brightspace course.",
       "Every lesson has been previewed.",
       "Try it questions have the correct answer selected.",
-      "Exported ZIP is the final version for upload.",
     ],
   },
   {
     step: "02",
-    label: "Brightspace files",
-    title: "Upload the package assets",
-    owner: "Platform admin",
+    label: "Export",
+    title: "Download the finished package",
+    owner: "You",
     summary:
-      "Put the exported HTML, CSS, JavaScript, and media files into the correct Brightspace Manage Files area.",
+      "Hit Share with learners to export the ZIP. Every link inside is already pointed at the right Brightspace URLs — nothing in the package needs editing.",
     checks: [
-      "Files land in the intended course offering.",
-      "Existing production files are archived or replaced intentionally.",
-      "Wrapper assets stay together so links do not break.",
-      "No learner-facing Content links are updated until files are confirmed.",
+      "The ZIP downloaded without validation errors.",
+      "DEPLOY.txt is inside — it lists the upload steps and every page URL.",
+      "Images you added in the Studio are in the images/ folder.",
     ],
   },
   {
     step: "03",
-    label: "Brightspace content",
-    title: "Create or update Content topics",
-    owner: "Platform admin",
+    label: "Brightspace files",
+    title: "Upload the package",
+    owner: "You",
     summary:
-      "Point Brightspace Content topics at the uploaded course pages using the clean learner view.",
+      "In Brightspace, open the course → Course Admin → Manage Files, and upload everything from the ZIP (keep the images/ folder together with the pages).",
     checks: [
-      "Each module and topic is linked in the right order.",
-      "Topic URLs include the clean-view parameter.",
-      "Learner preview opens the custom page, not a file listing.",
-      "Old topics are archived rather than casually deleted.",
+      "Files landed in the course named in DEPLOY.txt.",
+      "The whole package went up — pages, course-config.js, CSS, JS, images/.",
+      "Old versions were replaced intentionally, not mixed together.",
     ],
   },
   {
     step: "04",
-    label: "Sync",
-    title: "Sync the catalog record",
-    owner: "Platform admin",
+    label: "Brightspace content",
+    title: "Create the Content topics",
+    owner: "You",
     summary:
-      "Run the Brightspace to Supabase sync so Learning Hub can discover the live course offering.",
+      "In Content, create one topic per page. DEPLOY.txt lists the exact URL to paste for each lesson — no file editing, just copy and paste.",
     checks: [
-      "Course Inventory shows the offering.",
-      "Sync Diagnostics has no blocking drift for the course.",
-      "Supabase learning_items has the correct title, course id, and status.",
-      "Learning Hub listing metadata has been reviewed.",
-      "The write is previewed, confirmed, and logged.",
+      "Each lesson is linked in the right order.",
+      "Topic URLs are copied straight from DEPLOY.txt.",
+      "Learner preview opens the styled page, not a file listing.",
     ],
   },
   {
     step: "05",
-    label: "Learning Hub",
-    title: "Verify the learner path",
-    owner: "Reviewer",
+    label: "Check it",
+    title: "Walk through as a learner",
+    owner: "You",
     summary:
-      "Open the course from Learning Hub and confirm the learner can launch the Brightspace content cleanly.",
+      "Open the first topic in learner preview. The navigation bar, progress, prev/next, and Exit to Hub should all work.",
     checks: [
-      "Course appears in the expected catalog area.",
-      "Launch opens the correct Brightspace offering.",
-      "The first lesson loads without broken styling or missing files.",
-      "The course is ready to announce.",
+      "The first lesson loads with course styling.",
+      "Next/previous moves between lessons.",
+      "The completion page appears after the last lesson.",
+      "Optional: run the catalog sync so Learning Hub lists the course.",
     ],
   },
 ];
@@ -127,20 +123,29 @@ export default function PublishPage() {
             Build in Studio. Publish through the platform workflow.
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-            Course Studio creates the package, but getting it live is an operations
-            workflow. Brightspace files, Brightspace Content, Supabase catalog data, and
-            Learning Hub all need to agree before learners see the course.
+            Set the publish target once in Course Studio and the exported package comes out
+            deploy-ready — upload it to Manage Files, paste the URLs from DEPLOY.txt into Content
+            topics, and check it as a learner. No file editing anywhere.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link href="/course-studio/" className="btn-primary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/course-studio/"
+              className="btn-primary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconStudio size={15} />
               Open Studio
             </Link>
-            <Link href="/sync/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/sync/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconSync size={15} />
               Check sync
             </Link>
-            <Link href="/hub-listing/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/hub-listing/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconDatabase size={15} />
               Add to Learning Hub
             </Link>
@@ -153,9 +158,9 @@ export default function PublishPage() {
             One write path, always reviewed
           </h2>
           <p className="mt-2 text-[12.5px] leading-relaxed text-ink-muted">
-            Brightspace Manager is the place for platform writes. Updates should be
-            previewed, confirmed, and logged. Learning Hub reads the catalog; it does not
-            become the place where production Brightspace data is edited.
+            Brightspace Manager is the place for platform writes. Updates should be previewed,
+            confirmed, and logged. Learning Hub reads the catalog; it does not become the place
+            where production Brightspace data is edited.
           </p>
           <StatusBadge tone="info">Preview first</StatusBadge>
         </aside>
@@ -186,9 +191,7 @@ export default function PublishPage() {
                   <h3 className="mt-1 font-display text-[20px] font-semibold leading-snug text-ink">
                     {item.title}
                   </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                    {item.summary}
-                  </p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{item.summary}</p>
                 </div>
                 <div className="rounded-[10px] border border-line bg-surface-sunken px-3 py-3">
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
@@ -196,8 +199,14 @@ export default function PublishPage() {
                   </p>
                   <ul className="mt-2 grid gap-2">
                     {item.checks.map((check) => (
-                      <li key={check} className="flex gap-2 text-[12.5px] leading-relaxed text-ink-muted">
-                        <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-accent" aria-hidden />
+                      <li
+                        key={check}
+                        className="flex gap-2 text-[12.5px] leading-relaxed text-ink-muted"
+                      >
+                        <span
+                          className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-accent"
+                          aria-hidden
+                        />
                         <span>{check}</span>
                       </li>
                     ))}
@@ -217,12 +226,12 @@ export default function PublishPage() {
             <StatusCard
               tone="warn"
               title="Today"
-              detail="Studio exports a package. Brightspace upload, Content topic setup, and final catalog sync still need an admin review path."
+              detail="Uploading to Manage Files and creating Content topics happen inside Brightspace by hand — DEPLOY.txt turns that into copy-paste, but it's still a manual pass."
             />
             <StatusCard
               tone="info"
               title="Next milestone"
-              detail="Deploy automation will dry-run first, then upload files, create Content topics, and backfill URLs behind preview-confirm-log controls."
+              detail="Deploy automation could upload files and create Content topics directly, but that needs Brightspace write access — deliberately not granted yet."
             />
           </div>
         </div>
@@ -261,12 +270,15 @@ export default function PublishPage() {
             <p className="eyebrow mb-2">Mobile note</p>
             <h2 className="section-title text-ink">Useful for checking status</h2>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              This workflow page should be readable on a phone when you need to check
-              whether a course is live or where it is stuck. Building and deploying still
-              belong on a full-size screen.
+              This workflow page should be readable on a phone when you need to check whether a
+              course is live or where it is stuck. Building and deploying still belong on a
+              full-size screen.
             </p>
           </div>
-          <Link href="/courses/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+          <Link
+            href="/courses/"
+            className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+          >
             Check course inventory
           </Link>
         </div>
@@ -291,7 +303,9 @@ function StatusCard({
 
   return (
     <div className="rounded-[10px] border border-line bg-surface-sunken px-4 py-4">
-      <span className={`inline-flex rounded-[6px] px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${toneClass}`}>
+      <span
+        className={`inline-flex rounded-[6px] px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${toneClass}`}
+      >
         {title}
       </span>
       <p className="mt-3 text-[12.5px] leading-relaxed text-ink-muted">{detail}</p>

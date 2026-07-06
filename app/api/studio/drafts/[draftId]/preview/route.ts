@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
 import { readDraft } from "@/lib/studio/drafts";
+import { listImages } from "@/lib/studio/images";
 import { generateTopicHtml } from "@/lib/studio/generate";
 import { isTemplateAvailable, readWrapperFile } from "@/lib/studio/template";
 import type { ApiResponse } from "@/types/api";
@@ -51,13 +52,20 @@ export async function GET(request: NextRequest, { params }: Params) {
       '<style>[data-lace="next-link"]{pointer-events:none;cursor:default;}</style>\n</head>',
     );
 
-    /* Image files don't exist yet (placeholders) — render a labeled box so
-       the preview shows where each figure will sit. */
+    /* Uploaded images render for real (the srcdoc iframe is same-origin, so
+       the app's image API works inside it); anything referenced by name only
+       renders as a labeled box showing where the figure will sit. */
+    const uploaded = new Set(await listImages(draftId));
     html = html.replace(
       /<img src="images\/([^"]+)" alt="([^"]*)"[^>]*\/>/g,
-      (_match, filename, alt) =>
-        `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:120px;border:2px dashed var(--line, #d3d8e0);border-radius:10px;color:var(--muted, #8b909d);font-size:0.8rem;">` +
-        `<span style="font-size:1.4rem;">🖼</span><strong>images/${filename}</strong><span>${alt}</span></div>`,
+      (match, filename, alt) =>
+        uploaded.has(filename)
+          ? match.replace(
+              `src="images/${filename}"`,
+              `src="/api/studio/drafts/${draftId}/images/${filename}"`,
+            )
+          : `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:120px;border:2px dashed var(--line, #d3d8e0);border-radius:10px;color:var(--muted, #8b909d);font-size:0.8rem;">` +
+            `<span style="font-size:1.4rem;">🖼</span><strong>images/${filename}</strong><span>${alt}</span></div>`,
     );
 
     const body: ApiResponse<{ html: string }> = {
