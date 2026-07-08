@@ -9,8 +9,8 @@
    — energetic and modern. Dark is the DEFAULT; light is opt-in via
    [data-theme="light"] on <html>. Token *names* mirror the learning-hub Studio
    system so hub and admin feel like one product; only the *values* changed for
-   this direction. Three typefaces: Space Grotesk (display voice), Inter (UI),
-   JetBrains Mono (structural labels/IDs/counts). Colour stays disciplined — an
+   this direction. Two typefaces: Space Grotesk (display voice) and Inter (UI +
+   the structural label/ID/count role). Colour stays disciplined — an
    electric indigo-blue accent plus a multicolor category system kept alive on
    list rows, dots and chips.
    ========================================================================= */
@@ -25,10 +25,12 @@
   --font-sans:
     var(--font-inter, "Inter"), "Segoe UI Variable", "Segoe UI", system-ui, ui-sans-serif,
     -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  /* Mono: JetBrains Mono — org unit IDs, codes, counts, eyebrows, timestamps. */
+  /* "Mono" role — org unit IDs, codes, counts, eyebrows, timestamps. Points at
+     the Inter sans stack: the small all-caps treatment reads crisply in the UI
+     sans and avoids the blurry render a webfont mono had at 10–11px. */
   --font-mono:
-    var(--font-jetbrains-mono, "JetBrains Mono"), "SFMono-Regular", "Cascadia Mono", Consolas,
-    ui-monospace, monospace;
+    var(--font-inter, "Inter"), "Segoe UI Variable", "Segoe UI", system-ui, ui-sans-serif,
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 
   /* ── Neutral base — DARK (default) ────────────────────────────────────── */
   --paper: #0b0d12; /* app background / content area (--bg) */
@@ -232,7 +234,7 @@ input::placeholder {
 }
 
 /* ── Typography scale (cool direction) ──────────────────────────────────── */
-/* Eyebrow: UPPERCASE JetBrains Mono in accent — leads every section/page. */
+/* Eyebrow: UPPERCASE sans (via --font-mono) in accent — leads every section/page. */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 11px;

@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Providers } from "./providers";
 import "./globals.css";
 
-// Cool direction: Space Grotesk (display voice), Inter (UI/body), JetBrains
-// Mono (structural labels, IDs, counts). Each exposed as a CSS var consumed in
+// Cool direction: Space Grotesk (display voice) and Inter (UI/body plus the
+// structural label/ID/count role). Each exposed as a CSS var consumed in
 // globals.css.
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -17,12 +17,6 @@ const spaceGrotesk = Space_Grotesk({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains-mono",
 });
 
 // Set the theme before first paint so the dark default (or a saved light
@@ -65,7 +59,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+        className={`${spaceGrotesk.variable} ${inter.variable}`}
       >
         <Providers>
           <AppShell>{children}</AppShell>
