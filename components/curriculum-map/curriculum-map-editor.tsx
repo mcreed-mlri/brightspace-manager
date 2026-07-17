@@ -289,7 +289,7 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
     setSave("saving");
     setError(null);
     try {
-      const res = await fetch("/api/curriculum-map", {
+      const res = await fetch("/api/curriculum-map/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ map }),

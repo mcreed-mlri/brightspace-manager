@@ -3,6 +3,10 @@ import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
 import { getCurriculumMap } from "@/lib/data/curriculum-map";
 
+/* Always re-fetch so a successful Save is visible after navigate-away / refresh.
+   Other data pages set this; without it Next can statically cache the SSR result. */
+export const dynamic = "force-dynamic";
+
 /* Team-editable curriculum planning wall. Fetched server-side (live from
    Supabase when a row exists, else the bundled starter map); the client editor
    handles edit mode, drag-reorder, and Save. Sign-in is enforced by middleware
