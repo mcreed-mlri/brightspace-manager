@@ -30,7 +30,13 @@ export const SECTION_ORDER: SectionType[] = [
 
 export const BLOCKS: Record<
   SectionType,
-  { name: string; hint: string; emoji: string; accent: "warn" | "info" | null; previewLabel: string }
+  {
+    name: string;
+    hint: string;
+    emoji: string;
+    accent: "warn" | "info" | null;
+    previewLabel: string;
+  }
 > = {
   scene: {
     name: "Set the scene",
@@ -85,13 +91,19 @@ export const BLOCKS: Record<
 
 /* Palette for the Interactive section's per-element picker. Order here is the
    order shown in the "add element" menu. Phase 1 = the five JS-free elements. */
-export const BLOCK_TYPES: { type: ContentBlockType; name: string; emoji: string; hint: string }[] = [
-  { type: "accordion", name: "Accordion", emoji: "📂", hint: "Collapsible titled sections." },
-  { type: "reveal", name: "Click & Reveal", emoji: "👆", hint: "Hidden answers behind a prompt." },
-  { type: "callout", name: "Callout", emoji: "📣", hint: "A boxed note, tip, or warning." },
-  { type: "timeline", name: "Timeline", emoji: "📈", hint: "Ordered steps or milestones." },
-  { type: "quote", name: "Stylized quote", emoji: "❝", hint: "A pulled quote with attribution." },
-];
+export const BLOCK_TYPES: { type: ContentBlockType; name: string; emoji: string; hint: string }[] =
+  [
+    { type: "accordion", name: "Accordion", emoji: "📂", hint: "Collapsible titled sections." },
+    {
+      type: "reveal",
+      name: "Click & Reveal",
+      emoji: "👆",
+      hint: "Hidden answers behind a prompt.",
+    },
+    { type: "callout", name: "Callout", emoji: "📣", hint: "A boxed note, tip, or warning." },
+    { type: "timeline", name: "Timeline", emoji: "📈", hint: "Ordered steps or milestones." },
+    { type: "quote", name: "Stylized quote", emoji: "❝", hint: "A pulled quote with attribution." },
+  ];
 
 export const TEMPLATES: Record<string, { label: string; sections: SectionType[] }> = {
   standard: { label: "Standard lesson", sections: ["scene", "rule", "tryit"] },

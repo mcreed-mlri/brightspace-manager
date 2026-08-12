@@ -210,7 +210,11 @@ export function SignInCard() {
                       className={`${inputClass} mt-1.5 font-normal normal-case tracking-normal`}
                     />
                   </label>
-                  <button type="submit" disabled={busy || !email.trim()} className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm">
+                  <button
+                    type="submit"
+                    disabled={busy || !email.trim()}
+                    className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm"
+                  >
                     {busy ? "Sending…" : "Email me a sign-in code"}
                   </button>
                 </form>
@@ -239,7 +243,11 @@ export function SignInCard() {
             </label>
             {/* Supabase's OTP length is a project setting (6–10 digits; this
                 project sends 8) — accept the range rather than hardcoding. */}
-            <button type="submit" disabled={busy || code.length < 6} className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm">
+            <button
+              type="submit"
+              disabled={busy || code.length < 6}
+              className="btn-primary mt-5 w-full justify-center px-4 py-2 text-sm"
+            >
               {busy ? "Checking…" : "Sign in"}
             </button>
             <button

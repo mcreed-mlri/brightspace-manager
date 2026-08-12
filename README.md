@@ -77,8 +77,8 @@ assume an endpoint version is final.
 ## Where features belong
 
 See [docs/admin-boundaries.md](docs/admin-boundaries.md) for the working agreement on what
-lives here vs. in Learning Hub admin. Short version: this app operates the *platform* and is
-the only surface that writes; the hub operates the *learning program* and reads.
+lives here vs. in Learning Hub admin. Short version: this app operates the _platform_ and is
+the only surface that writes; the hub operates the _learning program_ and reads.
 
 ## Code map
 

@@ -110,13 +110,7 @@ function routeMode(pathname: string): NavMode | null {
   return null;
 }
 
-function ModeToggle({
-  mode,
-  onChange,
-}: {
-  mode: NavMode;
-  onChange: (mode: NavMode) => void;
-}) {
+function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMode) => void }) {
   return (
     <div className="px-3 pb-2 pt-0.5">
       <div className="flex gap-[3px] rounded-[9px] border border-line bg-surface-sunken p-[3px]">
@@ -211,7 +205,9 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
   return (
     <aside
       className={`flex shrink-0 flex-col overflow-hidden border-b border-line bg-surface transition-[width,opacity] duration-200 ease-in-out md:border-b-0 md:border-r ${
-        hidden ? "pointer-events-none h-0 opacity-0 md:h-auto md:w-0" : "max-h-[198px] w-full md:max-h-none md:w-[236px]"
+        hidden
+          ? "pointer-events-none h-0 opacity-0 md:h-auto md:w-0"
+          : "max-h-[198px] w-full md:max-h-none md:w-[236px]"
       }`}
       aria-hidden={hidden}
     >

@@ -52,7 +52,10 @@ export function SessionBadge() {
         {initials(email)}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[12px] font-semibold leading-tight text-ink" title={email}>
+        <span
+          className="block truncate text-[12px] font-semibold leading-tight text-ink"
+          title={email}
+        >
           {email}
         </span>
         <span className="block font-mono text-[10px] text-ink-soft">MLRI · admin</span>

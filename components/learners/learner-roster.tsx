@@ -14,9 +14,18 @@ import {
 } from "@/components/learners/learner-presentation";
 import { CourseProgressDrawer } from "@/components/learners/course-progress-drawer";
 import { LearnerDrawer } from "@/components/learners/learner-drawer";
-import type { CourseProgress, LearnerActivity, LearnerRecord, LearnerRole, LearnerStatus } from "@/types/domain";
+import type {
+  CourseProgress,
+  LearnerActivity,
+  LearnerRecord,
+  LearnerRole,
+  LearnerStatus,
+} from "@/types/domain";
 
-type Selection = { type: "course"; orgUnitId: number } | { type: "learner"; learnerId: string } | null;
+type Selection =
+  | { type: "course"; orgUnitId: number }
+  | { type: "learner"; learnerId: string }
+  | null;
 
 const ROLE_OPTIONS: LearnerRole[] = ["attorney", "advocate", "paralegal", "support"];
 const STATUS_OPTIONS: LearnerStatus[] = ["completed", "in-progress", "not-started"];
@@ -79,17 +88,24 @@ function LearnerRosterInner({
     setStatusFilter("all");
   }
 
-  const hasFilters = query !== "" || courseFilter !== "all" || roleFilter !== "all" || statusFilter !== "all";
+  const hasFilters =
+    query !== "" || courseFilter !== "all" || roleFilter !== "all" || statusFilter !== "all";
 
   const selectedCourse =
-    selection?.type === "course" ? byCourse.find((c) => c.orgUnitId === selection.orgUnitId) ?? null : null;
+    selection?.type === "course"
+      ? (byCourse.find((c) => c.orgUnitId === selection.orgUnitId) ?? null)
+      : null;
   const selectedCourseRoster =
-    selectedCourse !== null ? enrollments.filter((e) => e.orgUnitId === selectedCourse.orgUnitId) : [];
+    selectedCourse !== null
+      ? enrollments.filter((e) => e.orgUnitId === selectedCourse.orgUnitId)
+      : [];
 
   const selectedLearner =
-    selection?.type === "learner" ? learnerById.get(selection.learnerId) ?? null : null;
+    selection?.type === "learner" ? (learnerById.get(selection.learnerId) ?? null) : null;
   const selectedLearnerEnrollments =
-    selection?.type === "learner" ? enrollments.filter((e) => e.learnerId === selection.learnerId) : [];
+    selection?.type === "learner"
+      ? enrollments.filter((e) => e.learnerId === selection.learnerId)
+      : [];
 
   return (
     <>
@@ -166,7 +182,9 @@ function LearnerRosterInner({
 
         <select
           value={courseFilter === "all" ? "all" : String(courseFilter)}
-          onChange={(e) => setCourseFilter(e.target.value === "all" ? "all" : Number(e.target.value))}
+          onChange={(e) =>
+            setCourseFilter(e.target.value === "all" ? "all" : Number(e.target.value))
+          }
           className={selectClass}
           aria-label="Filter by course"
         >

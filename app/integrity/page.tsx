@@ -12,7 +12,10 @@ export default function IntegrityPage() {
         description="Cross-checks Brightspace Content, Manage Files, HTML links, and Supabase records to catch ghost topics and broken content."
         actions={<StatusBadge tone="neutral">Coming soon</StatusBadge>}
       />
-      <EmptyState icon={<IconShield size={28} />} title="The Integrity Checker is a later milestone">
+      <EmptyState
+        icon={<IconShield size={28} />}
+        title="The Integrity Checker is a later milestone"
+      >
         <p>Planned checks:</p>
         <ul className="mt-2 list-inside list-disc text-left">
           <li>Content topics whose linked HTML file is missing (ghost topics)</li>

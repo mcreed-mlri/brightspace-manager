@@ -102,17 +102,22 @@ export default function HubListingPage() {
             Collect once. Preview before writing.
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-            The goal is to let a finished Brightspace course appear in Learning Hub
-            without editing Learning Hub code. Brightspace Manager can collect the
-            listing metadata, show exactly what will be written, and later create or
-            update the Supabase catalog row.
+            The goal is to let a finished Brightspace course appear in Learning Hub without editing
+            Learning Hub code. Brightspace Manager can collect the listing metadata, show exactly
+            what will be written, and later create or update the Supabase catalog row.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link href="/publish/" className="btn-primary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/publish/"
+              className="btn-primary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconExternal size={15} />
               Back to publish workflow
             </Link>
-            <Link href="/supabase-data/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/supabase-data/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconDatabase size={15} />
               Inspect Supabase data
             </Link>
@@ -126,8 +131,8 @@ export default function HubListingPage() {
           </h2>
           <p className="mt-2 text-[12.5px] leading-relaxed text-ink-muted">
             The form is intentionally preview-only. The next step would connect it to a
-            create/update plan for `learning_items`, then require confirmation and audit
-            logging before any catalog row changes.
+            create/update plan for `learning_items`, then require confirmation and audit logging
+            before any catalog row changes.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <StatusBadge tone="info">Form</StatusBadge>
@@ -225,7 +230,9 @@ export default function HubListingPage() {
               <Field label="Brightspace org unit id">
                 <input
                   value={form.orgUnitId}
-                  onChange={(event) => update("orgUnitId", event.target.value.replace(/[^0-9]/g, ""))}
+                  onChange={(event) =>
+                    update("orgUnitId", event.target.value.replace(/[^0-9]/g, ""))
+                  }
                   className={`${inputClass} font-mono`}
                 />
               </Field>
@@ -257,7 +264,9 @@ export default function HubListingPage() {
                 <StatusBadge tone={form.status === "published" ? "ok" : "warn"}>
                   {form.status}
                 </StatusBadge>
-                {form.practiceArea ? <StatusBadge tone="info">{form.practiceArea}</StatusBadge> : null}
+                {form.practiceArea ? (
+                  <StatusBadge tone="info">{form.practiceArea}</StatusBadge>
+                ) : null}
               </div>
               <h2 className="font-display text-[22px] font-bold leading-tight text-ink">
                 {form.title || "Untitled course"}
@@ -291,7 +300,10 @@ export default function HubListingPage() {
             <h2 className="section-title mb-3 text-ink">Supabase learning_items row</h2>
             <div className="grid gap-2">
               {writePlan.map(([key, value]) => (
-                <div key={key} className="rounded-[9px] border border-line bg-surface-sunken px-3 py-2">
+                <div
+                  key={key}
+                  className="rounded-[9px] border border-line bg-surface-sunken px-3 py-2"
+                >
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
                     {key}
                   </p>
@@ -301,7 +313,11 @@ export default function HubListingPage() {
                 </div>
               ))}
             </div>
-            <button type="button" disabled className="btn-primary mt-4 w-full justify-center opacity-60">
+            <button
+              type="button"
+              disabled
+              className="btn-primary mt-4 w-full justify-center opacity-60"
+            >
               Preview only - write not connected
             </button>
           </section>

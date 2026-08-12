@@ -48,11 +48,13 @@ export default function SettingsPage() {
         </p>
         <p className="mt-2">
           To go live later: register an OAuth app in Brightspace (Admin Tools → Manage
-          Extensibility), set the variables above in <code className="font-mono text-xs">.env.local</code>,
-          and restart the app. The service-user (client-credentials) sync flow is the next
-          integration milestone.
+          Extensibility), set the variables above in{" "}
+          <code className="font-mono text-xs">.env.local</code>, and restart the app. The
+          service-user (client-credentials) sync flow is the next integration milestone.
         </p>
-        <p className="mt-4 font-mono text-xs text-ink-soft">Brightspace Manager v0.1 · read-only milestone</p>
+        <p className="mt-4 font-mono text-xs text-ink-soft">
+          Brightspace Manager v0.1 · read-only milestone
+        </p>
       </section>
     </>
   );

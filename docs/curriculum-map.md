@@ -36,12 +36,12 @@ If the page shows an amber **“Showing mock data”** banner, the app could not
 
 ## Quick troubleshooting
 
-| What you see | What to try |
-| --- | --- |
-| Save fails or “permission denied” | Refresh, sign out and back in, or contact a platform admin. |
-| Amber mock-data banner | Live map is not loading — do not rely on saves until an admin fixes the connection. |
-| Your changes disappeared | You may have clicked **Cancel**, refreshed before saving, or someone else saved after you. |
+| What you see                      | What to try                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| Save fails or “permission denied” | Refresh, sign out and back in, or contact a platform admin.                                |
+| Amber mock-data banner            | Live map is not loading — do not rely on saves until an admin fixes the connection.        |
+| Your changes disappeared          | You may have clicked **Cancel**, refreshed before saving, or someone else saved after you. |
 
 ---
 
-*Questions about access or setup? Reach out to whoever manages Brightspace Manager for MLRI.*
+_Questions about access or setup? Reach out to whoever manages Brightspace Manager for MLRI._

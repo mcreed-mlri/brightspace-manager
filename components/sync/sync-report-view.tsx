@@ -124,7 +124,10 @@ export function SyncReportView({
             </thead>
             <tbody>
               {report.diagnostics.map((diag) => (
-                <tr key={diag.orgUnitId} className="border-b border-line-soft align-top last:border-b-0">
+                <tr
+                  key={diag.orgUnitId}
+                  className="border-b border-line-soft align-top last:border-b-0"
+                >
                   <td className="px-4 py-3 font-medium text-ink">{diag.name}</td>
                   <td className="px-4 py-3 font-mono text-xs text-ink-muted">{diag.orgUnitId}</td>
                   <td className="px-4 py-3">

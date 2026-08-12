@@ -29,8 +29,8 @@ export default async function CourseBuilderPage({
             Course editing needs the desktop Studio.
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            The builder uses an outline, editor, and learner preview side by side. On a
-            phone, use Brightspace Manager for quick checks instead.
+            The builder uses an outline, editor, and learner preview side by side. On a phone, use
+            Brightspace Manager for quick checks instead.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/courses/" className="btn-secondary">

@@ -137,7 +137,8 @@ function CourseSignalPanel({ courses }: { courses: EvaluationCourseSignal[] }) {
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-ink">{course.courseName}</p>
                 <p className="mt-0.5 font-mono text-[11px] text-ink-soft">
-                  {course.reach} reached - {course.medianDaysToComplete}d median - {course.usefulness}/5
+                  {course.reach} reached - {course.medianDaysToComplete}d median -{" "}
+                  {course.usefulness}/5
                 </p>
               </div>
               <StatusBadge tone={RISK_TONE[course.risk]}>{course.risk}</StatusBadge>
@@ -171,7 +172,10 @@ function ReadinessTable({ rows }: { rows: EvaluationMetricReadiness[] }) {
       </div>
       <div className="divide-y divide-line-soft">
         {rows.map((row) => (
-          <div key={row.metric} className="grid gap-2 px-5 py-4 md:grid-cols-[1.1fr_0.9fr_auto_1.4fr] md:items-center">
+          <div
+            key={row.metric}
+            className="grid gap-2 px-5 py-4 md:grid-cols-[1.1fr_0.9fr_auto_1.4fr] md:items-center"
+          >
             <p className="text-sm font-semibold text-ink">{row.metric}</p>
             <p className="font-mono text-[11px] text-ink-soft">{row.source}</p>
             <StatusBadge tone={READINESS_TONE[row.status]}>{row.status}</StatusBadge>
@@ -212,8 +216,8 @@ export default async function EvaluationPage() {
           {report.pilotWindow}
         </p>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
-          This mock readout demonstrates the metrics framework before live Brightspace progress,
-          hub feedback, and survey rollups are connected.
+          This mock readout demonstrates the metrics framework before live Brightspace progress, hub
+          feedback, and survey rollups are connected.
         </p>
       </section>
 

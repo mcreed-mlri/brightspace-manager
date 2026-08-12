@@ -133,78 +133,80 @@ export function BuilderRail({
         </div>
       ) : (
         <>
-      <div className="flex items-center justify-between gap-2 px-[18px] pb-2 pt-[18px]">
-        <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">
-          Your course
-        </span>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10.5px] text-ink-soft">
-            {modules.length} part{modules.length === 1 ? "" : "s"} · {total} lesson
-            {total === 1 ? "" : "s"}
-          </span>
-          <button
-            type="button"
-            onClick={() => toggleCollapsed(true)}
-            title="Hide course outline"
-            aria-label="Hide course outline"
-            className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
-          >
-            <PanelToggleGlyph expanded={false} />
-          </button>
-        </div>
-      </div>
+          <div className="flex items-center justify-between gap-2 px-[18px] pb-2 pt-[18px]">
+            <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">
+              Your course
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10.5px] text-ink-soft">
+                {modules.length} part{modules.length === 1 ? "" : "s"} · {total} lesson
+                {total === 1 ? "" : "s"}
+              </span>
+              <button
+                type="button"
+                onClick={() => toggleCollapsed(true)}
+                title="Hide course outline"
+                aria-label="Hide course outline"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+              >
+                <PanelToggleGlyph expanded={false} />
+              </button>
+            </div>
+          </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pb-3.5 pt-1.5">
-        {modules.map((mod) => (
-          <div key={mod.id} className="mb-2.5">
-            <input
-              value={mod.title}
-              onChange={(e) => onRenameModule(mod.id, e.target.value)}
-              aria-label="Part title"
-              className="w-full border-none bg-transparent px-2 pb-1.5 pt-[9px] font-mono text-[10px] font-semibold uppercase tracking-[0.09em] text-ink-soft outline-none focus:text-ink-muted"
-            />
-            {mod.topics.map((topic, index) => (
-              <LessonRow
-                key={topic.slug}
-                topic={topic}
-                index={index}
-                isFirst={index === 0}
-                isLast={index === mod.topics.length - 1}
-                active={topic.slug === selectedSlug}
-                onSelect={onSelect}
-                onMove={onMoveLesson}
-                onDuplicate={onDuplicateLesson}
-                onDelete={onDeleteLesson}
-              />
+          <div className="flex-1 overflow-y-auto px-3 pb-3.5 pt-1.5">
+            {modules.map((mod) => (
+              <div key={mod.id} className="mb-2.5">
+                <input
+                  value={mod.title}
+                  onChange={(e) => onRenameModule(mod.id, e.target.value)}
+                  aria-label="Part title"
+                  className="w-full border-none bg-transparent px-2 pb-1.5 pt-[9px] font-mono text-[10px] font-semibold uppercase tracking-[0.09em] text-ink-soft outline-none focus:text-ink-muted"
+                />
+                {mod.topics.map((topic, index) => (
+                  <LessonRow
+                    key={topic.slug}
+                    topic={topic}
+                    index={index}
+                    isFirst={index === 0}
+                    isLast={index === mod.topics.length - 1}
+                    active={topic.slug === selectedSlug}
+                    onSelect={onSelect}
+                    onMove={onMoveLesson}
+                    onDuplicate={onDuplicateLesson}
+                    onDelete={onDeleteLesson}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => onAddLesson(mod.id)}
+                  className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg px-3 py-[7px] text-left font-mono text-[10.5px] font-medium uppercase tracking-[0.06em] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink-muted"
+                >
+                  <PlusGlyph /> Add lesson
+                </button>
+              </div>
             ))}
+
             <button
               type="button"
-              onClick={() => onAddLesson(mod.id)}
-              className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg px-3 py-[7px] text-left font-mono text-[10.5px] font-medium uppercase tracking-[0.06em] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink-muted"
+              onClick={onAddModule}
+              className="mt-1 flex w-full items-center justify-center gap-[7px] rounded-[10px] border border-dashed border-line-strong px-3 py-[11px] text-[12.5px] font-semibold text-ink-soft transition-colors hover:border-accent hover:text-accent"
             >
-              <PlusGlyph /> Add lesson
+              <PlusGlyph /> New part of the course
             </button>
           </div>
-        ))}
 
-        <button
-          type="button"
-          onClick={onAddModule}
-          className="mt-1 flex w-full items-center justify-center gap-[7px] rounded-[10px] border border-dashed border-line-strong px-3 py-[11px] text-[12.5px] font-semibold text-ink-soft transition-colors hover:border-accent hover:text-accent"
-        >
-          <PlusGlyph /> New part of the course
-        </button>
-      </div>
-
-      <div className="flex items-center gap-[9px] border-t border-line px-[18px] py-[13px] font-mono text-[10.5px] text-ink-soft">
-        <span
-          className={`h-1.5 w-1.5 rounded-full ${
-            saving ? "bg-status-warn shadow-[0_0_0_3px_var(--amber-tint)]" : "bg-ok shadow-[0_0_0_3px_var(--ok-glow)]"
-          }`}
-          aria-hidden
-        />
-        {saving ? "Saving…" : "Saved automatically"}
-      </div>
+          <div className="flex items-center gap-[9px] border-t border-line px-[18px] py-[13px] font-mono text-[10.5px] text-ink-soft">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                saving
+                  ? "bg-status-warn shadow-[0_0_0_3px_var(--amber-tint)]"
+                  : "bg-ok shadow-[0_0_0_3px_var(--ok-glow)]"
+              }`}
+              aria-hidden
+            />
+            {saving ? "Saving…" : "Saved automatically"}
+          </div>
         </>
       )}
     </aside>
@@ -396,7 +398,16 @@ function Glyph({ d }: { d: string }) {
 
 function PlusGlyph() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+    >
       <path d="M6 2v8M2 6h8" />
     </svg>
   );

@@ -116,9 +116,7 @@ export function SyncWritePanel({
             </div>
 
             {pendingCount === 0 ? (
-              <p className="text-sm text-ink-muted">
-                Everything is in sync. Nothing to write.
-              </p>
+              <p className="text-sm text-ink-muted">Everything is in sync. Nothing to write.</p>
             ) : (
               <ul className="max-h-72 space-y-1.5 overflow-y-auto pr-2">
                 {[...plan.toCreate, ...plan.toUpdate].map((item) => (

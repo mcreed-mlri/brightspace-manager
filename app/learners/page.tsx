@@ -145,7 +145,11 @@ export default async function LearnersPage() {
         ))}
       </div>
 
-      <LearnerRoster byCourse={report.byCourse} learners={report.learners} enrollments={report.enrollments} />
+      <LearnerRoster
+        byCourse={report.byCourse}
+        learners={report.learners}
+        enrollments={report.enrollments}
+      />
     </div>
   );
 }

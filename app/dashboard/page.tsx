@@ -77,7 +77,9 @@ function BandCell({
         </span>
         {flag}
       </div>
-      <div className={`mt-3 font-display text-[44px] font-bold leading-none tracking-[-0.03em] ${valueClass}`}>
+      <div
+        className={`mt-3 font-display text-[44px] font-bold leading-none tracking-[-0.03em] ${valueClass}`}
+      >
         {value}
       </div>
       <div className="mt-[7px] text-[11.5px] leading-snug text-ink-soft">{sub}</div>

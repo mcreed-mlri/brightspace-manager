@@ -93,21 +93,29 @@ export default function GuidePage() {
             Build from the learner&apos;s first real decision.
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-            Start with the moment where a learner needs judgment: a client asks a
-            question, a deadline appears, a form is confusing, or a rule changed.
-            Course Studio turns that plain-English teaching plan into a package learners
-            can open in Brightspace.
+            Start with the moment where a learner needs judgment: a client asks a question, a
+            deadline appears, a form is confusing, or a rule changed. Course Studio turns that
+            plain-English teaching plan into a package learners can open in Brightspace.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link href="/course-studio/" className="btn-primary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/course-studio/"
+              className="btn-primary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconStudio size={15} />
               Open Course Studio
             </Link>
-            <Link href="/building-blocks/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/building-blocks/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconCopy size={15} />
               View building blocks
             </Link>
-            <Link href="/publish/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/publish/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               Publish workflow
             </Link>
           </div>
@@ -138,8 +146,8 @@ export default function GuidePage() {
             ))}
           </div>
           <p className="mt-4 text-[12.5px] leading-relaxed text-ink-muted">
-            Add more sections when they earn their place. A concise course that teaches
-            one thing clearly beats a long course that tries to hold everything.
+            Add more sections when they earn their place. A concise course that teaches one thing
+            clearly beats a long course that tries to hold everything.
           </p>
         </aside>
       </section>
@@ -171,7 +179,10 @@ export default function GuidePage() {
                   </p>
                   <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                     {step.items.map((item) => (
-                      <li key={item} className="flex gap-2.5 text-[13px] leading-relaxed text-ink-muted">
+                      <li
+                        key={item}
+                        className="flex gap-2.5 text-[13px] leading-relaxed text-ink-muted"
+                      >
                         <span
                           className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-accent"
                           aria-hidden
@@ -192,13 +203,34 @@ export default function GuidePage() {
           <p className="eyebrow mb-2">Teaching sections</p>
           <h2 className="section-title mb-3 text-ink">What each block is for</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Block name="Scenario" detail="A concrete client situation, not an abstract introduction." />
-            <Block name="Rule" detail="The law, policy, or process in language a busy learner can use." />
-            <Block name="What changed" detail="A short update when something new affects the learner's work." />
-            <Block name="Media" detail="A visual aid or placeholder for files that will be added at upload time." />
-            <Block name="Interactive" detail="Accordions, callouts, timelines, quotes, and reveal moments." />
-            <Block name="Try it" detail="One application question with feedback that makes the rule stick." />
-            <Block name="Remember" detail="The two or three points learners should carry back to practice." />
+            <Block
+              name="Scenario"
+              detail="A concrete client situation, not an abstract introduction."
+            />
+            <Block
+              name="Rule"
+              detail="The law, policy, or process in language a busy learner can use."
+            />
+            <Block
+              name="What changed"
+              detail="A short update when something new affects the learner's work."
+            />
+            <Block
+              name="Media"
+              detail="A visual aid or placeholder for files that will be added at upload time."
+            />
+            <Block
+              name="Interactive"
+              detail="Accordions, callouts, timelines, quotes, and reveal moments."
+            />
+            <Block
+              name="Try it"
+              detail="One application question with feedback that makes the rule stick."
+            />
+            <Block
+              name="Remember"
+              detail="The two or three points learners should carry back to practice."
+            />
           </div>
         </div>
 

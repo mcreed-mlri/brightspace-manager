@@ -27,26 +27,26 @@ the Manager writes.
 
 ## Lives in Brightspace Manager
 
-| Feature | Why here |
-| --- | --- |
-| Course inventory, org structure monitoring | System plumbing |
-| Sync pipeline + diagnostics (Brightspace ↔ Supabase) | Cross-system correctness |
-| Manage Files browser | Content infrastructure |
-| Integrity Checker (ghost topics, orphaned files, broken links, clean-view enforcement) | Cross-system correctness |
-| Course Studio, template library, course provisioning | Infrastructure writes to Brightspace |
-| Attribute Monitor / bulk user edits (CSV upload) | Bulk writes need the preview–confirm–log pattern |
-| Archive/cleanup workflows | Governed write actions |
-| API health, token management, audit logs | Operational by definition |
-| Supabase table inspection | System plumbing |
+| Feature                                                                                | Why here                                         |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Course inventory, org structure monitoring                                             | System plumbing                                  |
+| Sync pipeline + diagnostics (Brightspace ↔ Supabase)                                   | Cross-system correctness                         |
+| Manage Files browser                                                                   | Content infrastructure                           |
+| Integrity Checker (ghost topics, orphaned files, broken links, clean-view enforcement) | Cross-system correctness                         |
+| Course Studio, template library, course provisioning                                   | Infrastructure writes to Brightspace             |
+| Attribute Monitor / bulk user edits (CSV upload)                                       | Bulk writes need the preview–confirm–log pattern |
+| Archive/cleanup workflows                                                              | Governed write actions                           |
+| API health, token management, audit logs                                               | Operational by definition                        |
+| Supabase table inspection                                                              | System plumbing                                  |
 
 ## Lives in Learning Hub admin
 
-| Feature | Why there |
-| --- | --- |
-| Manager/supervisor views (team progress, completions) | Audience is legal-aid supervisors, not platform admins |
-| Engagement analytics & program evaluation | About learners; the hub owns the events/feedback tables |
-| Access approval flow (pending users, UPL acknowledgment) | Part of the hub's login/identity experience |
-| "View as learner" preview | Only meaningful inside the hub |
+| Feature                                                  | Why there                                               |
+| -------------------------------------------------------- | ------------------------------------------------------- |
+| Manager/supervisor views (team progress, completions)    | Audience is legal-aid supervisors, not platform admins  |
+| Engagement analytics & program evaluation                | About learners; the hub owns the events/feedback tables |
+| Access approval flow (pending users, UPL acknowledgment) | Part of the hub's login/identity experience             |
+| "View as learner" preview                                | Only meaningful inside the hub                          |
 
 ## The gray zone — catalog curation
 

@@ -49,7 +49,9 @@ function FileRow({ node, depth }: { node: FileNode; depth: number }) {
 export function FileTree({ root }: { root: FileNode }) {
   return (
     <div className="editorial-card overflow-hidden">
-      {root.children?.map((node) => <FileRow key={node.path} node={node} depth={0} />)}
+      {root.children?.map((node) => (
+        <FileRow key={node.path} node={node} depth={0} />
+      ))}
     </div>
   );
 }

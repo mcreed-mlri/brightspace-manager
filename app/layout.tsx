@@ -58,9 +58,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
-      <body
-        className={`${spaceGrotesk.variable} ${inter.variable}`}
-      >
+      <body className={`${spaceGrotesk.variable} ${inter.variable}`}>
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

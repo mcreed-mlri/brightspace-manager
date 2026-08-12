@@ -67,7 +67,10 @@ export function CourseDrawer({
             </span>
           }
         />
-        <Field label="Course code" value={course.code || <span className="text-ink-soft">—</span>} />
+        <Field
+          label="Course code"
+          value={course.code || <span className="text-ink-soft">—</span>}
+        />
         <Field
           label="Jurisdiction"
           value={course.jurisdiction ?? <span className="text-ink-soft">Missing</span>}
@@ -94,12 +97,7 @@ export function CourseDrawer({
         </div>
       ) : null}
 
-      <a
-        href={course.brightspaceUrl}
-        target="_blank"
-        rel="noreferrer"
-        className="btn-primary mt-6"
-      >
+      <a href={course.brightspaceUrl} target="_blank" rel="noreferrer" className="btn-primary mt-6">
         Open in Brightspace
         <IconExternal size={15} />
       </a>

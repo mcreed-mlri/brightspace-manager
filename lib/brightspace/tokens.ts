@@ -20,9 +20,7 @@ type StoredTokens = {
 };
 
 export function getTokenFilePath() {
-  return (
-    process.env.BRIGHTSPACE_TOKEN_FILE || path.join(process.cwd(), ".brightspace-tokens.json")
-  );
+  return process.env.BRIGHTSPACE_TOKEN_FILE || path.join(process.cwd(), ".brightspace-tokens.json");
 }
 
 export function hasStoredTokens(): boolean {

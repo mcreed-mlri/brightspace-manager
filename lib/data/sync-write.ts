@@ -5,7 +5,13 @@ import { isBrightspaceLive } from "@/lib/brightspace/config";
 import { listCourseOfferings } from "@/lib/data/courses";
 import { listLearningItems } from "@/lib/data/learning-items";
 import { createSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import type { CourseOffering, LearningItemRow, SyncPlan, SyncPlanItem, SyncRunResult } from "@/types/domain";
+import type {
+  CourseOffering,
+  LearningItemRow,
+  SyncPlan,
+  SyncPlanItem,
+  SyncRunResult,
+} from "@/types/domain";
 
 /* The first write action in the app. Governance rules baked in:
      · plan first — the preview is computed server-side and shown to the admin
@@ -53,7 +59,9 @@ function diffChanges(course: CourseOffering, item: LearningItemRow): string[] {
     changes.push(`title: "${item.title}" → "${course.name}"`);
   }
   if ((item.practice_area ?? null) !== (course.program ?? null)) {
-    changes.push(`practice_area: ${item.practice_area ?? "(none)"} → ${course.program ?? "(none)"}`);
+    changes.push(
+      `practice_area: ${item.practice_area ?? "(none)"} → ${course.program ?? "(none)"}`,
+    );
   }
   if ((item.brightspace_url ?? "") !== course.brightspaceUrl) {
     changes.push("brightspace_url updated");
@@ -63,7 +71,9 @@ function diffChanges(course: CourseOffering, item: LearningItemRow): string[] {
     changes.push(`active flag: ${String(meta.is_active ?? "unset")} → ${String(course.isActive)}`);
   }
   if ((meta.jurisdiction ?? null) !== (course.jurisdiction ?? null)) {
-    changes.push(`jurisdiction: ${String(meta.jurisdiction ?? "(none)")} → ${course.jurisdiction ?? "(none)"}`);
+    changes.push(
+      `jurisdiction: ${String(meta.jurisdiction ?? "(none)")} → ${course.jurisdiction ?? "(none)"}`,
+    );
   }
   return changes;
 }

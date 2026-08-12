@@ -41,7 +41,8 @@ export default async function SupabaseDataPage() {
     {
       key: "tags",
       label: "tags",
-      description: "Planned reference table for catalog tags and how often each is used. Mock preview.",
+      description:
+        "Planned reference table for catalog tags and how often each is used. Mock preview.",
       columns: ["name", "usage_count"],
       rows: mockTags,
       source: "mock",

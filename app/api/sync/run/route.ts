@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   if (!confirmed) {
     const body: ApiResponse<never> = {
       ok: false,
-      error: { message: "Missing confirmation. Send { \"confirm\": true }.", status: 400 },
+      error: { message: 'Missing confirmation. Send { "confirm": true }.', status: 400 },
     };
     return NextResponse.json(body, { status: 400 });
   }

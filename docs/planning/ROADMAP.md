@@ -13,7 +13,7 @@ Now slot opens. One thing in **Now** at a time.
 > choices that preserve the option: course content lives in drafts (JSON) + Supabase, the
 > wrapper is plain HTML/CSS/JS, and every D2L touchpoint stays behind an adapter in the data
 > layer. If D2L earns renewal, nothing is wasted. If not, the content walks out the door.
-> No work item may couple course *content* to D2L-specific formats.
+> No work item may couple course _content_ to D2L-specific formats.
 
 ---
 
@@ -30,15 +30,15 @@ Now slot opens. One thing in **Now** at a time.
 
 ## ✅ Done
 
-| Milestone | What shipped | Date |
-| --- | --- | --- |
-| M1 — Read-only foundation | PWA shell, nav, dashboard, inventory, placeholders, server-side API pattern, mock-data banner system | 2026-06-11 |
-| M2 — Diagnostics + data tools | Sync diff engine, Supabase data browser (search/sort/drawer/CSV), files course picker | 2026-06-11 |
-| M3 — Live connections | Brightspace OAuth (rotating tokens, `npm run authorize`), live inventory with ancestors-based jurisdiction/program, live Supabase | 2026-06-11 |
-| M4 — Sync pipeline (first write) | Preview → confirm → upsert learning_items → audit log | 2026-06-11 |
-| M5 — Course Studio Phase A | Template library, five-section course builder, topic preview, ZIP package export; drafts tracked in git | 2026-06-11 |
-| Theme | Hub "Studio" design system: tokens, type scale, button system | 2026-06-11 |
-| M6 — Sign-in (team access) | Supabase Auth email codes, invite-only; middleware + per-route `requireUser()`; audit log records who ran each sync; SW network-first navigations. Setup: [docs/auth-setup.md](../auth-setup.md) | 2026-06-12 |
+| Milestone                               | What shipped                                                                                                                                                                                                                                                                                                                                                                                                                        | Date       |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| M1 — Read-only foundation               | PWA shell, nav, dashboard, inventory, placeholders, server-side API pattern, mock-data banner system                                                                                                                                                                                                                                                                                                                                | 2026-06-11 |
+| M2 — Diagnostics + data tools           | Sync diff engine, Supabase data browser (search/sort/drawer/CSV), files course picker                                                                                                                                                                                                                                                                                                                                               | 2026-06-11 |
+| M3 — Live connections                   | Brightspace OAuth (rotating tokens, `npm run authorize`), live inventory with ancestors-based jurisdiction/program, live Supabase                                                                                                                                                                                                                                                                                                   | 2026-06-11 |
+| M4 — Sync pipeline (first write)        | Preview → confirm → upsert learning_items → audit log                                                                                                                                                                                                                                                                                                                                                                               | 2026-06-11 |
+| M5 — Course Studio Phase A              | Template library, five-section course builder, topic preview, ZIP package export; drafts tracked in git                                                                                                                                                                                                                                                                                                                             | 2026-06-11 |
+| Theme                                   | Hub "Studio" design system: tokens, type scale, button system                                                                                                                                                                                                                                                                                                                                                                       | 2026-06-11 |
+| M6 — Sign-in (team access)              | Supabase Auth email codes, invite-only; middleware + per-route `requireUser()`; audit log records who ran each sync; SW network-first navigations. Setup: [docs/auth-setup.md](../auth-setup.md)                                                                                                                                                                                                                                    | 2026-06-12 |
 | M7 — Design handoff v3 (Studio UX pass) | Recreated the Claude-Design prototype (`design_handoff_brightspace_manager/`): dark sidebar with Author/Operator mode toggle, Author Home at `/` (operator dashboard moved to `/dashboard/`), and the Studio builder rebuilt as a full-screen three-pane editor — lesson outline → plain-English form with section blocks/templates → always-on live preview, 2s auto-save. Covers most of old Next item 5 ("Harborside patterns"). | 2026-06-12 |
 
 ## 🎯 Now (one thing)
@@ -69,7 +69,7 @@ platform before scaling writes or bulk production.
 
 ## 🅿️ Parking lot
 
-*Ideas land here so they stop taking up headspace. Nothing here is rejected.*
+_Ideas land here so they stop taking up headspace. Nothing here is rejected._
 
 **Author polish** (wait until the operator loop is solid):
 
@@ -95,5 +95,5 @@ platform before scaling writes or bulk production.
 
 ---
 
-*Update this file when a milestone lands or a decision changes. The git history of this file
-is the project's story.*
+_Update this file when a milestone lands or a decision changes. The git history of this file
+is the project's story._

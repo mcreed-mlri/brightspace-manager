@@ -44,7 +44,10 @@ export async function runSyncCheck(): Promise<DataResult<SyncReport>> {
       const syncedMs = item.synced_at ? Date.parse(item.synced_at) : NaN;
       if (!Number.isFinite(syncedMs)) {
         issues.push("Supabase row has no synced_at timestamp.");
-      } else if (course.isActive && Date.now() - syncedMs > STALE_AFTER_DAYS * 24 * 60 * 60 * 1000) {
+      } else if (
+        course.isActive &&
+        Date.now() - syncedMs > STALE_AFTER_DAYS * 24 * 60 * 60 * 1000
+      ) {
         issues.push(`Cache is stale: last synced over ${STALE_AFTER_DAYS} days ago.`);
       }
     }

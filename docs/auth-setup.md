@@ -29,15 +29,15 @@ flipped, uninvited emails cannot create accounts.
    one-time code) in the template, e.g. "Your Brightspace Manager sign-in code
    is {{ .Token }}. It expires in 1 hour."
    **This step is make-or-break**: the default template contains only a magic
-   *link*, and this app's sign-in asks for a *code* — without `{{ .Token }}`
+   _link_, and this app's sign-in asks for a _code_ — without `{{ .Token }}`
    the email that arrives is useless, and every retry burns the email budget
    (see rate limits below).
 2. **Settings → API**: copy the project URL and the anon/publishable key into
    `.env` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
    The new `sb_publishable_…` key format works fine as the anon key.
 3. **Authentication → Sign In / Up**: turn **off** "Allow new users to sign
-   up". The invite list is now the only way in. *(Checked 2026-06-12: still
-   on — `shouldCreateUser: false` in code is covering for it.)*
+   up". The invite list is now the only way in. _(Checked 2026-06-12: still
+   on — `shouldCreateUser: false` in code is covering for it.)_
 4. **Authentication → Users → Invite user**: invite each teammate's email.
    The invite email's link can be ignored — once invited, teammates just go
    to the app and sign in with a code like everyone else.
@@ -55,6 +55,7 @@ Emails → SMTP settings — e.g. a free Resend account, 100 emails/day), which
 also removes the "for development only" caveat on the built-in sender.
 
 Three things that soften the limit meanwhile:
+
 - **Double-click `scripts\dev-code.cmd`** to mint a valid sign-in code via
   the admin API — **no email is sent**, so testing never touches the budget.
   Pure PowerShell, no node/npm needed. Defaults to the first invited user;
@@ -64,7 +65,7 @@ Three things that soften the limit meanwhile:
   run invalidates the previous pending code — normal one-time-code
   behavior. `npm run dev-code` is the same thing for machines with node.)
 - A code stays valid for ~1 hour — if a send fails on the rate limit, the
-  code from an *earlier* email still works (the card lets you enter it).
+  code from an _earlier_ email still works (the card lets you enter it).
 - Local dev doesn't need auth at all: comment out
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env` and the app runs open in mock/dev
   mode (that's the opt-in design, not a bug).

@@ -128,7 +128,8 @@ async function main() {
   }
 
   const json = await response.json();
-  const tokenFile = env.BRIGHTSPACE_TOKEN_FILE || path.join(process.cwd(), ".brightspace-tokens.json");
+  const tokenFile =
+    env.BRIGHTSPACE_TOKEN_FILE || path.join(process.cwd(), ".brightspace-tokens.json");
   writeFileSync(
     tokenFile,
     JSON.stringify(

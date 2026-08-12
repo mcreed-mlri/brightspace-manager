@@ -66,7 +66,8 @@ const interactiveBlocks = [
   {
     name: "Accordion",
     bestFor: "Expandable lists",
-    detail: "Use for exceptions, FAQs, defenses, or optional detail that should not interrupt the main flow.",
+    detail:
+      "Use for exceptions, FAQs, defenses, or optional detail that should not interrupt the main flow.",
   },
   {
     name: "Click and reveal",
@@ -81,7 +82,8 @@ const interactiveBlocks = [
   {
     name: "Timeline",
     bestFor: "Ordered steps",
-    detail: "Use for deadlines, case stages, client workflows, or any process where sequence matters.",
+    detail:
+      "Use for deadlines, case stages, client workflows, or any process where sequence matters.",
   },
   {
     name: "Stylized quote",
@@ -125,21 +127,29 @@ export default function BuildingBlocksPage() {
             Pick the blocks that serve the lesson.
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-            You do not need every block in every lesson. Most strong lessons start with a
-            scenario, state the rule, ask the learner to apply it, and close with what to
-            remember. Add media, updates, or interactive elements when they make the lesson
-            clearer.
+            You do not need every block in every lesson. Most strong lessons start with a scenario,
+            state the rule, ask the learner to apply it, and close with what to remember. Add media,
+            updates, or interactive elements when they make the lesson clearer.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link href="/guide/" className="btn-primary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/guide/"
+              className="btn-primary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconFile size={15} />
               Read the guide
             </Link>
-            <Link href="/course-studio/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/course-studio/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               <IconStudio size={15} />
               Open Studio
             </Link>
-            <Link href="/publish/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+            <Link
+              href="/publish/"
+              className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+            >
               Publish workflow
             </Link>
           </div>
@@ -200,9 +210,7 @@ export default function BuildingBlocksPage() {
                   <h3 className="mt-1 font-display text-[20px] font-semibold leading-snug text-ink">
                     {section.name}
                   </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                    {section.purpose}
-                  </p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{section.purpose}</p>
                 </div>
                 <div className="rounded-[10px] border border-line bg-surface-sunken px-3 py-3">
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
@@ -230,16 +238,17 @@ export default function BuildingBlocksPage() {
           <h2 className="section-title mb-3 text-ink">Use interaction for clarity</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {interactiveBlocks.map((block) => (
-              <div key={block.name} className="rounded-[10px] border border-line bg-surface-sunken px-3 py-3 sm:px-4">
+              <div
+                key={block.name}
+                className="rounded-[10px] border border-line bg-surface-sunken px-3 py-3 sm:px-4"
+              >
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-accent">
                   {block.bestFor}
                 </p>
                 <h3 className="mt-1 font-display text-[16px] font-semibold text-ink">
                   {block.name}
                 </h3>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">
-                  {block.detail}
-                </p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">{block.detail}</p>
               </div>
             ))}
           </div>
@@ -250,14 +259,15 @@ export default function BuildingBlocksPage() {
           <h2 className="section-title mb-3 text-ink">Fast starting points</h2>
           <div className="grid gap-3">
             {templates.map((template) => (
-              <div key={template.name} className="border-b border-line-soft pb-3 last:border-b-0 last:pb-0">
+              <div
+                key={template.name}
+                className="border-b border-line-soft pb-3 last:border-b-0 last:pb-0"
+              >
                 <h3 className="font-display text-[16px] font-semibold text-ink">{template.name}</h3>
                 <p className="mt-1 font-mono text-[10.5px] uppercase tracking-[0.06em] text-accent">
                   {template.sections}
                 </p>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">
-                  {template.use}
-                </p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">{template.use}</p>
               </div>
             ))}
           </div>
@@ -270,12 +280,15 @@ export default function BuildingBlocksPage() {
             <p className="eyebrow mb-2">Mobile note</p>
             <h2 className="section-title text-ink">Good for reading, not authoring</h2>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              This reference is meant to be readable on a phone when you need a quick
-              reminder. Course Studio itself is still desktop-only because the builder
-              needs the outline, editor, and learner preview side by side.
+              This reference is meant to be readable on a phone when you need a quick reminder.
+              Course Studio itself is still desktop-only because the builder needs the outline,
+              editor, and learner preview side by side.
             </p>
           </div>
-          <Link href="/courses/" className="btn-secondary max-[520px]:w-full max-[520px]:justify-center">
+          <Link
+            href="/courses/"
+            className="btn-secondary max-[520px]:w-full max-[520px]:justify-center"
+          >
             Check course inventory
           </Link>
         </div>

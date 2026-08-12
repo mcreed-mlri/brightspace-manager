@@ -282,7 +282,9 @@ h3 {
   height: 38px;
   cursor: pointer;
   box-shadow: 0 3px 12px var(--accent-glow);
-  transition: filter 120ms ease, box-shadow 120ms ease;
+  transition:
+    filter 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .btn-primary:hover,

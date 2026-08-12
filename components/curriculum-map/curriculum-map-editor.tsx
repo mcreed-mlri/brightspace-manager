@@ -531,7 +531,9 @@ export function CurriculumMapEditor({ initial }: { initial: CurriculumMap }) {
                             onToggleLevel={() => toggleLevel(branch.id, col.id, note.id)}
                             onToggleTag={() => toggleTag(branch.id, col.id, note.id)}
                             onAddSub={() => addSubNote(branch.id, col.id, note.id)}
-                            onCommitComment={(text) => setNoteComment(branch.id, col.id, note.id, text)}
+                            onCommitComment={(text) =>
+                              setNoteComment(branch.id, col.id, note.id, text)
+                            }
                             onDelete={() => deleteNote(branch.id, col.id, note.id)}
                           />
                         ))}

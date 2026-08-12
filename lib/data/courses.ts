@@ -1,6 +1,11 @@
 import "server-only";
 
-import { brightspaceApiFetch, brightspacePagedGet, getBrightspaceBaseUrl, lpPath } from "@/lib/brightspace/api";
+import {
+  brightspaceApiFetch,
+  brightspacePagedGet,
+  getBrightspaceBaseUrl,
+  lpPath,
+} from "@/lib/brightspace/api";
 import { isBrightspaceLive } from "@/lib/brightspace/config";
 import { liveResult, mockResult } from "@/lib/data/envelope";
 import { listLearningItems } from "@/lib/data/learning-items";
@@ -139,7 +144,9 @@ export async function listCourseOfferings(): Promise<DataResult<CourseOffering[]
   }
 }
 
-export async function getCourseOffering(orgUnitId: number): Promise<DataResult<CourseOffering | null>> {
+export async function getCourseOffering(
+  orgUnitId: number,
+): Promise<DataResult<CourseOffering | null>> {
   const all = await listCourseOfferings();
   return { ...all, data: all.data.find((c) => c.orgUnitId === orgUnitId) ?? null };
 }

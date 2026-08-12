@@ -52,7 +52,9 @@ export function LearnerDrawer({
               >
                 <div className="mb-1 flex items-baseline justify-between gap-3">
                   <p className="truncate text-sm font-medium text-ink">{row.courseName}</p>
-                  <StatusBadge tone={STATUS_TONE[row.status]}>{STATUS_LABEL[row.status]}</StatusBadge>
+                  <StatusBadge tone={STATUS_TONE[row.status]}>
+                    {STATUS_LABEL[row.status]}
+                  </StatusBadge>
                 </div>
                 <p className="font-mono text-[11px] text-ink-soft">
                   {row.progressPct}% · active {formatRelative(row.lastActiveAt)}

@@ -1,7 +1,12 @@
 import "server-only";
 
 import { mockResult } from "@/lib/data/envelope";
-import { courseMeta, courseNameAndJurisdiction, mockEnrollments, mockLearners } from "@/lib/fixtures/learners";
+import {
+  courseMeta,
+  courseNameAndJurisdiction,
+  mockEnrollments,
+  mockLearners,
+} from "@/lib/fixtures/learners";
 import type {
   AbandonmentReasons,
   CourseProgress,
@@ -18,13 +23,13 @@ function median(values: number[]): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 function daysBetween(fromIso: string, toIso: string): number {
-  return Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / (24 * 60 * 60 * 1000));
+  return Math.round(
+    (new Date(toIso).getTime() - new Date(fromIso).getTime()) / (24 * 60 * 60 * 1000),
+  );
 }
 
 /* Course-level rollup, derived from the enrollment join so filtered numbers
@@ -63,7 +68,9 @@ function buildCourseProgress(enrollments: Enrollment[]): CourseProgress[] {
         ? null
         : median(completers.map((r) => daysBetween(r.enrolledAt, r.completedAt as string)));
 
-    const eligibleFor30d = rows.filter((r) => now - new Date(r.enrolledAt).getTime() >= THIRTY_DAYS_MS);
+    const eligibleFor30d = rows.filter(
+      (r) => now - new Date(r.enrolledAt).getTime() >= THIRTY_DAYS_MS,
+    );
     const completedWithin30d = eligibleFor30d.filter(
       (r) =>
         r.status === "completed" &&
@@ -99,7 +106,10 @@ function buildCourseProgress(enrollments: Enrollment[]): CourseProgress[] {
 
 /* One row per enrollment (learner x course) — the full join backing the
    Learners page roster/filter UI and both drill-down drawers. */
-function buildEnrollmentRows(enrollments: Enrollment[], learners: LearnerRecord[]): LearnerActivity[] {
+function buildEnrollmentRows(
+  enrollments: Enrollment[],
+  learners: LearnerRecord[],
+): LearnerActivity[] {
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
   return enrollments
@@ -190,7 +200,10 @@ function buildReport(): LearnerProgressReport {
   const now = Date.now();
   const activeLearnerIds = new Set(
     mockEnrollments
-      .filter((e) => e.lastActiveAt !== null && now - new Date(e.lastActiveAt).getTime() <= THIRTY_DAYS_MS)
+      .filter(
+        (e) =>
+          e.lastActiveAt !== null && now - new Date(e.lastActiveAt).getTime() <= THIRTY_DAYS_MS,
+      )
       .map((e) => e.learnerId),
   );
 
