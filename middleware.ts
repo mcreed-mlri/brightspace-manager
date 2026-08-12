@@ -50,11 +50,14 @@ export async function middleware(request: NextRequest) {
   const isSignInPage = pathname === "/sign-in" || pathname === "/sign-in/";
   const isPreviewStylesheet =
     pathname === "/api/studio/template/css" || pathname === "/api/studio/template/css/";
+  /* Public liveness probe for the Training Unit command center — returns only
+     ok/db/latencyMs, no secrets. Must stay ungated or external monitors 401. */
+  const isPublicHealth = pathname === "/api/health" || pathname === "/api/health/";
   /* The OAuth callback runs BEFORE a session exists — it's what establishes
      one. Gating it behind sign-in would trap the user in a redirect loop. */
   const isAuthCallback = pathname === "/auth/callback" || pathname === "/auth/callback/";
 
-  if (isPreviewStylesheet || isAuthCallback) return response;
+  if (isPreviewStylesheet || isPublicHealth || isAuthCallback) return response;
 
   if (!user && !isSignInPage) {
     /* API callers get the standard error envelope, not an HTML redirect. */
