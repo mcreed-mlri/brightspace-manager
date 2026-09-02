@@ -56,6 +56,30 @@ export function contentTypeFor(filename: string): string {
   return CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? "application/octet-stream";
 }
 
+export function isAllowedImageBytes(mimeType: string, bytes: Buffer): boolean {
+  if (mimeType === "image/png") {
+    return (
+      bytes.length >= 8 &&
+      bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+    );
+  }
+  if (mimeType === "image/jpeg") {
+    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+  if (mimeType === "image/webp") {
+    return (
+      bytes.length >= 12 &&
+      bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
+      bytes.subarray(8, 12).toString("ascii") === "WEBP"
+    );
+  }
+  if (mimeType === "image/gif") {
+    const signature = bytes.subarray(0, 6).toString("ascii");
+    return signature === "GIF87a" || signature === "GIF89a";
+  }
+  return false;
+}
+
 /* "Notice Timeline (v2).PNG" → "notice-timeline-v2.png" */
 export function sanitizeImageFilename(original: string, mimeType: string): string {
   const ext =

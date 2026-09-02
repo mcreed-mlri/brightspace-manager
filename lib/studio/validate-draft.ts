@@ -9,9 +9,7 @@ import {
   type TopicMedia,
 } from "@/types/studio";
 
-type ValidationResult =
-  | { ok: true; draft: CourseDraft }
-  | { ok: false; message: string };
+type ValidationResult = { ok: true; draft: CourseDraft } | { ok: false; message: string };
 
 type CheckResult = { ok: true } | { ok: false; message: string };
 

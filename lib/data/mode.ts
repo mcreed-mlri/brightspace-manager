@@ -37,4 +37,3 @@ export function dataModeLabel(mode = getDataMode()): string {
   if (mode === "mock") return "Mock";
   return "Hybrid";
 }
-

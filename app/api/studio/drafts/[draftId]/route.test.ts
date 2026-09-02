@@ -20,7 +20,7 @@ vi.mock("@/lib/studio/drafts", () => ({
   writeDraft: routeMocks.writeDraft,
 }));
 
-import { PUT } from "@/app/api/studio/drafts/[draftId]/route";
+import { DELETE, PUT } from "@/app/api/studio/drafts/[draftId]/route";
 
 function validDraft(overrides: Partial<CourseDraft> = {}): CourseDraft {
   return {
@@ -51,7 +51,7 @@ function requestWithJson(body: unknown) {
   return new Request("http://localhost/api/studio/drafts/existing", {
     method: "PUT",
     body: JSON.stringify(body),
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", origin: "http://localhost" },
   });
 }
 
@@ -98,7 +98,7 @@ describe("PUT /api/studio/drafts/[draftId]", () => {
       new Request("http://localhost/api/studio/drafts/existing", {
         method: "PUT",
         body: "{",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", origin: "http://localhost" },
       }) as unknown as NextRequest,
       params,
     );
@@ -137,5 +137,36 @@ describe("PUT /api/studio/drafts/[draftId]", () => {
         createdAt: "2026-09-01T12:00:00.000Z",
       },
     });
+  });
+
+  it("rejects cross-origin draft updates before writing", async () => {
+    const response = await PUT(
+      new Request("http://localhost/api/studio/drafts/existing", {
+        method: "PUT",
+        body: JSON.stringify(validDraft()),
+        headers: { "content-type": "application/json", origin: "https://attacker.example" },
+      }) as unknown as NextRequest,
+      params,
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      error: { message: "Cross-origin request rejected.", status: 403 },
+    });
+    expect(routeMocks.writeDraft).not.toHaveBeenCalled();
+  });
+
+  it("applies same-origin protection to draft deletion", async () => {
+    const response = await DELETE(
+      new Request("http://localhost/api/studio/drafts/existing", {
+        method: "DELETE",
+        headers: { origin: "https://attacker.example" },
+      }) as unknown as NextRequest,
+      params,
+    );
+
+    expect(response.status).toBe(403);
+    expect(routeMocks.deleteDraft).not.toHaveBeenCalled();
   });
 });

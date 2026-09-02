@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { clientKey, rateLimit, RATE_LIMITS, requireSameOriginMutation } from "@/lib/security";
 import { deleteDraft, readDraft, writeDraft } from "@/lib/studio/drafts";
 import { validateCourseDraft } from "@/lib/studio/validate-draft";
 import type { ApiResponse } from "@/types/api";
@@ -31,8 +32,17 @@ export async function GET(_request: NextRequest, { params }: Params) {
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `draft-update:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.draftWrite,
+  );
+  if (limited) return limited;
 
   const { draftId } = await params;
   const existing = await readDraft(draftId);
@@ -86,9 +96,18 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(_request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `draft-delete:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.draftWrite,
+  );
+  if (limited) return limited;
 
   const { draftId } = await params;
   const existing = await readDraft(draftId);

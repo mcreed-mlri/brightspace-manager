@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
 import { saveCurriculumMap } from "@/lib/data/curriculum-map";
+import { clientKey, rateLimit, RATE_LIMITS, requireSameOriginMutation } from "@/lib/security";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { ApiResponse } from "@/types/api";
 import type { CurriculumBranch, CurriculumMap } from "@/types/domain";
@@ -67,8 +68,17 @@ function isValidMap(value: unknown): value is CurriculumMap {
 }
 
 export async function POST(request: NextRequest) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `curriculum-map:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.draftWrite,
+  );
+  if (limited) return limited;
 
   if (!isSupabaseConfigured()) {
     const body: ApiResponse<never> = {

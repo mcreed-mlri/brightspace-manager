@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import {
+  clientKey,
+  noStoreHeaders,
+  rateLimit,
+  RATE_LIMITS,
+  requireSameOriginMutation,
+} from "@/lib/security";
 import { deleteImage, isValidImageFilename, readImage } from "@/lib/studio/images";
 import type { ApiResponse } from "@/types/api";
 
@@ -23,16 +30,25 @@ export async function GET(_request: NextRequest, { params }: Params) {
   if (!image) return err("Image not found.", 404);
 
   return new NextResponse(new Uint8Array(image.bytes), {
-    headers: {
+    headers: noStoreHeaders({
       "Content-Type": image.contentType,
-      "Cache-Control": "no-store",
-    },
+      "Content-Disposition": `inline; filename="${filename}"`,
+    }),
   });
 }
 
-export async function DELETE(_request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `image-delete:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.draftWrite,
+  );
+  if (limited) return limited;
 
   const { draftId, filename } = await params;
   if (!isValidImageFilename(filename)) return err("Invalid image name.", 400);

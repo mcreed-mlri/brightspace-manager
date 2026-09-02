@@ -2,12 +2,22 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
 import { canSyncWrite, executeSyncPlan } from "@/lib/data/sync-write";
+import { clientKey, rateLimit, RATE_LIMITS, requireSameOriginMutation } from "@/lib/security";
 import type { ApiResponse } from "@/types/api";
 import type { SyncRunResult } from "@/types/domain";
 
 export async function POST(request: NextRequest) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `sync-run:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.syncRun,
+  );
+  if (limited) return limited;
 
   if (!canSyncWrite()) {
     const body: ApiResponse<never> = {

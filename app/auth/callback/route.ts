@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSupabaseAuthEnv } from "@/lib/auth/config";
 import { isAllowedOrgEmail } from "@/lib/auth/server";
+import { getAppBaseUrl } from "@/lib/security";
 import { createSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 /* OAuth landing point. Google (via Supabase) redirects the browser here with a
@@ -14,11 +15,12 @@ import { createSupabaseAdminClient, isSupabaseConfigured } from "@/lib/supabase/
    registered redirect URL must be /auth/callback/. */
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl;
+  const { searchParams } = request.nextUrl;
+  const appOrigin = getAppBaseUrl()?.origin ?? request.nextUrl.origin;
   const code = searchParams.get("code");
   const oauthError = searchParams.get("error_description") || searchParams.get("error");
 
-  const failUrl = new URL("/sign-in/", origin);
+  const failUrl = new URL("/sign-in/", appOrigin);
 
   if (oauthError) {
     failUrl.searchParams.set("error", oauthError);
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   const { url, anonKey } = getSupabaseAuthEnv();
   const cookieStore = await cookies();
-  const response = NextResponse.redirect(new URL("/dashboard/", origin));
+  const response = NextResponse.redirect(new URL("/dashboard/", appOrigin));
 
   const supabase = createServerClient(url, anonKey, {
     cookies: {

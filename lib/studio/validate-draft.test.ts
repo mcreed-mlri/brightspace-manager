@@ -95,7 +95,8 @@ describe("validateCourseDraft", () => {
 
     expect(validateCourseDraft(draft)).toMatchObject({
       ok: false,
-      message: "Invalid course draft payload: modules[0].topics[0].blocks[0].type is not supported.",
+      message:
+        "Invalid course draft payload: modules[0].topics[0].blocks[0].type is not supported.",
     });
   });
 });

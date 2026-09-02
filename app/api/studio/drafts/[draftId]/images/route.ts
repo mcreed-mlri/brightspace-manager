@@ -1,8 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { clientKey, rateLimit, RATE_LIMITS, requireSameOriginMutation } from "@/lib/security";
 import { readDraft } from "@/lib/studio/drafts";
-import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES, listImages, saveImage } from "@/lib/studio/images";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_IMAGE_BYTES,
+  isAllowedImageBytes,
+  listImages,
+  saveImage,
+} from "@/lib/studio/images";
 import type { ApiResponse } from "@/types/api";
 
 type Params = { params: Promise<{ draftId: string }> };
@@ -36,8 +43,17 @@ export async function GET(_request: NextRequest, { params }: Params) {
 /* Uploads one image (multipart form, field "file"). Returns the stored
    filename — sanitized, and suffixed if the name was already taken. */
 export async function POST(request: NextRequest, { params }: Params) {
+  const originError = requireSameOriginMutation(request);
+  if (originError) return originError;
+
   const auth = await requireUser();
   if (!auth.ok) return auth.response;
+
+  const limited = rateLimit(
+    `image-upload:${clientKey(request, auth.user?.email)}`,
+    RATE_LIMITS.imageUpload,
+  );
+  if (limited) return limited;
 
   const { draftId } = await params;
   if (!(await readDraft(draftId))) return err("Draft not found.", 404);
@@ -62,6 +78,9 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   try {
     const bytes = Buffer.from(await file.arrayBuffer());
+    if (!isAllowedImageBytes(file.type, bytes)) {
+      return err("The uploaded file does not match its declared image type.", 400);
+    }
     const filename = await saveImage(draftId, file.name, file.type, bytes);
     const body: ApiResponse<{ filename: string }> = {
       ok: true,

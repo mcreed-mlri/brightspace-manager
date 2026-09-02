@@ -48,6 +48,10 @@ disabled across the app; screens without a live source show a clear
 **Live data required** state instead of rendering demo data. Use
 `APP_DATA_MODE=mock` only for deliberate demo work.
 
+Set `APP_BASE_URL` in deployed environments (for example
+`https://brightspace-manager.example.org`). The app uses it as the canonical
+origin for OAuth redirects and same-origin checks on mutating API routes.
+
 ## Running it
 
 ```powershell
