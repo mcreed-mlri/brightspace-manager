@@ -10,7 +10,7 @@ import type { DataResult, LearningItemRow } from "@/types/domain";
    keeps working — the health check on Settings surfaces the real failure. */
 export async function listLearningItems(): Promise<DataResult<LearningItemRow[]>> {
   if (!isSupabaseConfigured()) {
-    return mockResult(mockLearningItems);
+    return mockResult(mockLearningItems, "Supabase learning_items");
   }
 
   try {
@@ -19,9 +19,9 @@ export async function listLearningItems(): Promise<DataResult<LearningItemRow[]>
       .from("learning_items")
       .select("*")
       .order("updated_at", { ascending: false });
-    if (error) return mockResult(mockLearningItems);
+    if (error) return mockResult(mockLearningItems, "Supabase learning_items");
     return liveResult((data ?? []) as LearningItemRow[]);
   } catch {
-    return mockResult(mockLearningItems);
+    return mockResult(mockLearningItems, "Supabase learning_items");
   }
 }

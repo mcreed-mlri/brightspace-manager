@@ -1,5 +1,7 @@
 import { PageHeader } from "@/components/page-header";
 import { MockDataBanner } from "@/components/mock-data-banner";
+import { LiveDataRequiredPanel } from "@/components/live-data-required-panel";
+import { isMockDataDisabledError } from "@/lib/data/mode";
 import { getLearnerProgress } from "@/lib/data/learners";
 import { LearnerRoster } from "@/components/learners/learner-roster";
 
@@ -34,7 +36,22 @@ function MetricCell({
 }
 
 export default async function LearnersPage() {
-  const result = await getLearnerProgress();
+  let result: Awaited<ReturnType<typeof getLearnerProgress>>;
+  try {
+    result = await getLearnerProgress();
+  } catch (error) {
+    if (!isMockDataDisabledError(error)) throw error;
+    return (
+      <div className="max-w-[880px] fade-up">
+        <PageHeader
+          eyebrow="LACE · Learners"
+          title="Learner Progress"
+          description="How everyone enrolled in LACE courses is doing: completion and recent activity across the platform."
+        />
+        <LiveDataRequiredPanel message={error.message} />
+      </div>
+    );
+  }
   const report = result.data;
   const isMock = result.source === "mock";
 

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\dev\\\\Brightspace-Manager; npx tsc --noEmit)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\dev\\\\Brightspace-Manager; npm run build)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\dev\\\\Brightspace-Manager; npm run dev)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "PowerShell(Get-Command chromium-cli -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command chromium-cli.cmd -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command chromium-cli.ps1 -ErrorAction SilentlyContinue)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; npx --yes playwright --version 2>&1 | Select-Object -First 5)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; npx --yes playwright --help 2>&1 | Select-Object -First 40)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; npx --yes playwright install chromium 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\Users\\\\mcreed\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--dev-Brightspace-Manager\\\\640bc146-957b-421f-9b1c-c1cfe8f3fcf3\\\\scratchpad; npx --yes --package=playwright -- node verify.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\Users\\\\mcreed\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--dev-Brightspace-Manager\\\\640bc146-957b-421f-9b1c-c1cfe8f3fcf3\\\\scratchpad; npm init -y | Out-Null; npm install playwright --no-audit --no-fund 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\Users\\\\mcreed\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--dev-Brightspace-Manager\\\\640bc146-957b-421f-9b1c-c1cfe8f3fcf3\\\\scratchpad; node verify.mjs)",
+      "PowerShell($env:PATH = \"C:\\\\dev\\\\learning-hub\\\\tools\\\\node-v24.15.0-win-x64;$env:PATH\"; cd C:\\\\dev\\\\Brightspace-Manager; node scripts/dev-code.mjs)",
+      "PowerShell(Start-Sleep -Seconds 3; try { Invoke-WebRequest -Uri http://localhost:3001/learners -UseBasicParsing -TimeoutSec 15 | Select-Object -ExpandProperty StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri http://localhost:3001/learners/ -UseBasicParsing -TimeoutSec 15; $r.StatusCode } catch { $_.Exception.Message })"
+    ]
+  }
+}

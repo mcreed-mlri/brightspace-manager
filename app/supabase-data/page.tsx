@@ -1,14 +1,35 @@
 import { DataBrowser, type BrowserTable } from "@/components/supabase/data-browser";
+import { LiveDataRequiredPanel } from "@/components/live-data-required-panel";
 import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { listLearningItems } from "@/lib/data/learning-items";
+import { isMockDataAllowed, isMockDataDisabledError, MockDataDisabledError } from "@/lib/data/mode";
 import { mockJurisdictions, mockPrograms, mockTags } from "@/lib/fixtures/supabase-tables";
 
 export const dynamic = "force-dynamic";
 
 export default async function SupabaseDataPage() {
-  const items = await listLearningItems();
+  let items: Awaited<ReturnType<typeof listLearningItems>>;
+  try {
+    items = await listLearningItems();
+    if (!isMockDataAllowed()) {
+      throw new MockDataDisabledError("Supabase reference table previews");
+    }
+  } catch (error) {
+    if (!isMockDataDisabledError(error)) throw error;
+    return (
+      <>
+        <PageHeader
+          eyebrow="Infrastructure · Supabase"
+          title="Supabase Data"
+          description="Read-only inspector for the Supabase cache layer. Search, sort, open a row for full detail, or export the current view to CSV."
+          actions={<StatusBadge tone="info">Read-only</StatusBadge>}
+        />
+        <LiveDataRequiredPanel message={error.message} />
+      </>
+    );
+  }
 
   const tables: BrowserTable[] = [
     {

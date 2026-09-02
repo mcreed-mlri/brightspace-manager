@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { LiveDataRequiredPanel } from "@/components/live-data-required-panel";
 import { MockDataBanner } from "@/components/mock-data-banner";
 import { StatusBadge, type BadgeTone } from "@/components/status-badge";
 import { listCourseOfferings } from "@/lib/data/courses";
 import { checkBrightspaceHealth, checkSupabaseHealth } from "@/lib/data/health";
+import { isMockDataDisabledError } from "@/lib/data/mode";
 import { getSyncStatus } from "@/lib/data/sync";
 import { missingMetadata, type CourseOffering, type HealthStatus } from "@/types/domain";
 import { formatRelative } from "@/components/courses/course-presentation";
@@ -94,12 +96,39 @@ function countRecentlyUpdated(courses: CourseOffering[]): number {
 }
 
 export default async function OperatorDashboardPage() {
-  const [coursesResult, syncResult, bsHealth, sbHealth] = await Promise.all([
-    listCourseOfferings(),
-    getSyncStatus(),
-    checkBrightspaceHealth(),
-    checkSupabaseHealth(),
-  ]);
+  let coursesResult: Awaited<ReturnType<typeof listCourseOfferings>>;
+  let syncResult: Awaited<ReturnType<typeof getSyncStatus>>;
+  const [bsHealth, sbHealth] = await Promise.all([checkBrightspaceHealth(), checkSupabaseHealth()]);
+  try {
+    [coursesResult, syncResult] = await Promise.all([listCourseOfferings(), getSyncStatus()]);
+  } catch (error) {
+    if (!isMockDataDisabledError(error)) throw error;
+    return (
+      <div className="fade-up">
+        <div className="mb-[30px] flex flex-wrap items-end justify-between gap-6">
+          <div className="min-w-0">
+            <p className="eyebrow mb-2.5 tracking-[0.14em]">Operations console</p>
+            <h1 className="font-display text-[46px] font-bold leading-none tracking-[-0.03em] text-ink">
+              Dashboard
+            </h1>
+          </div>
+          <div className="flex shrink-0 gap-2.5">
+            <ConnectionChip
+              name="Brightspace"
+              meta={formatRelative(bsHealth.checkedAt)}
+              tone={HEALTH_TONE[bsHealth.status]}
+            />
+            <ConnectionChip
+              name="Supabase"
+              meta={formatRelative(sbHealth.checkedAt)}
+              tone={HEALTH_TONE[sbHealth.status]}
+            />
+          </div>
+        </div>
+        <LiveDataRequiredPanel message={error.message} />
+      </div>
+    );
+  }
 
   const courses = coursesResult.data;
   const sync = syncResult.data;

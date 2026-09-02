@@ -131,7 +131,7 @@ async function fetchLiveCourseOfferings(): Promise<CourseOffering[]> {
 
 export async function listCourseOfferings(): Promise<DataResult<CourseOffering[]>> {
   if (!isBrightspaceLive()) {
-    return mockResult(mockCourseOfferings);
+    return mockResult(mockCourseOfferings, "Course Inventory");
   }
 
   try {
@@ -140,7 +140,7 @@ export async function listCourseOfferings(): Promise<DataResult<CourseOffering[]
     /* Surface the failure in server logs; the UI falls back to mock with the
        banner visible, and Settings' health check shows the real error. */
     console.error("[brightspace] live course listing failed:", error);
-    return mockResult(mockCourseOfferings);
+    return mockResult(mockCourseOfferings, "Course Inventory");
   }
 }
 

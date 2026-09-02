@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
 import { deleteDraft, readDraft, writeDraft } from "@/lib/studio/drafts";
+import { validateCourseDraft } from "@/lib/studio/validate-draft";
 import type { ApiResponse } from "@/types/api";
 import type { CourseDraft } from "@/types/studio";
 
@@ -43,11 +44,30 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json(body, { status: 404 });
   }
 
+  let incoming: unknown;
   try {
-    const incoming = (await request.json()) as CourseDraft;
+    incoming = await request.json();
+  } catch {
+    const body: ApiResponse<never> = {
+      ok: false,
+      error: { message: "Invalid JSON payload.", status: 400 },
+    };
+    return NextResponse.json(body, { status: 400 });
+  }
+
+  const validated = validateCourseDraft(incoming);
+  if (!validated.ok) {
+    const body: ApiResponse<never> = {
+      ok: false,
+      error: { message: validated.message, status: 400 },
+    };
+    return NextResponse.json(body, { status: 400 });
+  }
+
+  try {
     /* id and createdAt are server-owned. */
     const saved = await writeDraft(
-      { ...incoming, id: existing.id, createdAt: existing.createdAt },
+      { ...validated.draft, id: existing.id, createdAt: existing.createdAt },
       auth.user?.email,
     );
     const body: ApiResponse<CourseDraft> = {

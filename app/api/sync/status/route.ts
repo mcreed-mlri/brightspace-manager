@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { liveDataRequiredApiResponse } from "@/lib/data/api-errors";
 import { getSyncStatus } from "@/lib/data/sync";
 import type { ApiResponse } from "@/types/api";
 import type { SyncStatus } from "@/types/domain";
@@ -18,7 +19,9 @@ export async function GET() {
       fetchedAt: result.fetchedAt,
     };
     return NextResponse.json(body);
-  } catch {
+  } catch (error) {
+    const liveRequired = liveDataRequiredApiResponse(error);
+    if (liveRequired) return liveRequired;
     const body: ApiResponse<never> = {
       ok: false,
       error: { message: "Failed to compute sync status.", status: 500 },

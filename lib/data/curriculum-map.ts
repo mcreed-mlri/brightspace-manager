@@ -7,14 +7,14 @@ import type { CurriculumMap, DataResult } from "@/types/domain";
 
 /* The whole map lives in one `curriculum_map` row (id = 'default'). Reads go
    through the service-role client, mirroring lib/data/learning-items.ts:
-   live when Supabase is configured and the row exists, otherwise the bundled
-   starter map so the page always renders. */
+  live when Supabase is configured and the row exists, otherwise the bundled
+  starter map so the page always renders. */
 
 const ROW_ID = "default";
 
 export async function getCurriculumMap(): Promise<DataResult<CurriculumMap>> {
   if (!isSupabaseConfigured()) {
-    return mockResult(mockCurriculumMap);
+    return mockResult(mockCurriculumMap, "Curriculum Map");
   }
 
   try {
@@ -27,10 +27,10 @@ export async function getCurriculumMap(): Promise<DataResult<CurriculumMap>> {
 
     /* No row yet (first run) or a query error → fall back to the starter map.
        The first Save writes it, after which this returns live. */
-    if (error || !data?.data) return mockResult(mockCurriculumMap);
+    if (error || !data?.data) return mockResult(mockCurriculumMap, "Curriculum Map");
     return liveResult(data.data as CurriculumMap);
   } catch {
-    return mockResult(mockCurriculumMap);
+    return mockResult(mockCurriculumMap, "Curriculum Map");
   }
 }
 

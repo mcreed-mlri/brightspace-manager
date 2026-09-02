@@ -8,5 +8,5 @@ import type { DataResult, EvaluationReport } from "@/types/domain";
    returns mock data until Brightspace progress and hub feedback are connected
    into a live reporting rollup. */
 export async function getEvaluationReport(): Promise<DataResult<EvaluationReport>> {
-  return mockResult(mockEvaluationReport);
+  return mockResult(mockEvaluationReport, "Evaluation Framework");
 }

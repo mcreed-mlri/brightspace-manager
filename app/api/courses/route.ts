@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { liveDataRequiredApiResponse } from "@/lib/data/api-errors";
 import { listCourseOfferings } from "@/lib/data/courses";
 import type { ApiResponse } from "@/types/api";
 import type { CourseOffering } from "@/types/domain";
@@ -39,7 +40,9 @@ export async function GET(request: NextRequest) {
       fetchedAt: result.fetchedAt,
     };
     return NextResponse.json(body);
-  } catch {
+  } catch (error) {
+    const liveRequired = liveDataRequiredApiResponse(error);
+    if (liveRequired) return liveRequired;
     const body: ApiResponse<never> = {
       ok: false,
       error: { message: "Failed to list course offerings.", status: 500 },

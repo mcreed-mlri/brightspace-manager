@@ -227,5 +227,5 @@ function buildReport(): LearnerProgressReport {
    completion reads (or a Supabase rollup) replace the fixture here, returning
    liveResult, once the enrollment data is available. */
 export async function getLearnerProgress(): Promise<DataResult<LearnerProgressReport>> {
-  return mockResult(buildReport());
+  return mockResult(buildReport(), "Learner Progress");
 }

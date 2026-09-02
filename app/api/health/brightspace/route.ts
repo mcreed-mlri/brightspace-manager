@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireUser } from "@/lib/auth/server";
+import { isMockDataAllowed } from "@/lib/data/mode";
 import { checkBrightspaceHealth } from "@/lib/data/health";
 import type { ApiResponse } from "@/types/api";
 import type { HealthStatus } from "@/types/domain";
@@ -14,7 +15,7 @@ export async function GET() {
     const body: ApiResponse<HealthStatus> = {
       ok: true,
       data: health,
-      source: health.status === "ok" ? "live" : "mock",
+      source: health.status === "ok" || !isMockDataAllowed() ? "live" : "mock",
       fetchedAt: health.checkedAt,
     };
     return NextResponse.json(body);

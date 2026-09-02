@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { LiveDataRequiredPanel } from "@/components/live-data-required-panel";
 import { MetricCard } from "@/components/metric-card";
 import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge, type BadgeTone } from "@/components/status-badge";
 import { getEvaluationReport } from "@/lib/data/evaluation";
+import { isMockDataDisabledError } from "@/lib/data/mode";
 import type {
   EvaluationCourseSignal,
   EvaluationMetricReadiness,
@@ -197,7 +199,22 @@ function Legend({ color, label }: { color: string; label: string }) {
 }
 
 export default async function EvaluationPage() {
-  const result = await getEvaluationReport();
+  let result: Awaited<ReturnType<typeof getEvaluationReport>>;
+  try {
+    result = await getEvaluationReport();
+  } catch (error) {
+    if (!isMockDataDisabledError(error)) throw error;
+    return (
+      <div className="fade-up">
+        <PageHeader
+          eyebrow="Operator / Evaluation"
+          title="Evaluation Framework"
+          description="Pilot reporting will appear here once live progress, feedback, and survey rollups are connected."
+        />
+        <LiveDataRequiredPanel message={error.message} />
+      </div>
+    );
+  }
   const report = result.data;
   const isMock = result.source === "mock";
 

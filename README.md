@@ -37,10 +37,16 @@ No write actions exist in this milestone. Future cleanup follows MLRI governance
 
 ## Mock mode
 
-With no credentials configured the app runs entirely on realistic mock fixtures
-(`lib/fixtures/`) and every page shows an amber **"Showing mock data"** banner. Every data
-function returns a `DataResult<T>` envelope whose `source: "mock" | "live"` field powers that
-banner — fixtures can never silently masquerade as live data.
+By default the app runs in `APP_DATA_MODE=hybrid`: live data when configured,
+realistic mock fixtures (`lib/fixtures/`) otherwise, always with an amber
+**"Showing mock data"** banner. Every data function returns a `DataResult<T>`
+envelope whose `source: "mock" | "live"` field powers that banner — fixtures
+can never silently masquerade as live data.
+
+For the pilot, set `APP_DATA_MODE=live_required`. Fixture fallbacks are then
+disabled across the app; screens without a live source show a clear
+**Live data required** state instead of rendering demo data. Use
+`APP_DATA_MODE=mock` only for deliberate demo work.
 
 ## Running it
 
@@ -52,8 +58,11 @@ npm run typecheck
 npm run build && npm run start
 ```
 
-Node is not on the global PATH on this machine; the learning-hub repo bundles a portable
-runtime at `C:\dev\learning-hub\tools\node-v24.15.0-win-x64` — prepend it to PATH first.
+Node/npm now work normally on this machine. If you are on another Windows
+machine where npm is unavailable or blocked by policy, the learning-hub repo
+keeps a portable runtime at
+`C:\dev\LACE\learning-hub\tools\node-v24.15.0-win-x64`; prepend that folder to
+`PATH` before running the commands above.
 
 ## Going live later
 

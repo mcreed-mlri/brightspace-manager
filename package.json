@@ -11,6 +11,8 @@
     "build": "next build --webpack",
     "start": "next start -p 3001",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
@@ -35,6 +37,7 @@
     "postcss": "^8.5.15",
     "prettier": "^3.8.4",
     "tailwindcss": "3.4.17",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "^4.1.11"
   }
 }
