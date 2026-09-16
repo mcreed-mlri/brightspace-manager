@@ -23,9 +23,7 @@ import type {
 } from "@/types/domain";
 
 type Selection =
-  | { type: "course"; orgUnitId: number }
-  | { type: "learner"; learnerId: string }
-  | null;
+  { type: "course"; orgUnitId: number } | { type: "learner"; learnerId: string } | null;
 
 const ROLE_OPTIONS: LearnerRole[] = ["attorney", "advocate", "paralegal", "support"];
 const STATUS_OPTIONS: LearnerStatus[] = ["completed", "in-progress", "not-started"];

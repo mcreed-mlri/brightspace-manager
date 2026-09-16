@@ -7,13 +7,7 @@ import type { ContentBlockType, TopicDraft, TopicFamily } from "@/types/studio";
    "removing" clears it — the export pipeline stays untouched. */
 
 export type SectionType =
-  | "scene"
-  | "rule"
-  | "changed"
-  | "media"
-  | "interactive"
-  | "tryit"
-  | "remember";
+  "scene" | "rule" | "changed" | "media" | "interactive" | "tryit" | "remember";
 
 /* Canonical render/export order — sections always appear in this order
    regardless of the order they were added. The interactive band sits after

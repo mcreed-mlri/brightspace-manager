@@ -62,8 +62,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 }
 
 export type AuthCheck =
-  | { ok: true; user: SessionUser | null }
-  | { ok: false; response: NextResponse<ApiErr> };
+  { ok: true; user: SessionUser | null } | { ok: false; response: NextResponse<ApiErr> };
 
 function authError(message: string, status: number): AuthCheck {
   const body: ApiErr = {

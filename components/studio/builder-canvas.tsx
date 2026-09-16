@@ -668,8 +668,7 @@ function MediaRow({
         body: form,
       });
       const body = (await response.json()) as
-        | { ok: true; data: { filename: string } }
-        | { ok: false; error: { message: string } };
+        { ok: true; data: { filename: string } } | { ok: false; error: { message: string } };
       if (body.ok) {
         setThumbBroken(false);
         onChange((m) => void (m.filename = body.data.filename));
