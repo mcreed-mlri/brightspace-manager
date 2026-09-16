@@ -2,14 +2,13 @@ import type { EvaluationReport } from "@/types/domain";
 
 export const mockEvaluationReport: EvaluationReport = {
   generatedAt: new Date().toISOString(),
-  pilotWindow: "Oct 2026 pilot readout",
-  thesis:
-    "LACE is working when busy legal aid staff can reach the right training, finish it quickly, and report that it made practice easier.",
+  pilotWindow: "Oct 2026 pilot snapshot",
+  thesis: "Pilot reach, completion, usefulness, and course risk across LACE learning programs.",
   kpis: [
     {
       label: "Reach",
       value: "342",
-      sub: "distinct learners reached in pilot courses",
+      sub: "distinct learners in pilot courses",
       trend: "up",
     },
     {
@@ -21,7 +20,7 @@ export const mockEvaluationReport: EvaluationReport = {
     {
       label: "Median fit",
       value: "11d",
-      sub: "median enrollment to completion",
+      sub: "median enrollment-to-completion",
       trend: "flat",
     },
     {
@@ -130,19 +129,19 @@ export const mockEvaluationReport: EvaluationReport = {
       metric: "Reach and enrollment",
       source: "Brightspace classlist",
       status: "partial",
-      note: "Mocked now; Brightspace reader is planned for live enrollment.",
+      note: "Enrollment signal is available for pilot reporting; live reader is next.",
     },
     {
       metric: "Completion and time to finish",
       source: "Brightspace user progress",
       status: "partial",
-      note: "Definition is in place; live completion import still needed.",
+      note: "Completion definition is aligned; automated import is next.",
     },
     {
       metric: "Usefulness rating",
       source: "Learning Hub feedback",
       status: "ready",
-      note: "Fits existing feedback shape and can roll up by course.",
+      note: "Feedback can roll up by course and segment.",
     },
     {
       metric: "Confidence delta",
@@ -154,7 +153,7 @@ export const mockEvaluationReport: EvaluationReport = {
       metric: "Abandonment reasons",
       source: "Stalled-course nudge",
       status: "partial",
-      note: "Mock categories are represented; live capture is next.",
+      note: "Reason categories are defined; live capture is next.",
     },
   ],
 };

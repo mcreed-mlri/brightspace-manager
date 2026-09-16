@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { LiveDataRequiredPanel } from "@/components/live-data-required-panel";
 import { MetricCard } from "@/components/metric-card";
-import { MockDataBanner } from "@/components/mock-data-banner";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge, type BadgeTone } from "@/components/status-badge";
 import { getEvaluationReport } from "@/lib/data/evaluation";
@@ -27,6 +26,45 @@ const READINESS_TONE: Record<EvaluationMetricReadiness["status"], BadgeTone> = {
   planned: "neutral",
 };
 
+function formatGeneratedAt(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function SourceStatusStrip({
+  pilotWindow,
+  generatedAt,
+  isMock,
+}: {
+  pilotWindow: string;
+  generatedAt: string;
+  isMock: boolean;
+}) {
+  const cells = [
+    { label: "Pilot snapshot", value: pilotWindow },
+    { label: "Data source", value: isMock ? "Illustrative pilot data" : "Live rollup" },
+    { label: "Last generated", value: formatGeneratedAt(generatedAt) },
+    { label: "Sources", value: "Brightspace + Hub feedback + survey" },
+  ];
+
+  return (
+    <section className="mb-6 grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
+      {cells.map((cell) => (
+        <div key={cell.label} className="bg-surface px-4 py-3">
+          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.07em] text-ink-soft">
+            {cell.label}
+          </p>
+          <p className="mt-1.5 truncate text-sm font-semibold text-ink">{cell.value}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function TrendChart({ points }: { points: EvaluationTrendPoint[] }) {
   const maxReach = Math.max(...points.map((p) => p.reach));
 
@@ -34,9 +72,9 @@ function TrendChart({ points }: { points: EvaluationTrendPoint[] }) {
     <section className="editorial-card px-5 py-5">
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <h2 className="section-title text-ink">Pilot trend</h2>
+          <h2 className="section-title text-ink">Monthly performance</h2>
           <p className="mt-1 text-[12.5px] text-ink-muted">
-            Reach, completion, usefulness, and confidence are the framework spine.
+            Reach, completion, usefulness, and confidence movement across the pilot.
           </p>
         </div>
         <span className="font-mono text-[10.5px] uppercase tracking-[0.07em] text-ink-soft">
@@ -87,9 +125,9 @@ function TrendChart({ points }: { points: EvaluationTrendPoint[] }) {
 function SegmentPanel({ segments }: { segments: EvaluationSegment[] }) {
   return (
     <section className="editorial-card px-5 py-5">
-      <h2 className="section-title text-ink">Equity by role</h2>
+      <h2 className="section-title text-ink">Role segment performance</h2>
       <p className="mt-1 text-[12.5px] text-ink-muted">
-        The framework keeps averages honest by segmenting role groups.
+        Completion and usefulness by learner role.
       </p>
       <div className="mt-5 space-y-4">
         {segments.map((segment) => (
@@ -118,13 +156,13 @@ function CourseSignalPanel({ courses }: { courses: EvaluationCourseSignal[] }) {
     <section className="editorial-card px-5 py-5">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="section-title text-ink">Course effectiveness signals</h2>
+          <h2 className="section-title text-ink">Course risk queue</h2>
           <p className="mt-1 text-[12.5px] text-ink-muted">
-            Completion and usefulness together show where to invest.
+            Courses ranked by completion pace, usefulness, and learner reach.
           </p>
         </div>
         <span className="font-mono text-[10.5px] uppercase tracking-[0.07em] text-ink-soft">
-          mock rollup
+          active rollup
         </span>
       </div>
 
@@ -167,9 +205,9 @@ function ReadinessTable({ rows }: { rows: EvaluationMetricReadiness[] }) {
   return (
     <section className="editorial-card overflow-hidden">
       <div className="border-b border-line px-5 py-4">
-        <h2 className="section-title text-ink">Metric readiness</h2>
+        <h2 className="section-title text-ink">Data coverage</h2>
         <p className="mt-1 text-[12.5px] text-ink-muted">
-          What is demonstrable now versus what needs live instrumentation.
+          Current signal coverage across Brightspace, hub feedback, and survey inputs.
         </p>
       </div>
       <div className="divide-y divide-line-soft">
@@ -208,7 +246,7 @@ export default async function EvaluationPage() {
       <div className="fade-up">
         <PageHeader
           eyebrow="Operator / Evaluation"
-          title="Evaluation Framework"
+          title="Evaluation"
           description="Pilot reporting will appear here once live progress, feedback, and survey rollups are connected."
         />
         <LiveDataRequiredPanel message={error.message} />
@@ -222,21 +260,15 @@ export default async function EvaluationPage() {
     <div className="fade-up">
       <PageHeader
         eyebrow="Operator / Evaluation"
-        title="Evaluation Framework"
-        description={report.thesis}
+        title="Evaluation"
+        description="Track pilot reach, completion, usefulness, and course risk across LACE learning programs."
       />
 
-      {isMock ? <MockDataBanner /> : null}
-
-      <section className="mb-6 rounded-[14px] border border-[var(--accent-tint)] bg-brand-tint px-5 py-4">
-        <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-accent-ink">
-          {report.pilotWindow}
-        </p>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
-          This mock readout demonstrates the metrics framework before live Brightspace progress, hub
-          feedback, and survey rollups are connected.
-        </p>
-      </section>
+      <SourceStatusStrip
+        pilotWindow={report.pilotWindow}
+        generatedAt={report.generatedAt}
+        isMock={isMock}
+      />
 
       <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {report.kpis.map((kpi) => (

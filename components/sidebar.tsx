@@ -89,7 +89,7 @@ const OPERATOR_NAV: NavGroup[] = [
       { label: "Course Inventory", href: "/courses/", dot: "var(--cat-blue)" },
       { label: "Sync Diagnostics", href: "/sync/", dot: "var(--cat-amber)" },
       { label: "Integrity Checker", href: "/integrity/", dot: "var(--cat-teal)" },
-      { label: "Evaluation Framework", href: "/evaluation/", dot: "var(--cat-pink)" },
+      { label: "Evaluation", href: "/evaluation/", dot: "var(--cat-pink)" },
       { label: "Learner Progress", href: "/learners/", dot: "var(--cat-green)" },
     ],
   },
