@@ -48,7 +48,7 @@ export function SessionBadge() {
 
   return (
     <div className="flex items-center gap-2.5 border-t border-line px-3.5 py-3">
-      <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-accent text-[11px] font-bold text-white">
+      <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-brand-fill text-[11px] font-bold text-white">
         {initials(email)}
       </span>
       <span className="min-w-0 flex-1">

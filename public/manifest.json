@@ -4,8 +4,8 @@
   "description": "Internal admin console for the LACE learning platform.",
   "display": "standalone",
   "start_url": "/dashboard/",
-  "background_color": "#f5f6f8",
-  "theme_color": "#14161b",
+  "background_color": "#fbf7f0",
+  "theme_color": "#fbf7f0",
   "icons": [
     {
       "src": "/icon.svg",

@@ -1,46 +1,33 @@
-"use client";
-
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { IconScales } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-provider";
 
-/* Top bar — cool direction. 60px, surface, hairline bottom border. Left: a
-   mono breadcrumb derived from the route (e.g. "operator / dashboard"). Right:
-   the global theme toggle. Page-specific primary actions live in each page's
-   own header. Hidden on the full-screen builder route, which owns its own
-   header. */
-
-const SECTION: Record<string, { mode: "author" | "operator" | "lace"; label: string }> = {
-  dashboard: { mode: "operator", label: "dashboard" },
-  author: { mode: "author", label: "home" },
-  courses: { mode: "operator", label: "course inventory" },
-  sync: { mode: "operator", label: "sync diagnostics" },
-  integrity: { mode: "operator", label: "integrity checker" },
-  evaluation: { mode: "operator", label: "evaluation framework" },
-  learners: { mode: "operator", label: "learner progress" },
-  files: { mode: "operator", label: "brightspace files" },
-  "supabase-data": { mode: "operator", label: "supabase data" },
-  settings: { mode: "operator", label: "settings" },
-  "course-studio": { mode: "author", label: "course studio" },
-  publish: { mode: "author", label: "publish workflow" },
-  "hub-listing": { mode: "author", label: "learning hub listing" },
-  "sign-in": { mode: "lace", label: "sign in" },
-};
-
-function breadcrumb(pathname: string) {
-  const first = pathname.split("/").filter(Boolean)[0] ?? "";
-  const entry = SECTION[first] ?? { mode: "lace" as const, label: first || "home" };
-  return `${entry.mode} / ${entry.label}`;
-}
+const trainingHubUrl = process.env.NEXT_PUBLIC_TRAINING_HUB_URL;
 
 export function TopBar() {
-  const pathname = usePathname();
-
   return (
-    <header className="flex h-[52px] shrink-0 items-center gap-3.5 border-b border-line bg-surface px-4 md:h-[60px] md:px-7">
-      <span className="min-w-0 truncate font-mono text-[11px] tracking-[0.04em] text-ink-soft">
-        {breadcrumb(pathname)}
-      </span>
-      <div className="ml-auto flex items-center gap-2.5">
+    <header className="flex min-h-[60px] shrink-0 items-center justify-between gap-3 border-b border-line bg-paper px-4 sm:px-6 lg:min-h-[68px]">
+      <Link
+        href="/dashboard/"
+        className="inline-flex min-w-0 items-center gap-2.5 rounded-lg text-[15px] font-bold leading-tight tracking-[-0.02em] sm:text-[17px]"
+      >
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink text-paper">
+          <IconScales size={18} />
+        </span>
+        <span>Brightspace Manager</span>
+      </Link>
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        {trainingHubUrl ? (
+          <a
+            href={trainingHubUrl}
+            className="inline-flex min-h-11 items-center rounded-lg px-2 text-[13px] font-semibold text-accent-ink hover:bg-surface-sunken sm:px-3"
+          >
+            Training Hub{" "}
+            <span className="ml-1" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        ) : null}
         <ThemeToggle />
       </div>
     </header>

@@ -2,11 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
-/* Dual theme per the cool design direction. Dark is the default; a saved
-   'light' choice is applied before first paint by the inline script in
-   layout.tsx (no flash). This provider keeps React in sync with that choice
-   and persists changes to localStorage ('bm-theme'). */
-
 type Theme = "dark" | "light";
 
 type ThemeContextValue = {
@@ -18,19 +13,14 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  if (theme === "light") root.setAttribute("data-theme", "light");
-  else root.removeAttribute("data-theme");
+  document.documentElement.dataset.theme = theme;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Start from whatever the pre-paint script applied so the first render
-  // matches the DOM (dark default).
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("bm-theme");
-    if (saved === "light" || saved === "dark") setThemeState(saved);
+    setThemeState(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   }, []);
 
   const setTheme = useCallback((next: Theme) => {
@@ -70,7 +60,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       onClick={toggleTheme}
       title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className={`grid h-9 w-9 place-items-center rounded-[10px] border border-line bg-surface text-ink-muted transition-colors hover:text-ink ${className}`}
+      className={`grid h-11 w-11 md:h-9 md:w-9 place-items-center rounded-[10px] border border-line bg-transparent hover:bg-surface-sunken text-ink-muted transition-colors hover:text-ink ${className}`}
     >
       {theme === "dark" ? (
         <svg

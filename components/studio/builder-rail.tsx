@@ -108,7 +108,7 @@ export function BuilderRail({
                     aria-current={active ? "page" : undefined}
                     className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] font-mono text-[11px] font-semibold transition-colors ${
                       active
-                        ? "bg-accent text-white"
+                        ? "bg-brand-fill text-white"
                         : "bg-surface-sunken text-ink-soft hover:bg-[var(--accent-tint)] hover:text-accent"
                     }`}
                   >
@@ -260,7 +260,7 @@ function LessonRow({
       >
         <span
           className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] font-mono text-[11px] font-semibold ${
-            active ? "bg-accent text-white" : "bg-surface-sunken text-ink-soft"
+            active ? "bg-brand-fill text-white" : "bg-surface-sunken text-ink-soft"
           }`}
         >
           {index + 1}

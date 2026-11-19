@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SessionBadge } from "@/components/auth/session-badge";
-import { IconScales } from "@/components/icons";
 
 const MODE_STORAGE_KEY = "bm-mode";
 const MODE_VERSION_KEY = "bm-mode-version";
@@ -112,7 +111,7 @@ function routeMode(pathname: string): NavMode | null {
 
 function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMode) => void }) {
   return (
-    <div className="px-3 pb-2 pt-0.5">
+    <div className="px-4 pb-2 pt-3">
       <div className="flex gap-[3px] rounded-[9px] border border-line bg-surface-sunken p-[3px]">
         {(["operator", "author"] as const).map((value) => {
           const active = mode === value;
@@ -120,11 +119,10 @@ function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMod
             <button
               key={value}
               type="button"
+              aria-pressed={active}
               onClick={() => onChange(value)}
-              className={`flex-1 rounded-[7px] py-[7px] text-[12px] font-semibold capitalize transition-colors ${
-                active
-                  ? "bg-accent text-white shadow-[0_2px_8px_var(--accent-glow)]"
-                  : "bg-transparent text-ink-soft hover:text-ink-muted"
+              className={`flex-1 rounded-[7px] min-h-9 px-3 text-[12px] font-semibold capitalize transition-colors ${
+                active ? "bg-ink text-paper" : "bg-transparent text-ink-soft hover:text-ink-muted"
               }`}
             >
               {value}
@@ -138,7 +136,7 @@ function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMod
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(href);
+  return pathname.replace(/\/$/, "") === href.slice(0, -1) || pathname.startsWith(href);
 }
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {
@@ -147,10 +145,10 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-[13px] transition-colors duration-100 ${
+        className={`flex w-full items-center gap-2.5 rounded-[9px] px-[11px] py-[9px] text-[13px] transition-colors duration-100 ${
           active
-            ? "bg-[var(--accent-tint)] font-semibold text-ink"
-            : "font-medium text-ink-muted hover:bg-sb-hover hover:text-ink"
+            ? "bg-surface-sunken font-semibold text-ink"
+            : "font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
         }`}
       >
         <span
@@ -167,7 +165,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   );
 }
 
-export function Sidebar({ hidden = false }: { hidden?: boolean }) {
+export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const forcedMode = routeMode(pathname);
@@ -203,31 +201,17 @@ export function Sidebar({ hidden = false }: { hidden?: boolean }) {
   const navGroups = mode === "author" ? AUTHOR_NAV : OPERATOR_NAV;
 
   return (
-    <aside
-      className={`flex shrink-0 flex-col overflow-hidden border-b border-line bg-surface transition-[width,opacity] duration-200 ease-in-out md:border-b-0 md:border-r ${
-        hidden
-          ? "pointer-events-none h-0 opacity-0 md:h-auto md:w-0"
-          : "max-h-[198px] w-full md:max-h-none md:w-[236px]"
-      }`}
-      aria-hidden={hidden}
-    >
-      <div className="flex items-center gap-2.5 px-4 pb-3 pt-3 md:pb-4 md:pt-[18px]">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink text-surface">
-          <IconScales size={17} />
-        </span>
-        <span className="font-display text-[17px] font-bold tracking-[-0.02em] text-ink">LACE</span>
-      </div>
-
+    <aside className="flex w-full shrink-0 flex-col overflow-hidden border-b border-line bg-surface md:w-[248px] md:border-b-0 md:border-r">
       <ModeToggle mode={mode} onChange={switchMode} />
 
       <nav
-        className="flex gap-2 overflow-x-auto px-[11px] pb-2 pt-1 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto md:pb-1.5"
+        className="flex gap-2 overflow-x-auto px-4 pb-3 pt-1 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto md:pb-3"
         aria-label="Main navigation"
       >
         {navGroups.map((group) => (
           <div key={group.label ?? "top"} className="mb-1.5 shrink-0">
             {group.label ? (
-              <p className="hidden px-2 pb-1.5 pt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] text-ink-soft md:block">
+              <p className="hidden px-2 pb-1.5 pt-3 text-[10px] font-semibold uppercase tracking-[0.06em] text-ink-soft md:block">
                 {group.label}
               </p>
             ) : null}
