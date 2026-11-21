@@ -39,8 +39,8 @@ export function ConfirmDialog({
 
   const confirmClass =
     tone === "danger"
-      ? "bg-status-error text-white hover:opacity-[0.9]"
-      : "bg-brand-fill text-white hover:opacity-[0.88]";
+      ? "bg-status-error text-[var(--status-error-on)] hover:opacity-[0.9]"
+      : "bg-[var(--solid-bg)] text-[var(--solid-ink)] hover:opacity-[0.88]";
 
   return (
     <div

@@ -80,7 +80,7 @@ const AUTHOR_NAV: NavGroup[] = [
 const OPERATOR_NAV: NavGroup[] = [
   {
     label: null,
-    items: [{ label: "Dashboard", href: "/dashboard/", dot: "var(--accent)" }],
+    items: [{ label: "Dashboard", href: "/dashboard/", dot: "var(--brand)" }],
   },
   {
     label: "Monitor",
@@ -112,7 +112,7 @@ function routeMode(pathname: string): NavMode | null {
 function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMode) => void }) {
   return (
     <div className="px-4 pb-2 pt-3">
-      <div className="flex gap-[3px] rounded-[9px] border border-line bg-surface-sunken p-[3px]">
+      <div className="flex gap-1 rounded-full border-[1.5px] border-[var(--ink)] p-1">
         {(["operator", "author"] as const).map((value) => {
           const active = mode === value;
           return (
@@ -121,8 +121,10 @@ function ModeToggle({ mode, onChange }: { mode: NavMode; onChange: (mode: NavMod
               type="button"
               aria-pressed={active}
               onClick={() => onChange(value)}
-              className={`flex-1 rounded-[7px] min-h-9 px-3 text-[12px] font-semibold capitalize transition-colors ${
-                active ? "bg-ink text-paper" : "bg-transparent text-ink-soft hover:text-ink-muted"
+              className={`min-h-9 flex-1 rounded-full px-3 text-[12.5px] font-semibold capitalize transition-colors ${
+                active
+                  ? "is-selected"
+                  : "text-ink-muted hover:bg-[var(--hover-wash)] hover:text-ink"
               }`}
             >
               {value}
@@ -145,15 +147,13 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex w-full items-center gap-2.5 rounded-[9px] px-[11px] py-[9px] text-[13px] transition-colors duration-100 ${
-          active
-            ? "bg-surface-sunken font-semibold text-ink"
-            : "font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
+        className={`nav-link flex w-full items-center gap-2.5 whitespace-nowrap rounded-[var(--radius-control)] px-3 py-[9px] text-[13px] transition-colors duration-100 ${
+          active ? "nav-link-active font-semibold" : "font-medium text-ink-muted hover:text-ink"
         }`}
       >
         <span
-          className="h-1.5 w-1.5 shrink-0 rounded-[2px]"
-          style={{ background: active ? "var(--accent)" : item.dot }}
+          className="h-2 w-2 shrink-0 rounded-full"
+          style={{ background: item.dot }}
           aria-hidden
         />
         <span className="flex-1 truncate text-left">{item.label}</span>
