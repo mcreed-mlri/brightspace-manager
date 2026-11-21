@@ -21,10 +21,11 @@ import {
 /* Narrow a ContentBlock to a specific variant by its `type` tag. */
 type BlockOf<K extends ContentBlockType> = Extract<ContentBlock, { type: K }>;
 
-/* Canvas (cool direction) — the lesson IS the editor. Accent eyebrow, a 38px
-   Space Grotesk title, the hook line, a bordered controls strip (Type pills +
-   Length stepper + Flag), then the content blocks. Each block is introduced by
-   an S-marker row — [accent mono "S1"] · hairline · [ink-soft UPPERCASE label]
+/* Canvas — the lesson IS the editor, in the Training Hub's look. A rule and
+   eyebrow in the course's topic colour, a heavy tight title, the hook line, a
+   controls strip (Type pills + Length stepper + Flag), then the content
+   blocks. Each block is introduced by an S-marker row — [ink "S1"] ·
+   hairline · [sentence-case label]
    — the same marker the learner-facing reader uses, tying authoring to output.
    Every section maps 1:1 onto the existing TopicDraft fields, so the export
    pipeline is untouched. */
@@ -41,10 +42,10 @@ const SECTION_LABEL: Record<SectionType, string> = {
 
 const blockTextareaClass =
   "w-full resize-y border-none bg-transparent text-[15px] leading-[1.65] text-ink outline-none placeholder:text-ink-soft";
+/* The Hub's form field: white, rounded, a 1.5px control-strength edge. */
 const fieldClass =
-  "w-full rounded-[9px] border border-line bg-paper px-3 py-[9px] text-[13.5px] text-ink outline-none transition-colors focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-tint)]";
-const monoLabelClass =
-  "mb-1.5 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft";
+  "w-full rounded-[10px] border-[1.5px] border-[var(--line-control)] bg-surface-raised px-3 py-[9px] text-[14px] text-ink outline-none transition-colors focus:border-ink";
+const monoLabelClass = "mb-1.5 block text-[13px] font-semibold text-ink-muted";
 
 export function BuilderCanvas({
   draftId,
@@ -89,7 +90,7 @@ export function BuilderCanvas({
   return (
     <main ref={scrollRef} className="min-w-0 flex-1 overflow-y-auto bg-paper">
       <div className="mx-auto max-w-[680px] px-11 pb-[100px] pt-9">
-        <div className="mb-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.13em] text-accent">
+        <div className="mb-3.5 border-t-4 border-[var(--family)] pt-3 text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--family-ink)]">
           {topic.kind} · Topic {lessonIndex + 1} of {lessonTotal}
         </div>
 
@@ -98,7 +99,7 @@ export function BuilderCanvas({
           onChange={(e) => onTitleChange(e.target.value)}
           aria-label="Lesson title"
           placeholder="Untitled lesson"
-          className="w-full border-none bg-transparent p-0 font-display text-[38px] font-bold leading-[1.08] tracking-[-0.03em] text-ink outline-none placeholder:text-ink-soft"
+          className="w-full border-none bg-transparent p-0 font-display text-[40px] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink outline-none placeholder:text-ink-soft"
         />
         <input
           value={topic.standfirst}
@@ -111,9 +112,7 @@ export function BuilderCanvas({
         {/* controls strip */}
         <div className="my-6 flex flex-wrap items-center gap-x-[18px] gap-y-3 border-y border-line py-[15px]">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
-              Type
-            </span>
+            <span className="text-[13px] font-semibold text-ink-muted">Type</span>
             <div className="flex flex-wrap gap-1.5">
               {TOPIC_KINDS.map((kind) => {
                 const active = topic.kind === kind;
@@ -122,10 +121,10 @@ export function BuilderCanvas({
                     key={kind}
                     type="button"
                     onClick={() => onTopicChange((t) => void (t.kind = kind))}
-                    className={`inline-flex items-center rounded-lg border px-3 py-[5px] text-[12px] font-semibold transition-colors ${
+                    className={`inline-flex min-h-9 items-center rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold transition-colors ${
                       active
-                        ? "border-accent bg-[var(--accent-tint)] text-accent-ink"
-                        : "border-line text-ink-soft hover:text-ink-muted"
+                        ? "is-selected border-ink"
+                        : "border-ink text-ink hover:bg-[var(--hover-wash)]"
                     }`}
                   >
                     {kind}
@@ -136,10 +135,8 @@ export function BuilderCanvas({
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
-              Length
-            </span>
-            <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-surface p-[3px]">
+            <span className="text-[13px] font-semibold text-ink-muted">Length</span>
+            <div className="flex items-center gap-0.5 rounded-full border-[1.5px] border-[var(--line-control)] bg-surface-raised p-[3px]">
               <Stepper label="−" onClick={() => setMinutes(-1)} disabled={topic.minutes <= 1} />
               <span className="min-w-[50px] text-center text-[13px] font-semibold text-ink">
                 {topic.minutes} min
@@ -149,14 +146,12 @@ export function BuilderCanvas({
           </div>
 
           <label className="flex items-center gap-2.5">
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.06em] text-ink-soft">
-              Flag
-            </span>
+            <span className="text-[13px] font-semibold text-ink-muted">Flag</span>
             <select
               value={topic.updated}
               onChange={(e) => onTopicChange((t) => void (t.updated = e.target.value))}
               aria-label="Lesson flag"
-              className="rounded-[8px] border border-line bg-surface px-2.5 py-[5px] font-mono text-[11px] text-ink-muted outline-none focus:border-accent"
+              className="min-h-9 rounded-[10px] border-[1.5px] border-[var(--line-control)] bg-surface-raised px-2.5 text-[13px] font-medium text-ink outline-none focus:border-ink"
             >
               {UPDATED_FLAGS.map((flag) => (
                 <option key={flag} value={flag}>
@@ -180,7 +175,7 @@ export function BuilderCanvas({
             />
           </label>
           <details>
-            <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
+            <summary className="cursor-pointer text-[13px] font-semibold text-ink-muted">
               Advanced
             </summary>
             <label className="mt-2 block">
@@ -243,7 +238,7 @@ function Stepper({
       onClick={onClick}
       disabled={disabled}
       aria-label={label === "+" ? "Add a minute" : "Remove a minute"}
-      className="grid h-[26px] w-[26px] place-items-center rounded-md text-[16px] leading-none text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
+      className="grid h-[26px] w-[26px] place-items-center rounded-full text-[16px] leading-none text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
     >
       {label}
     </button>
@@ -272,11 +267,9 @@ function Block({
   return (
     <div className="section-in" style={{ "--i": marker - 1 } as CSSProperties}>
       <div className="mb-3 flex items-center gap-3">
-        <span className="font-mono text-[12px] font-semibold text-accent">S{marker}</span>
+        <span className="text-[13px] font-bold tabular-nums text-ink">S{marker}</span>
         <span className="h-px flex-1 bg-line" />
-        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink-soft">
-          {SECTION_LABEL[type]}
-        </span>
+        <span className="text-[13px] font-semibold text-ink-soft">{SECTION_LABEL[type]}</span>
         <button
           type="button"
           onClick={onRemove}
@@ -324,7 +317,7 @@ function BlockEditor({
   switch (type) {
     case "scene":
       return (
-        <div className="rounded-[14px] border border-line bg-surface px-[18px] py-4">
+        <div className="rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised px-[18px] py-4">
           <textarea
             rows={4}
             autoFocus={autoFocus}
@@ -338,7 +331,7 @@ function BlockEditor({
 
     case "rule":
       return (
-        <div className="rounded-[14px] border border-line bg-surface px-[18px] py-4">
+        <div className="rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised px-[18px] py-4">
           <textarea
             rows={4}
             autoFocus={autoFocus}
@@ -396,7 +389,7 @@ function BlockEditor({
 
     case "media":
       return (
-        <div className="rounded-[14px] border border-line bg-surface px-[18px] py-4">
+        <div className="rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised px-[18px] py-4">
           <MediaList draftId={draftId} topic={topic} onTopicChange={onTopicChange} />
         </div>
       );
@@ -409,7 +402,7 @@ function BlockEditor({
 
     case "remember":
       return (
-        <div className="rounded-[14px] border border-brand-fill/25 bg-brand-tint px-[18px] py-4">
+        <div className="rounded-[14px] border-[1.5px] border-ink bg-brand-tint px-[18px] py-4">
           <textarea
             rows={3}
             autoFocus={autoFocus}
@@ -435,7 +428,7 @@ function TryItEditor({
   onTopicChange: (fn: (topic: TopicDraft) => void) => void;
 }) {
   return (
-    <div className="rounded-[16px] border border-line bg-surface p-5">
+    <div className="rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised p-5">
       <textarea
         rows={2}
         autoFocus={autoFocus}
@@ -444,17 +437,15 @@ function TryItEditor({
         value={topic.tryIt.question}
         onChange={(e) => onTopicChange((t) => void (t.tryIt.question = e.target.value))}
       />
-      <div className="mb-[9px] mt-3.5 font-mono text-[10px] uppercase tracking-[0.07em] text-ink-soft">
+      <div className="mb-[9px] mt-3.5 text-[13px] font-semibold text-ink-muted">
         Tap the circle by the right answer
       </div>
       <div className="flex flex-col gap-2">
         {topic.tryIt.options.map((option, i) => (
           <div
             key={i}
-            className={`flex items-center gap-[11px] rounded-[11px] border px-[15px] py-3 transition-colors ${
-              option.correct
-                ? "border-accent bg-[var(--accent-tint)]"
-                : "border-line bg-surface-sunken"
+            className={`flex items-center gap-[11px] rounded-[12px] border-[1.5px] px-[15px] py-3 transition-colors ${
+              option.correct ? "border-ink bg-brand-tint" : "border-line-strong bg-surface-raised"
             }`}
           >
             <button
@@ -465,7 +456,7 @@ function TryItEditor({
               aria-label={`Mark option ${i + 1} correct`}
               aria-pressed={option.correct}
               className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-2 transition-colors ${
-                option.correct ? "border-accent bg-accent" : "border-line-strong"
+                option.correct ? "border-ink bg-ink" : "border-[var(--line-control)]"
               }`}
             >
               {option.correct ? (
@@ -474,7 +465,7 @@ function TryItEditor({
                   height="11"
                   viewBox="0 0 12 12"
                   fill="none"
-                  stroke="var(--brand-on)"
+                  stroke="var(--paper)"
                   strokeWidth="2.3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -520,7 +511,7 @@ function TryItEditor({
           onClick={() =>
             onTopicChange((t) => void t.tryIt.options.push({ text: "", correct: false }))
           }
-          className="mt-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
+          className="mt-2.5 text-action text-[13px] font-semibold"
         >
           + Add option
         </button>
@@ -556,7 +547,7 @@ function RuleCallout({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
+        className="mt-3 text-action text-[13px] font-semibold"
       >
         + Add numbered call-out box
       </button>
@@ -625,7 +616,7 @@ function MediaList({
             t.media.push({ filename: "", alt: "", caption: "", placement: "scenario" });
           })
         }
-        className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
+        className="text-action text-[13px] font-semibold"
       >
         + Add image
       </button>
@@ -687,7 +678,7 @@ function MediaRow({
   return (
     <div
       className={`rounded-[10px] border px-3 py-3 transition-colors ${
-        dragOver ? "border-accent bg-[var(--accent-tint)]" : "border-line bg-paper"
+        dragOver ? "border-ink bg-brand-tint" : "border-line-strong bg-surface-raised"
       }`}
       onDragOver={(e) => {
         e.preventDefault();
@@ -728,7 +719,9 @@ function MediaRow({
             <span className="px-1">
               Drop an image or
               <br />
-              <span className="font-semibold text-accent">Choose image</span>
+              <span className="font-semibold text-ink underline decoration-[var(--line-control)] decoration-2 underline-offset-4">
+                Choose image
+              </span>
             </span>
           )}
         </button>
@@ -855,12 +848,13 @@ function InteractiveBlocks({
       {blocks.map((block, i) => {
         const meta = BLOCK_TYPES.find((b) => b.type === block.type);
         return (
-          <div key={i} className="rounded-[14px] border border-line bg-surface px-[18px] py-3.5">
+          <div
+            key={i}
+            className="rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised px-[18px] py-3.5"
+          >
             <div className="mb-3 flex items-center gap-2">
               <span aria-hidden>{meta?.emoji}</span>
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
-                {meta?.name ?? block.type}
-              </span>
+              <span className="text-[13px] font-bold text-ink">{meta?.name ?? block.type}</span>
               <span className="flex-1" />
               <RowIconButton
                 label="Move up"
@@ -929,9 +923,7 @@ function InteractiveBlocks({
 function AddInteractive({ onAdd }: { onAdd: (type: ContentBlockType) => void }) {
   return (
     <div className="rounded-[12px] border border-dashed border-line-strong p-2.5">
-      <div className="mb-2 px-1 font-mono text-[10px] uppercase tracking-[0.07em] text-ink-soft">
-        Add an element
-      </div>
+      <div className="mb-2 px-1 text-[13px] font-semibold text-ink-muted">Add an element</div>
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
         {BLOCK_TYPES.map((b) => (
           <button
@@ -939,7 +931,7 @@ function AddInteractive({ onAdd }: { onAdd: (type: ContentBlockType) => void }) 
             type="button"
             onClick={() => onAdd(b.type)}
             title={b.hint}
-            className="flex items-center gap-2 rounded-[9px] border border-line bg-surface px-2.5 py-2 text-left transition-colors hover:border-accent hover:bg-[var(--accent-tint)]"
+            className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface-raised px-2.5 py-2 text-left transition-colors hover:border-ink hover:bg-[var(--hover-wash)]"
           >
             <span aria-hidden>{b.emoji}</span>
             <span className="truncate text-[12px] font-semibold text-ink">{b.name}</span>
@@ -1056,7 +1048,7 @@ function PairList({
       <button
         type="button"
         onClick={() => mutate((r) => void r.push({ [keyA]: "", [keyB]: "" }))}
-        className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent hover:underline"
+        className="text-action text-[13px] font-semibold"
       >
         {addLabel}
       </button>
@@ -1086,10 +1078,10 @@ function CalloutEditor({
               key={v.value}
               type="button"
               onClick={() => mutate((b) => void (b.variant = v.value))}
-              className={`rounded-lg border px-3 py-[5px] text-[12px] font-semibold transition-colors ${
+              className={`inline-flex min-h-9 items-center rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold transition-colors ${
                 active
-                  ? "border-accent bg-[var(--accent-tint)] text-accent-ink"
-                  : "border-line text-ink-soft hover:text-ink-muted"
+                  ? "is-selected border-ink"
+                  : "border-ink text-ink hover:bg-[var(--hover-wash)]"
               }`}
             >
               {v.label}
@@ -1149,7 +1141,9 @@ function EmptyStart({
 }) {
   return (
     <div className="rounded-[14px] border border-dashed border-line-strong px-6 py-8 text-center">
-      <p className="font-display text-[16px] font-semibold text-ink-muted">Build this lesson</p>
+      <p className="font-display text-[17px] font-extrabold tracking-[-0.02em] text-ink">
+        Build this lesson
+      </p>
       <p className="mt-1 text-[13px] text-ink-soft">Start from a shape, or add a block below.</p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         {(Object.keys(TEMPLATES) as (keyof typeof TEMPLATES)[]).map((name) => (
@@ -1157,7 +1151,7 @@ function EmptyStart({
             key={name}
             type="button"
             onClick={() => onApplyTemplate(name)}
-            className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-[12px] font-semibold text-ink-muted transition-colors hover:border-accent hover:bg-[var(--accent-tint)] hover:text-accent-ink"
+            className="min-h-9 rounded-full border-[1.5px] border-ink px-3.5 text-[13px] font-semibold text-ink transition-colors hover:bg-[var(--hover-wash)]"
           >
             {TEMPLATES[name].label}
           </button>
@@ -1195,8 +1189,8 @@ function AddBlock({
         onClick={() => setOpen((v) => !v)}
         className={`flex w-full items-center justify-center gap-[9px] rounded-[14px] border border-dashed px-4 py-[17px] text-[13.5px] font-semibold transition-colors ${
           open
-            ? "border-accent bg-[var(--accent-tint)] text-accent-ink"
-            : "border-line-strong text-ink-soft hover:border-accent hover:bg-[var(--accent-tint)] hover:text-accent-ink"
+            ? "border-ink bg-[var(--hover-wash)] text-ink"
+            : "border-[var(--line-control)] text-ink-muted hover:border-ink hover:bg-[var(--hover-wash)] hover:text-ink"
         }`}
       >
         <svg
@@ -1214,7 +1208,7 @@ function AddBlock({
         Add something to this lesson
       </button>
       {open ? (
-        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-surface p-2 shadow-[var(--shadow-lg)]">
+        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 grid grid-cols-2 gap-1 rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised p-2 shadow-[var(--shadow-lg)]">
           {(Object.keys(BLOCKS) as SectionType[]).map((type) => {
             const taken = active.includes(type);
             return (
@@ -1226,7 +1220,7 @@ function AddBlock({
                   onAdd(type);
                   setOpen(false);
                 }}
-                className="flex items-center gap-[9px] rounded-[10px] px-3 py-2.5 text-left transition-colors hover:bg-surface-sunken disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
+                className="flex items-center gap-[9px] rounded-[10px] px-3 py-2.5 text-left transition-colors hover:bg-[var(--hover-wash)] disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
               >
                 <span
                   className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] bg-surface-sunken text-sm"
@@ -1256,9 +1250,7 @@ function AddBlock({
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block min-w-0 flex-1">
-      <span className="mb-1 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
-        {label}
-      </span>
+      <span className="mb-1 block text-[13px] font-semibold text-ink-muted">{label}</span>
       {hint ? <span className="mb-1.5 block text-[11px] text-ink-soft">{hint}</span> : null}
       {children}
     </label>

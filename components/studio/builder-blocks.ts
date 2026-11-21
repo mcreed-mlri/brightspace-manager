@@ -137,17 +137,12 @@ export function activeSections(topic: TopicDraft, added: SectionType[]): Section
   return SECTION_ORDER.filter((type) => present.has(type));
 }
 
-/* ── Per-course accent ──────────────────────────────────────────────────────
-   The Course Details "Topic family" picker re-tints the builder (chrome,
-   pills, S-markers, the correct-answer radio) with that family's colour. The
-   colours are the Training Hub's topic families (its app/styles/tokens.css,
-   ADR 0015), defined in globals.css as --hue-1..8, so a course looks the same
-   here as it does in the Hub's catalog.
-
-   The Hub's rule: a hue's bright `solid` is for fills, bars and swatches;
-   anything you read, or anything with text on top, takes its `ink`. So the
-   accent and brand roles get the ink, and the swatch gets the solid. Text on
-   an ink fill uses --brand-on, which already flips with the theme. */
+/* ── Per-course topic colour ─────────────────────────────────────────────────
+   The Course Details "Topic family" picker sets the course's colour: the
+   Training Hub's topic families (its app/styles/tokens.css, ADR 0015),
+   defined in globals.css as --hue-1..8, so a course looks the same here as in
+   the Hub's catalog. A hue's bright `solid` is for fills, rules and swatches;
+   any text in that colour takes its `ink`. */
 const FAMILY_HUE: Partial<Record<TopicFamily, number>> = {
   foundations: 1,
   ethics: 2,
@@ -164,21 +159,24 @@ export function familyColor(family: TopicFamily): string {
   return hue ? `var(--hue-${hue})` : "var(--accent)";
 }
 
-/* CSS-var overrides applied to the builder root; undefined = keep theme accent. */
-export function familyAccentStyle(family: TopicFamily): CSSProperties | undefined {
+/* The family colour as --family / --family-ink / --family-tint on the builder
+   root. The Hub uses a category colour only for small accents (a rule over an
+   item, a swatch, a label in the hue's ink), never to repaint the chrome, so
+   the builder keeps the Hub's sky for selection and ink for actions, and
+   only the lesson's colour rule and eyebrow read these. */
+export function familyAccentStyle(family: TopicFamily): CSSProperties {
   const hue = FAMILY_HUE[family];
-  if (!hue) return undefined;
-  const ink = `var(--hue-${hue}-ink)`;
-  const tint = `var(--hue-${hue}-tint)`;
+  if (!hue) {
+    return {
+      "--family": "var(--line-strong)",
+      "--family-ink": "var(--ink-soft)",
+      "--family-tint": "var(--surface-sunken)",
+    } as CSSProperties;
+  }
   return {
-    "--accent": ink,
-    "--accent-ink": ink,
-    "--accent-tint": tint,
-    "--accent-glow": `color-mix(in srgb, var(--hue-${hue}) 40%, transparent)`,
-    "--brand": ink,
-    "--brand-ink": ink,
-    "--brand-fill": ink,
-    "--brand-tint": tint,
+    "--family": `var(--hue-${hue})`,
+    "--family-ink": `var(--hue-${hue}-ink)`,
+    "--family-tint": `var(--hue-${hue}-tint)`,
   } as CSSProperties;
 }
 

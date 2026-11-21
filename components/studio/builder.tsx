@@ -29,12 +29,13 @@ import { useTheme } from "@/components/theme-provider";
    hides while this screen is open (AppShell handles that). Saves are
    debounced 2s after the last keystroke. */
 
-/* Course Details fields — cool spec: 44px, radius 10, --bg fill, accent focus
-   ring. Textareas drop the fixed height and add vertical padding instead. */
+/* Course Details fields — the Training Hub's form field: 44px, radius 10, a
+   1.5px control-strength edge that turns ink on focus. Textareas drop the
+   fixed height and add vertical padding instead. */
 const drawerInputClass =
-  "h-11 w-full rounded-[10px] border border-line bg-paper px-[13px] text-[13.5px] text-ink outline-none transition-colors focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-tint)]";
+  "h-11 w-full rounded-[10px] border-[1.5px] border-[var(--line-control)] bg-surface-raised px-[13px] text-[13.5px] text-ink outline-none transition-colors focus:border-ink";
 const drawerAreaClass =
-  "w-full rounded-[10px] border border-line bg-paper px-[13px] py-[11px] text-[13.5px] leading-relaxed text-ink outline-none transition-colors focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-tint)]";
+  "w-full rounded-[10px] border-[1.5px] border-[var(--line-control)] bg-surface-raised px-[13px] py-[11px] text-[13.5px] leading-relaxed text-ink outline-none transition-colors focus:border-ink";
 
 function locate(draft: CourseDraft, slug: string | null) {
   if (!slug) return null;
@@ -526,12 +527,12 @@ export function Builder({
   /* One save indicator instead of two: the pill carries label, tone, and the
      relative save time (was a separate redundant text element). */
   const savePill = saving
-    ? { label: "Saving…", tone: "bg-status-warn-soft text-status-warn" }
+    ? { label: "Saving…", tone: "border-status-warn bg-status-warn-soft text-status-warn-ink" }
     : dirty
-      ? { label: "● Unsaved", tone: "bg-status-warn-soft text-status-warn" }
+      ? { label: "Unsaved", tone: "border-status-warn bg-status-warn-soft text-status-warn-ink" }
       : {
-          label: savedAt ? `Saved · ${formatRelative(savedAt)}` : "Saved",
-          tone: "bg-status-ok-soft text-status-ok-ink",
+          label: savedAt ? `Saved ${formatRelative(savedAt)}` : "Saved",
+          tone: "border-[var(--line-control)] text-ink-muted",
         };
 
   const deployReady = isDeployReady(draft);
@@ -542,26 +543,24 @@ export function Builder({
       style={familyAccentStyle(draft.topic)}
     >
       {/* ── top bar ── */}
-      <div className="flex h-[60px] shrink-0 items-center gap-3 border-b border-line bg-surface px-[22px]">
+      <div className="studio-masthead flex h-[64px] shrink-0 items-center gap-3 px-[22px]">
         <Link
           href="/course-studio/"
           title="All courses"
           aria-label="All courses"
-          className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-ink text-surface transition-transform hover:-translate-x-0.5"
+          className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[10px] bg-ink text-paper transition-transform hover:-translate-x-0.5"
         >
-          <IconScales size={16} />
+          <IconScales size={20} strokeWidth={2.2} />
         </Link>
         <div className="flex min-w-0 items-center gap-2.5">
           <input
             value={draft.courseTitle}
             onChange={(e) => mutate((n) => void (n.courseTitle = e.target.value))}
             aria-label="Course title"
-            className="min-w-0 max-w-[360px] flex-shrink rounded-lg border-none bg-transparent px-2 py-[5px] font-display text-[17px] font-semibold tracking-[-0.02em] text-ink outline-none focus:bg-surface-sunken"
+            className="min-w-0 max-w-[360px] flex-shrink rounded-lg border-none bg-transparent px-2 py-[5px] font-display text-[19px] font-extrabold tracking-[-0.03em] text-ink outline-none hover:bg-[var(--hover-wash)] focus:bg-[var(--hover-wash)]"
             style={{ width: `${Math.max(draft.courseTitle.length, 10)}ch` }}
           />
-          <span className="rounded-[5px] bg-[var(--accent-tint)] px-2 py-[3px] font-mono text-[9.5px] font-semibold tracking-[0.06em] text-accent">
-            DRAFT
-          </span>
+          <span className="hub-chip border-[var(--line-control)] text-ink-muted">Draft</span>
         </div>
         {error ? (
           <span className="truncate text-xs font-semibold text-status-error-ink">{error}</span>
@@ -575,7 +574,7 @@ export function Builder({
               title="Undo (Ctrl+Z)"
               onClick={undo}
               disabled={historyRef.current.past.length === 0}
-              className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
+              className="grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <svg
                 width="15"
@@ -598,7 +597,7 @@ export function Builder({
               title="Redo (Ctrl+Shift+Z)"
               onClick={redo}
               disabled={historyRef.current.future.length === 0}
-              className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
+              className="grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <svg
                 width="15"
@@ -624,24 +623,20 @@ export function Builder({
                 : "Exports work on your computer only. Click to pick a Brightspace course."
             }
             onClick={() => setDetailsOpen(true)}
-            className={`whitespace-nowrap rounded-[6px] px-[9px] py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] transition-colors ${
+            className={`hub-chip transition-colors ${
               deployReady
-                ? "bg-status-ok-soft text-status-ok-ink"
-                : "bg-surface-sunken text-ink-soft hover:text-ink"
+                ? "border-status-ok bg-status-ok-soft text-status-ok-ink"
+                : "border-[var(--line-control)] text-ink-muted hover:bg-[var(--hover-wash)] hover:text-ink"
             }`}
           >
             {deployReady ? "Deploy-ready" : "Local preview"}
           </button>
-          <span
-            className={`whitespace-nowrap rounded-[6px] px-[9px] py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] transition-colors ${savePill.tone}`}
-          >
-            {savePill.label}
-          </span>
+          <span className={`hub-chip transition-colors ${savePill.tone}`}>{savePill.label}</span>
           <button
             type="button"
             onClick={() => void showServerPreview()}
             disabled={previewBusy || !topic}
-            className="flex h-9 items-center gap-[7px] rounded-[9px] border border-line bg-surface px-[13px] text-[12.5px] font-semibold text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-50"
+            className="btn-secondary !min-h-10 !py-0 disabled:opacity-50"
           >
             <svg
               width="14"
@@ -687,8 +682,8 @@ export function Builder({
               aria-haspopup="menu"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((v) => !v)}
-              className={`grid h-9 w-9 place-items-center rounded-[10px] border border-line bg-surface text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink ${
-                menuOpen ? "bg-surface-sunken text-ink" : ""
+              className={`masthead-control grid h-10 w-10 place-items-center ${
+                menuOpen ? "bg-[var(--hover-wash)]" : ""
               }`}
             >
               <svg width="15" height="15" viewBox="0 0 14 14" fill="currentColor" aria-hidden>
@@ -701,7 +696,7 @@ export function Builder({
             {menuOpen ? (
               <div
                 role="menu"
-                className="absolute right-0 top-[42px] z-50 w-[188px] rounded-lg border border-line bg-surface p-1 shadow-[var(--shadow-lg)]"
+                className="absolute right-0 top-[46px] z-50 w-[200px] rounded-[12px] border border-line bg-surface-raised p-1.5 shadow-[var(--shadow-lg)]"
               >
                 <button
                   type="button"
@@ -710,7 +705,7 @@ export function Builder({
                     setDetailsOpen(true);
                     setMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                  className="flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left text-[13px] font-semibold text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink"
                 >
                   <svg
                     width="14"
@@ -736,7 +731,7 @@ export function Builder({
                     toggleTheme();
                     setMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] font-medium text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                  className="flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left text-[13px] font-semibold text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink"
                 >
                   {theme === "dark" ? (
                     <svg
@@ -846,10 +841,10 @@ export function Builder({
               onChange={(e) => mutate((n) => void (n.courseBlurb = e.target.value))}
             />
           </DrawerField>
-          <DrawerField label="Topic family" hint="Sets the accent colour.">
+          <DrawerField label="Topic family" hint="The course's colour in the Training Hub catalog.">
             <div className="relative">
               <span
-                className="pointer-events-none absolute left-[13px] top-1/2 z-10 h-[11px] w-[11px] -translate-y-1/2 rounded-[3px]"
+                className="pointer-events-none absolute left-[13px] top-1/2 z-10 h-3 w-3 -translate-y-1/2 rounded-full"
                 style={{ background: familyColor(draft.topic) }}
                 aria-hidden
               />
@@ -869,8 +864,8 @@ export function Builder({
             </div>
           </DrawerField>
 
-          <details className="rounded-[10px] border border-line px-4 py-3">
-            <summary className="cursor-pointer font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+          <details className="rounded-[12px] border-[1.5px] border-line-strong px-4 py-3">
+            <summary className="cursor-pointer text-[13px] font-semibold text-ink-muted">
               Advanced
             </summary>
             <div className="mt-3 space-y-4">
@@ -980,9 +975,7 @@ function DrawerField({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
-        {label}
-      </span>
+      <span className="mb-1 block text-[13px] font-semibold text-ink-muted">{label}</span>
       {hint ? (
         <span className="mb-2 block text-[12px] leading-snug text-ink-soft">{hint}</span>
       ) : null}

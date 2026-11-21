@@ -394,6 +394,35 @@ h3 {
   text-decoration-color: currentColor;
 }
 
+/* In-place text action (add option, remove, show more): ink text with the
+   neutral hover wash. Blue text is kept for links to another page. */
+.text-action {
+  color: var(--ink);
+  border-radius: 6px;
+  padding-inline: 0.375rem;
+  margin-inline: -0.375rem;
+  transition: background 120ms ease;
+}
+
+.text-action:hover {
+  background: var(--hover-wash);
+}
+
+/* Status chip, as in the Hub's training-status-chip: a sentence-case pill
+   with a 1.5px edge. Set the border and colours alongside it. */
+.hub-chip {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-width: 1.5px;
+  border-style: solid;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 /* ── Chrome ──────────────────────────────────────────────────────────────
    The header sits on paper with a heavy ink rule under it, the same bar the
    Hub and the public site use. Controls are outlined circles. */
