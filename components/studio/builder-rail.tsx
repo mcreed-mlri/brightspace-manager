@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import type { ModuleDraft, TopicDraft } from "@/types/studio";
 import { SECTION_ORDER, sectionsWithContent } from "@/components/studio/builder-blocks";
 
-/* Left rail (cool direction) — 280px, --surface. Accent mono eyebrow "Your
-   course"; per module a mono-uppercase title and lesson rows (number chip,
-   title, mono meta, build-out dots). The active row sits on --accent-tint.
+/* Left rail — 280px, --surface. Eyebrow "Your course"; per module an
+   uppercase eyebrow title and lesson rows (number chip, title, meta,
+   build-out dots). The active row takes the Hub's "you are here" look: pale
+   sky with an ink edge, and an ink number chip.
    Footer: a dashed "New part of the course" button and an auto-save line with
    a green haloed dot. The per-row ⋯ menu (move / duplicate / delete) and the
    per-module "Add lesson" affordance are kept from the prior outline.
@@ -84,7 +85,7 @@ export function BuilderRail({
               onClick={() => toggleCollapsed(false)}
               title="Show course outline"
               aria-label="Show course outline"
-              className="grid h-8 w-8 place-items-center rounded-lg border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+              className="grid h-8 w-8 place-items-center rounded-full border-[1.5px] border-ink text-ink transition-colors hover:bg-[var(--hover-wash)]"
             >
               <PanelToggleGlyph expanded />
             </button>
@@ -106,10 +107,10 @@ export function BuilderRail({
                     title={label}
                     aria-label={label}
                     aria-current={active ? "page" : undefined}
-                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] font-mono text-[11px] font-semibold transition-colors ${
+                    className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] text-[12px] font-bold tabular-nums transition-colors ${
                       active
-                        ? "bg-brand-fill text-[var(--brand-on)]"
-                        : "bg-surface-sunken text-ink-soft hover:bg-[var(--accent-tint)] hover:text-accent"
+                        ? "bg-ink text-paper"
+                        : "bg-surface-sunken text-ink-muted hover:bg-[var(--hover-wash)] hover:text-ink"
                     }`}
                   >
                     {number}
@@ -134,11 +135,11 @@ export function BuilderRail({
       ) : (
         <>
           <div className="flex items-center justify-between gap-2 px-[18px] pb-2 pt-[18px]">
-            <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-accent">
+            <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-ink-soft">
               Your course
             </span>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10.5px] text-ink-soft">
+              <span className="text-[12px] font-medium tabular-nums text-ink-soft">
                 {modules.length} part{modules.length === 1 ? "" : "s"} · {total} lesson
                 {total === 1 ? "" : "s"}
               </span>
@@ -147,7 +148,7 @@ export function BuilderRail({
                 onClick={() => toggleCollapsed(true)}
                 title="Hide course outline"
                 aria-label="Hide course outline"
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-line text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full border-[1.5px] border-ink text-ink transition-colors hover:bg-[var(--hover-wash)]"
               >
                 <PanelToggleGlyph expanded={false} />
               </button>
@@ -161,7 +162,7 @@ export function BuilderRail({
                   value={mod.title}
                   onChange={(e) => onRenameModule(mod.id, e.target.value)}
                   aria-label="Part title"
-                  className="w-full border-none bg-transparent px-2 pb-1.5 pt-[9px] font-mono text-[10px] font-semibold uppercase tracking-[0.09em] text-ink-soft outline-none focus:text-ink-muted"
+                  className="w-full rounded-[6px] border-none bg-transparent px-2 pb-1.5 pt-[9px] text-[11.5px] font-bold uppercase tracking-[0.08em] text-ink-soft outline-none hover:bg-[var(--hover-wash)] focus:bg-[var(--hover-wash)] focus:text-ink"
                 />
                 {mod.topics.map((topic, index) => (
                   <LessonRow
@@ -180,7 +181,7 @@ export function BuilderRail({
                 <button
                   type="button"
                   onClick={() => onAddLesson(mod.id)}
-                  className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg px-3 py-[7px] text-left font-mono text-[10.5px] font-medium uppercase tracking-[0.06em] text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink-muted"
+                  className="mt-0.5 flex w-full items-center gap-1.5 rounded-[8px] px-3 py-[7px] text-left text-[13px] font-semibold text-ink transition-colors hover:bg-[var(--hover-wash)]"
                 >
                   <PlusGlyph /> Add lesson
                 </button>
@@ -190,13 +191,13 @@ export function BuilderRail({
             <button
               type="button"
               onClick={onAddModule}
-              className="mt-1 flex w-full items-center justify-center gap-[7px] rounded-[10px] border border-dashed border-line-strong px-3 py-[11px] text-[12.5px] font-semibold text-ink-soft transition-colors hover:border-accent hover:text-accent"
+              className="mt-1 flex w-full items-center justify-center gap-[7px] rounded-[10px] border-[1.5px] border-dashed border-[var(--line-control)] px-3 py-[11px] text-[13px] font-semibold text-ink-muted transition-colors hover:border-ink hover:bg-[var(--hover-wash)] hover:text-ink"
             >
               <PlusGlyph /> New part of the course
             </button>
           </div>
 
-          <div className="flex items-center gap-[9px] border-t border-line px-[18px] py-[13px] font-mono text-[10.5px] text-ink-soft">
+          <div className="flex items-center gap-[9px] border-t border-line px-[18px] py-[13px] text-[12px] font-medium tabular-nums text-ink-soft">
             <span
               className={`h-1.5 w-1.5 rounded-full ${
                 saving
@@ -255,12 +256,14 @@ function LessonRow({
         onClick={() => onSelect(topic.slug)}
         title={topic.title || topic.slug}
         className={`mb-0.5 flex w-full items-start gap-[11px] rounded-[10px] py-[9px] pl-2.5 pr-8 text-left transition-colors ${
-          active ? "bg-[var(--accent-tint)]" : "hover:bg-surface-sunken"
+          active
+            ? "bg-brand-tint shadow-[inset_0_0_0_1.5px_var(--ink)]"
+            : "hover:bg-[var(--hover-wash)]"
         }`}
       >
         <span
-          className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] font-mono text-[11px] font-semibold ${
-            active ? "bg-brand-fill text-[var(--brand-on)]" : "bg-surface-sunken text-ink-soft"
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-[7px] text-[12px] font-bold tabular-nums ${
+            active ? "bg-ink text-paper" : "bg-surface-sunken text-ink-muted"
           }`}
         >
           {index + 1}
@@ -274,7 +277,7 @@ function LessonRow({
             {topic.title || "Untitled lesson"}
           </span>
           <span className="mt-1 flex items-center gap-[7px]">
-            <span className="font-mono text-[10px] text-ink-soft">
+            <span className="text-[12px] font-medium tabular-nums text-ink-soft">
               {topic.kind} · {topic.minutes} min
             </span>
             <span className="flex shrink-0 gap-[3px]" aria-hidden>
@@ -282,7 +285,7 @@ function LessonRow({
                 <span
                   key={type}
                   className={`h-[5px] w-[5px] rounded-full ${
-                    present.has(type) ? "bg-accent" : "bg-line-strong"
+                    present.has(type) ? "bg-ink-muted" : "bg-line-strong"
                   }`}
                 />
               ))}
@@ -295,7 +298,7 @@ function LessonRow({
         type="button"
         aria-label="Lesson actions"
         onClick={() => setMenuOpen((v) => !v)}
-        className={`absolute right-1.5 top-[9px] grid h-6 w-6 place-items-center rounded-md text-ink-soft transition-colors hover:bg-surface hover:text-ink ${
+        className={`absolute right-1.5 top-[9px] grid h-6 w-6 place-items-center rounded-full text-ink-muted transition-colors hover:bg-[var(--hover-wash)] hover:text-ink ${
           menuOpen || active ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
       >
@@ -307,7 +310,7 @@ function LessonRow({
       </button>
 
       {menuOpen ? (
-        <div className="absolute right-1.5 top-[36px] z-50 w-[164px] rounded-lg border border-line bg-surface p-1 shadow-[var(--shadow-lg)]">
+        <div className="absolute right-1.5 top-[36px] z-50 w-[164px] rounded-[12px] border border-line bg-surface-raised p-1.5 shadow-[var(--shadow-lg)]">
           <MenuItem
             onClick={() => {
               onDuplicate(topic.slug);

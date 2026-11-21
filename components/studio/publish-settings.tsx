@@ -86,9 +86,7 @@ export function PublishSettingsSection({
 
   return (
     <div className="rounded-[10px] border border-line bg-surface-sunken px-4 py-4">
-      <p className="mb-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
-        Publish to Brightspace
-      </p>
+      <p className="mb-1 text-[13px] font-semibold text-ink-muted">Publish to Brightspace</p>
       <p className="mb-3 text-[12px] leading-snug text-ink-soft">
         Tell the Studio which Brightspace course this will live in. Exports then come out ready to
         upload — every link already points to the right place.
