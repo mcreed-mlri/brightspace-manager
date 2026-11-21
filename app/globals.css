@@ -432,30 +432,29 @@ h3 {
   color: var(--solid-ink);
 }
 
-/* Nav: hover is the neutral wash; the current page is pale sky, ink edge,
-   and a short sky marker on the left. */
-.nav-link:hover {
-  background: var(--hover-wash);
+/* The account circle: the one sky accent in the masthead, with an ink ring. */
+.masthead-avatar {
+  background: var(--feature-action-bg);
+  color: var(--feature-action-ink);
+  box-shadow: inset 0 0 0 2px var(--ink);
 }
 
-.nav-link-active,
-.nav-link-active:hover {
-  position: relative;
+/* Nav tiles (components/side-rail.tsx, after the Hub's nav-tile.tsx): icon
+   in a pill, label under it. Hover is a quiet neutral wash on the pill; the
+   current place takes pale sky with an ink ring. */
+.side-rail,
+.phone-bar {
+  --nav-hover: color-mix(in srgb, var(--ink-soft) 10%, var(--surface));
+}
+
+.rail-tile:hover .rail-pill {
+  background: var(--nav-hover);
+}
+
+.rail-pill-active,
+.rail-tile:hover .rail-pill-active {
   background: var(--brand-tint);
-  color: var(--ink);
   box-shadow: inset 0 0 0 1.5px var(--ink);
-}
-
-.nav-link-active::before {
-  content: "";
-  position: absolute;
-  left: 3px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 1.125rem;
-  border-radius: 999px;
-  background: var(--brand);
 }
 
 /* ── Surfaces ───────────────────────────────────────────────────────────── */

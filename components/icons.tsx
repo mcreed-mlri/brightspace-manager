@@ -186,3 +186,89 @@ export function IconWarning(props: IconProps) {
     </svg>
   );
 }
+
+export function IconChart(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 3v18h18" />
+      <path d="M8 17v-5M13 17V8M18 17v-8" />
+    </svg>
+  );
+}
+
+export function IconTrend(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 17l6-6 4 4 8-8" />
+      <path d="M15 7h6v6" />
+    </svg>
+  );
+}
+
+export function IconMap(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" />
+      <path d="M9 4v14M15 6v14" />
+    </svg>
+  );
+}
+
+export function IconBook(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z" />
+      <path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z" />
+    </svg>
+  );
+}
+
+export function IconBlocks(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="13" width="8" height="8" rx="1.5" />
+      <rect x="3" y="13" width="8" height="8" rx="1.5" />
+      <path d="M17 3v8M13 7h8" />
+    </svg>
+  );
+}
+
+export function IconUpload(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 15V3M7 8l5-5 5 5" />
+      <path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
+    </svg>
+  );
+}
+
+export function IconList(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M9 6h12M9 12h12M9 18h12" />
+      <circle cx="4.5" cy="6" r="1" />
+      <circle cx="4.5" cy="12" r="1" />
+      <circle cx="4.5" cy="18" r="1" />
+    </svg>
+  );
+}
+
+export function IconFaculty(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M2 9l10-5 10 5-10 5z" />
+      <path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" />
+      <path d="M22 9v6" />
+    </svg>
+  );
+}
+
+export function IconUser(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+    </svg>
+  );
+}
