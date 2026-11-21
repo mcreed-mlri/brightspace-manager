@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens, copied from the Training Hub (lms-discovery
+   app/styles/tokens.css, ADR 0015 "warm paper and ink") so moving between the
+   Hub, the public site and this console feels like one place. Every text pair
+   was measured there (its ADR 0008); copy changes from the Hub rather than
+   inventing values here. Dark is the base block, light overrides it. */
 :root {
   color-scheme: dark;
 
@@ -9,155 +14,214 @@
   --font-display: var(--font-sans);
   --font-mono: var(--font-sans);
 
-  /* Shared Training Hub neutrals, with Manager's indigo and status colors. */
+  /* Slate-navy canvas (Hub dark theme). */
   --paper: #131a23;
   --paper-deep: #0e141c;
   --panel: #1b2431;
   --surface: #1b2431;
   --surface-raised: #212b39;
   --surface-sunken: #273242;
-  --hover-tint: var(--paper);
+  --hover-tint: #222c3a;
+  --chrome-bg: #131a23;
   --ink: #eef2f6;
   --ink-muted: #c3ccd8;
   --ink-soft: #a9b4c2;
   --line: #2f3a4a;
   --line-strong: #4d5a6c;
   --line-soft: #212b39;
-  --hover: var(--surface-sunken);
+  --line-control: #8592a5;
   --scroll: var(--line-strong);
-  --shadow-xs: none;
-  --shadow-card: none;
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.16), 0 6px 18px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.3);
   --shadow-drawer: -26px 0 70px rgba(0, 0, 0, 0.4);
 
-  /* ── Accent — electric indigo-blue ────────────────────────────────────── */
-  --accent: #a8b4ff;
-  --accent-ink: #b9c3ff;
-  --accent-tint: rgba(91, 125, 255, 0.15);
-  --accent-glow: rgba(91, 125, 255, 0.4);
+  /* Hover is a quiet neutral wash, never sky: pale sky means "selected" or
+     "you are here" (Hub ADR 0015, "one look, one job"). */
+  --hover-wash: color-mix(in srgb, var(--ink-soft) 10%, transparent);
+  --hover: var(--hover-wash);
 
-  /* Brand aliases (Tailwind bg-brand-text-brand) point at the accent. */
-  --brand: var(--accent);
-  --brand-ink: var(--accent-ink);
-  --brand-fill: #4557c8;
-  --brand-tint: var(--accent-tint);
+  /* ── Sky: the one accent, shared with the Hub and the public site ───── */
+  --brand: #9fd0e0;
+  --brand-ink: #bfe0ea;
+  --brand-fill: #9fd0e0;
+  --brand-tint: #1e3640;
+  /* Text sitting ON a solid --brand-fill. Inverts with the theme. */
+  --brand-on: #131a23;
+  /* The sky used as a fill under ink text (avatar, Hub link). */
+  --feature-action-bg: #9fd0e0;
+  --feature-action-ink: #131a23;
 
-  /* ── Sidebar — themed surface (no longer a permanent dark rail) ────────── */
+  /* Older components say "accent"; it is the same sky. */
+  --accent: var(--brand);
+  --accent-ink: var(--brand-ink);
+  --accent-tint: var(--brand-tint);
+  --accent-glow: rgba(159, 208, 224, 0.34);
+
+  /* Maximum-contrast solid: the primary action (ink pill). Flips in dark. */
+  --solid-bg: #eef2f6;
+  --solid-ink: #131a23;
+
+  --selection-bg: rgba(159, 208, 224, 0.34);
+
+  /* ── Sidebar ─────────────────────────────────────────────────────────── */
   --sb: var(--surface);
   --sb-ink: var(--ink);
   --sb-muted: var(--ink-soft);
-  --sb-hover: var(--surface-sunken);
-  --sb-active: var(--accent-tint);
+  --sb-hover: var(--hover-wash);
+  --sb-active: var(--brand-tint);
   --sb-line: var(--line);
 
-  /* ── Status — health / lifecycle signal (admin semantics) ─────────────── */
-  --ok: #2fd397;
-  --ok-glow: rgba(47, 211, 151, 0.22);
-  --amber: #f0a93a;
-  --amber-ink: #f0b860;
-  --amber-tint: rgba(240, 169, 58, 0.14);
-  --danger: #ff6257;
-  --danger-tint: rgba(255, 98, 87, 0.14);
+  /* ── Status: health / lifecycle signal (Hub status values) ──────────── */
+  --ok: #5fc9a8;
+  --ok-glow: rgba(95, 201, 168, 0.22);
+  --amber: #e0a552;
+  --amber-ink: #e0a552;
+  --amber-tint: #3a2c10;
+  --danger: #ec8275;
+  --danger-tint: #3a1c18;
 
   --status-ok: var(--ok);
-  --status-ok-soft: var(--ok-glow);
-  --status-ok-ink: #3fdca5;
-  --status-info: var(--accent);
-  --status-info-soft: var(--accent-tint);
-  --status-info-ink: var(--accent-ink);
+  --status-ok-soft: #133029;
+  --status-ok-ink: #5fc9a8;
+  --status-info: #7fb3ee;
+  --status-info-soft: #13304d;
+  --status-info-ink: #98c2f3;
   --status-warn: var(--amber);
   --status-warn-soft: var(--amber-tint);
   --status-warn-ink: var(--amber-ink);
   --status-error: var(--danger);
   --status-error-soft: var(--danger-tint);
-  --status-error-ink: #ff8077;
-  --status-neutral: var(--ink-soft);
-  --status-neutral-soft: var(--surface-sunken);
-  --status-neutral-ink: var(--ink-muted);
+  --status-error-ink: #ec8275;
+  /* Text on a solid --status-error fill (destructive confirm button). */
+  --status-error-on: #131a23;
+  --status-neutral: #9aa0ad;
+  --status-neutral-soft: #262a33;
+  --status-neutral-ink: #c0c6d1;
 
   --radius-card: 14px;
-  --radius-control: 9px;
+  --radius-control: 8px;
 
-  /* ── Category palette — theme-independent multicolor system. Keeps the
-        cool palette from feeling sleepy: row bars, dots, per-course accents. */
-  --cat-blue: #3b82f6;
-  --cat-violet: #8b5cf6;
-  --cat-pink: #ec4899;
-  --cat-amber: #f59e0b;
-  --cat-green: #10b981;
-  --cat-teal: #14b8a6;
+  /* ── Category hues: the Hub's eight (ADR 0015), dark values ─────────── */
+  --hue-1: #f0965f;
+  --hue-1-tint: #3d2318;
+  --hue-1-ink: #f0965f;
+  --hue-2: #c9a8ec;
+  --hue-2-tint: #2f2440;
+  --hue-2-ink: #c9a8ec;
+  --hue-3: #9bd8ad;
+  --hue-3-tint: #1d3226;
+  --hue-3-ink: #9bd8ad;
+  --hue-4: #7fcbbd;
+  --hue-4-tint: #163430;
+  --hue-4-ink: #7fcbbd;
+  --hue-5: #e6c06a;
+  --hue-5-tint: #3a2f14;
+  --hue-5-ink: #e6c06a;
+  --hue-6: #eba79f;
+  --hue-6-tint: #3d2220;
+  --hue-6-ink: #eba79f;
+  --hue-7: #d2ad8c;
+  --hue-7-tint: #362a20;
+  --hue-7-ink: #d2ad8c;
+  --hue-8: #b9c79a;
+  --hue-8-tint: #283020;
+  --hue-8-ink: #b9c79a;
 
-  /* Hue aliases (legacy hub naming) — kept pointing at the category palette. */
-  --hue-1: var(--cat-blue);
-  --hue-1-tint: rgba(59, 130, 246, 0.16);
-  --hue-2: var(--cat-violet);
-  --hue-2-tint: rgba(139, 92, 246, 0.16);
-  --hue-3: var(--cat-pink);
-  --hue-3-tint: rgba(236, 72, 153, 0.16);
-  --hue-4: var(--cat-amber);
-  --hue-4-tint: rgba(245, 158, 11, 0.16);
-  --hue-5: var(--cat-green);
-  --hue-5-tint: rgba(16, 185, 129, 0.16);
-  --hue-6: #38bdf8;
-  --hue-6-tint: rgba(56, 189, 248, 0.16);
-  --hue-7: #6366f1;
-  --hue-7-tint: rgba(99, 102, 241, 0.16);
-  --hue-8: #fb7185;
-  --hue-8-tint: rgba(251, 113, 133, 0.16);
+  /* Legacy names used by nav dots and charts, pointed at the Hub hues. */
+  --cat-blue: var(--hue-4);
+  --cat-violet: var(--hue-2);
+  --cat-pink: var(--hue-6);
+  --cat-amber: var(--hue-5);
+  --cat-green: var(--hue-3);
+  --cat-teal: var(--hue-8);
 }
 
 :root:not([data-theme="dark"]) {
   color-scheme: light;
 
+  /* Warm paper and ink (Hub light theme, public site). */
   --paper: #fbf7f0;
   --paper-deep: #f0e9dc;
   --panel: #f0e9dc;
   --surface: #fffdf9;
   --surface-raised: #ffffff;
   --surface-sunken: #f0e9dc;
-  --hover-tint: var(--paper);
+  --hover-tint: #f5efe4;
+  --chrome-bg: #fbf7f0;
   --ink: #221e1b;
   --ink-muted: #4a433d;
   --ink-soft: #5c544c;
   --line: #e2d9cb;
   --line-strong: #c9bdab;
   --line-soft: #ece4d6;
-  --hover: var(--surface-sunken);
-  --scroll: var(--line-strong);
-  --shadow-lg: 0 8px 32px rgba(20, 22, 27, 0.15), 0 2px 6px rgba(20, 22, 27, 0.06);
-  --shadow-drawer: -26px 0 70px rgba(20, 22, 27, 0.18);
+  --line-control: #7d7266;
+  --shadow-xs: 0 1px 2px rgba(34, 30, 27, 0.05);
+  --shadow-card: 0 1px 2px rgba(34, 30, 27, 0.04), 0 4px 14px rgba(34, 30, 27, 0.04);
+  --shadow-sm: 0 1px 2px rgba(34, 30, 27, 0.04), 0 4px 14px rgba(34, 30, 27, 0.04);
+  --shadow-md: 0 2px 4px rgba(34, 30, 27, 0.04), 0 6px 18px rgba(34, 30, 27, 0.06);
+  --shadow-lg: 0 8px 24px rgba(34, 30, 27, 0.12), 0 2px 6px rgba(34, 30, 27, 0.06);
+  --shadow-drawer: -26px 0 70px rgba(34, 30, 27, 0.18);
 
-  --accent: #4355bd;
-  --brand-fill: var(--accent);
-  --accent-ink: #3749ad;
-  --accent-tint: #ebedfa;
-  --accent-glow: rgba(47, 91, 255, 0.26);
+  --brand: #1f5f7a;
+  --brand-ink: #174a5f;
+  --brand-fill: #1f5f7a;
+  --brand-tint: #dcedf2;
+  --brand-on: #ffffff;
+  --feature-action-bg: #bfdde6;
+  --feature-action-ink: #221e1b;
+  --accent-glow: rgba(31, 95, 122, 0.26);
 
-  --ok: #10b981;
-  --ok-glow: rgba(16, 185, 129, 0.18);
-  --amber: #e0941f;
-  --amber-ink: #9a6510;
-  --amber-tint: #fdf2dd;
-  --danger: #e0463a;
-  --danger-tint: #fdeae8;
+  --solid-bg: #221e1b;
+  --solid-ink: #fbf7f0;
 
-  --status-ok: var(--ok);
+  --selection-bg: #bfdde6;
+
+  --ok: #179a72;
+  --ok-glow: rgba(23, 154, 114, 0.18);
+  --amber: #c8791b;
+  --amber-ink: #99610f;
+  --amber-tint: #fbf0dc;
+  --danger: #c8493b;
+  --danger-tint: #fbe9e6;
+
   --status-ok-soft: #e2f4ed;
   --status-ok-ink: #0f6e51;
-  --status-info: var(--accent);
-  --status-info-soft: var(--accent-tint);
-  --status-info-ink: var(--accent-ink);
-  --status-warn: var(--amber);
-  --status-warn-soft: var(--amber-tint);
-  --status-warn-ink: var(--amber-ink);
-  --status-error: var(--danger);
-  --status-error-soft: var(--danger-tint);
+  --status-info: #1c63b0;
+  --status-info-soft: #e8eff8;
+  --status-info-ink: #12447c;
   --status-error-ink: #9c3528;
-  --status-neutral: var(--ink-soft);
-  --status-neutral-soft: var(--surface-sunken);
-  --status-neutral-ink: var(--ink-muted);
+  --status-error-on: #ffffff;
+  --status-neutral: #8b909d;
+  --status-neutral-soft: #efede7;
+  --status-neutral-ink: #565c69;
+
+  --hue-1: #e2663b;
+  --hue-1-tint: #fbe3d8;
+  --hue-1-ink: #a63f1a;
+  --hue-2: #b68ee6;
+  --hue-2-tint: #efe4fa;
+  --hue-2-ink: #6b3fa0;
+  --hue-3: #8fd3a5;
+  --hue-3-tint: #e2f3e7;
+  --hue-3-ink: #2f6b45;
+  --hue-4: #5fb8aa;
+  --hue-4-tint: #dcf0ec;
+  --hue-4-ink: #1f645a;
+  --hue-5: #e3b44f;
+  --hue-5-tint: #f8ecce;
+  --hue-5-ink: #7d5a12;
+  --hue-6: #e59a92;
+  --hue-6-tint: #f9e2df;
+  --hue-6-ink: #9a3f36;
+  --hue-7: #c49a76;
+  --hue-7-tint: #f1e5da;
+  --hue-7-ink: #6e4a2e;
+  --hue-8: #a9b98a;
+  --hue-8-tint: #e8eddc;
+  --hue-8-ink: #4c5f3a;
 }
 
 * {
@@ -202,8 +266,12 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+::selection {
+  background: var(--selection-bg);
 }
 
 input::placeholder {
@@ -211,29 +279,29 @@ input::placeholder {
   opacity: 1;
 }
 
-/* Typography */
+/* Typography: the Hub's voice. Heavy, tight titles; quiet uppercase eyebrows. */
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-ink);
+  color: var(--ink-soft);
 }
 
 .page-title {
   font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 34px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
 }
 
 .section-title {
   font-family: var(--font-display);
   font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 h1,
@@ -243,18 +311,19 @@ h3 {
   letter-spacing: -0.02em;
 }
 
-/* Buttons */
+/* Buttons, "one look, one job" (Hub ADR 0015):
+   primary action = solid ink pill, secondary = outlined ink pill. */
 .btn-primary,
 .btn-blue {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--brand-fill);
-  color: #ffffff;
+  background: var(--solid-bg);
+  color: var(--solid-ink);
   border: none;
   border-radius: 999px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 13.5px;
   padding: 0 20px;
   min-height: 44px;
   cursor: pointer;
@@ -263,51 +332,143 @@ h3 {
 
 .btn-primary:hover,
 .btn-blue:hover {
-  filter: brightness(1.07);
+  filter: brightness(0.88);
+}
+
+:root[data-theme="dark"] .btn-primary:hover,
+:root[data-theme="dark"] .btn-blue:hover {
+  filter: brightness(0.92);
 }
 
 .btn-primary:disabled,
 .btn-blue:disabled {
   opacity: 0.5;
   cursor: default;
+  filter: none;
 }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--surface);
-  color: var(--ink-muted);
-  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--ink);
   border-radius: 999px;
   min-height: 44px;
   font-weight: 600;
   font-size: 13.5px;
-  padding: 8px 20px;
+  padding: 6px 18px;
   cursor: pointer;
   transition: background 120ms ease;
 }
 
 .btn-secondary:hover {
-  background: var(--surface-sunken);
+  background: var(--hover-wash);
 }
 
 .btn-secondary:disabled {
   opacity: 0.5;
   cursor: default;
+  background: transparent;
+}
+
+/* Selected / current: pale sky with an ink edge, the same look as the
+   current page in the nav. Never the ink fill, which means "action". */
+.is-selected,
+.is-selected:hover {
+  background: var(--brand-tint);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+
+/* Ordinary link: own colour with a grey underline that darkens on hover. */
+.text-link {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--line-control);
+}
+
+.text-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ── Chrome ──────────────────────────────────────────────────────────────
+   The header sits on paper with a heavy ink rule under it, the same bar the
+   Hub and the public site use. Controls are outlined circles. */
+.studio-masthead {
+  background: var(--chrome-bg);
+  color: var(--ink);
+  border-bottom: 3px solid var(--ink);
+}
+
+.masthead-control {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  transition: background 120ms ease;
+}
+
+.masthead-control:hover {
+  background: var(--hover-wash);
+}
+
+/* The link out to the Hub: a sky pill with an ink edge, as on the public
+   site, so it already looks like part of the Hub. */
+.hub-link {
+  background: var(--feature-action-bg);
+  color: var(--feature-action-ink);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.hub-link:hover {
+  background: var(--solid-bg);
+  color: var(--solid-ink);
+}
+
+/* Nav: hover is the neutral wash; the current page is pale sky, ink edge,
+   and a short sky marker on the left. */
+.nav-link:hover {
+  background: var(--hover-wash);
+}
+
+.nav-link-active,
+.nav-link-active:hover {
+  position: relative;
+  background: var(--brand-tint);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+
+.nav-link-active::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.125rem;
+  border-radius: 999px;
+  background: var(--brand);
 }
 
 /* ── Surfaces ───────────────────────────────────────────────────────────── */
-/* The default card: flat surface, hairline only — no lift animation. */
+/* The default card: flat surface on a hairline, no lift animation. */
 .editorial-card {
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line-strong);
   border-radius: var(--radius-card);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-xs);
+  box-shadow: none;
 }
 
 .editorial-card-hover:hover {
-  border-color: var(--line-strong);
+  border-color: var(--ink-soft);
   background: var(--hover-tint);
   box-shadow: var(--shadow-card);
 }
