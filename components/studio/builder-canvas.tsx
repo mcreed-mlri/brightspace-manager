@@ -474,7 +474,7 @@ function TryItEditor({
                   height="11"
                   viewBox="0 0 12 12"
                   fill="none"
-                  stroke="#fff"
+                  stroke="var(--brand-on)"
                   strokeWidth="2.3"
                   strokeLinecap="round"
                   strokeLinejoin="round"

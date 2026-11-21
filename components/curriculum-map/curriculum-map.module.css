@@ -4,15 +4,17 @@
    dark ink on bright paper colors, so they read on any surface. */
 
 .board {
-  --note-blue: #bfe0f2;
-  --note-orange: #f4b183;
-  --note-teal: #7fc7bc;
-  --note-green: #c6e86b;
-  --note-ink: #23303a;
+  /* Hub hues (lms-discovery app/styles/tokens.css): the light values, which
+     hold dark ink in both themes. Blue is the Hub's sky fill. */
+  --note-blue: #9fd0e0;
+  --note-orange: #f0965f;
+  --note-teal: #7fcbbd;
+  --note-green: #9bd8ad;
+  --note-ink: #221e1b;
   --note-tape: rgba(255, 255, 255, 0.55);
-  --note-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.16);
-  --note-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.22), 0 2px 4px rgba(0, 0, 0, 0.14);
-  --note-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.18);
+  --note-shadow-sm: 0 1px 2px rgba(34, 30, 27, 0.18), 0 2px 6px rgba(34, 30, 27, 0.16);
+  --note-shadow-md: 0 4px 12px rgba(34, 30, 27, 0.22), 0 2px 4px rgba(34, 30, 27, 0.14);
+  --note-shadow-lg: 0 12px 28px rgba(34, 30, 27, 0.3), 0 4px 10px rgba(34, 30, 27, 0.18);
 }
 
 .legend {
@@ -166,7 +168,7 @@
   font-weight: 700;
   color: var(--note-ink);
   background: rgba(255, 255, 255, 0.55);
-  border: 1px dashed rgba(35, 48, 58, 0.4);
+  border: 1px dashed rgba(34, 30, 27, 0.4);
   border-radius: 3px;
   padding: 0.15rem 0.35rem;
 }
@@ -215,7 +217,7 @@
   top: 50%;
   width: 0.55rem;
   height: 1px;
-  background: var(--ph-border, rgba(35, 48, 58, 0.45));
+  background: rgba(34, 30, 27, 0.45);
 }
 
 /* Private margin note: a corner dot that reveals its text via the native
@@ -258,7 +260,8 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #8a4b00;
+  /* On a sticky note, which stays light in both themes. */
+  color: var(--note-ink);
   vertical-align: 0.05em;
 }
 
@@ -268,7 +271,7 @@
   border-radius: 2px;
 }
 .editable:focus {
-  box-shadow: 0 0 0 2px rgba(35, 48, 58, 0.35);
+  box-shadow: 0 0 0 2px rgba(34, 30, 27, 0.35);
 }
 
 /* Edit-mode controls */
@@ -304,7 +307,7 @@
   border-color: var(--note-green);
 }
 .ctrlDanger:hover {
-  color: #fff;
+  color: var(--status-error-on);
   background: var(--danger);
   border-color: var(--danger);
 }
