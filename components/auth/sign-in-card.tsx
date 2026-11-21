@@ -131,7 +131,7 @@ export function SignInCard() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-paper px-5">
       <div className="editorial-card w-full max-w-sm bg-surface p-8">
         <div className="mb-6 flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand font-mono text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand font-mono text-xs font-semibold text-[var(--brand-on)]">
             BM
           </span>
           <span>

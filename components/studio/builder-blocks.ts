@@ -137,46 +137,47 @@ export function activeSections(topic: TopicDraft, added: SectionType[]): Section
   return SECTION_ORDER.filter((type) => present.has(type));
 }
 
-/* ── Per-course accent (cool direction) ─────────────────────────────────────
-   The Course Details "Topic family" picker sets the course accent from the
-   category palette. These hues MUST match the wrapper's --topic-* tokens in
-   brightspace-courses/Course-Template/course-style.css, so the builder swatch
-   and chrome show the same colour the learner will see. Each family re-tints
-   the whole builder (chrome, pills, S-markers, the correct-answer radio) by
-   overriding the accent CSS vars on the builder root. */
-const FAMILY_HUE: Partial<Record<TopicFamily, { accent: string; ink: string }>> = {
-  court: { accent: "#bb573b", ink: "#8d472e" },
-  client: { accent: "#179a72", ink: "#0f6e52" },
-  ethics: { accent: "#5563d6", ink: "#3a45a8" },
-  research: { accent: "#3a8ec9", ink: "#2b6c99" },
-  drafting: { accent: "#7a4fe0", ink: "#5a32b0" },
-  trauma: { accent: "#d24d83", ink: "#a83464" },
-  foundations: { accent: "#c8791b", ink: "#8a5512" },
-};
+/* ── Per-course accent ──────────────────────────────────────────────────────
+   The Course Details "Topic family" picker re-tints the builder (chrome,
+   pills, S-markers, the correct-answer radio) with that family's colour. The
+   colours are the Training Hub's topic families (its app/styles/tokens.css,
+   ADR 0015), defined in globals.css as --hue-1..8, so a course looks the same
+   here as it does in the Hub's catalog.
 
-function hexToRgba(hex: string, alpha: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
-}
+   The Hub's rule: a hue's bright `solid` is for fills, bars and swatches;
+   anything you read, or anything with text on top, takes its `ink`. So the
+   accent and brand roles get the ink, and the swatch gets the solid. Text on
+   an ink fill uses --brand-on, which already flips with the theme. */
+const FAMILY_HUE: Partial<Record<TopicFamily, number>> = {
+  foundations: 1,
+  ethics: 2,
+  drafting: 3,
+  research: 4,
+  court: 6,
+  trauma: 7,
+  client: 8,
+};
 
 /* The swatch shown beside the Topic family picker. */
 export function familyColor(family: TopicFamily): string {
-  return FAMILY_HUE[family]?.accent ?? "var(--accent)";
+  const hue = FAMILY_HUE[family];
+  return hue ? `var(--hue-${hue})` : "var(--accent)";
 }
 
 /* CSS-var overrides applied to the builder root; undefined = keep theme accent. */
 export function familyAccentStyle(family: TopicFamily): CSSProperties | undefined {
   const hue = FAMILY_HUE[family];
   if (!hue) return undefined;
-  const tint = hexToRgba(hue.accent, 0.15);
+  const ink = `var(--hue-${hue}-ink)`;
+  const tint = `var(--hue-${hue}-tint)`;
   return {
-    "--accent": hue.accent,
-    "--accent-ink": hue.ink,
+    "--accent": ink,
+    "--accent-ink": ink,
     "--accent-tint": tint,
-    "--accent-glow": hexToRgba(hue.accent, 0.4),
-    "--brand": hue.accent,
-    "--brand-ink": hue.ink,
-    "--brand-fill": hue.accent,
+    "--accent-glow": `color-mix(in srgb, var(--hue-${hue}) 40%, transparent)`,
+    "--brand": ink,
+    "--brand-ink": ink,
+    "--brand-fill": ink,
     "--brand-tint": tint,
   } as CSSProperties;
 }

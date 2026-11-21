@@ -31,7 +31,7 @@ export function Drawer({
         type="button"
         aria-label="Close panel"
         onClick={onClose}
-        className="absolute inset-0 bg-[rgba(6,8,12,0.55)] backdrop-blur-[2px]"
+        className="absolute inset-0 bg-[rgba(20,22,27,0.34)] backdrop-blur-sm"
       />
       <div className="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-[452px] flex-col border-l border-line bg-surface shadow-[var(--shadow-drawer)]">
         <div className="flex items-center justify-between border-b border-line px-6 py-5">
